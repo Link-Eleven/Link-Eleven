@@ -1,0 +1,62 @@
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+
+        - id: feed-service
+          uri: lb://feed-service
+          predicates:
+            - Path=/feed/**
+
+        - id: area-service
+          uri: lb://area-service
+          predicates:
+            - Path=/area/**
+
+        - id: coupon-service
+          uri: lb://coupon-service
+          predicates:
+            - Path=/coupon/**
+
+        - id: interaction-service
+          uri: lb://interaction-service
+          predicates:
+            - Path=/interaction/**
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/notification/**
+
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/orders/**
+
+        - id: recommendation-service
+          uri: lb://recommendation-service
+          predicates:
+            - Path=/recommendation/**
+
+      discovery:
+        locator:
+          enabled: true
+
+server:
+  port: ${GATEWAY_PORT}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${SERVER_URL}
+service:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}

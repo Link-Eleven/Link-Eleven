@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: ${COUPON_DB_URL}
+    username: ${COUPON_DB_USER}
+    password: ${COUPON_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    open-in-view: false
+
+    eureka:
+      client:
+        service-url:
+          defaultZone: ${SERVER_URL}
+
+server:
+  port: ${COUPON_PORT}

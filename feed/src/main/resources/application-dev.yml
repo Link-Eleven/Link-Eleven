@@ -1,11 +1,8 @@
 spring:
-  application:
-    name: auth-service
-
   datasource:
-    url: ${AUTH_DB_URL}
-    username: ${AUTH_DB_USER}
-    password: ${AUTH_DB_PASSWORD}
+    url: ${FEED_DB_URL}
+    username: ${FEED_DB_USER}
+    password: ${FEED_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -18,14 +15,10 @@ spring:
         format_sql: true
     open-in-view: false
 
-eureka:
-  client:
-    service-url:
-      defaultZone: ${SERVER_URL}
-
-service:
-  jwt:
-    secret-key: ${JWT_SECRET_KEY}
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://localhost:19090/eureka/
 
 server:
-  port: ${AUTH_PORT}
+  port: 19093

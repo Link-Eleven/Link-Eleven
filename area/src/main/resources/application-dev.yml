@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${FEED_DB_URL}
-    username: ${FEED_DB_USER}
-    password: ${FEED_DB_PASSWORD}
+    url: ${AREA_DB_URL}
+    username: ${AREA_DB_USER}
+    password: ${AREA_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -18,7 +18,7 @@ spring:
     eureka:
       client:
         service-url:
-          defaultZone: ${SERVER_URL}
+          defaultZone: http://localhost:19090/eureka/
 
 server:
-  port: ${FEED_PORT}
+  port: 19095

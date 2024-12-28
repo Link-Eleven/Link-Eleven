@@ -1,10 +1,11 @@
-package com.linkeleven.msa.area.libs.exception;
+package com.linkeleven.msa.feed.libs.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.linkeleven.msa.area.libs.dto.ExceptionResponseDto;
+import com.linkeleven.msa.feed.libs.exception.CustomException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,8 +42,8 @@ public class GlobalExceptionHandler {
 		log.error("RuntimeException: ", e);
 		return ResponseEntity.internalServerError().body(
 			ExceptionResponseDto.of(
-				ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus(),
-				ErrorCode.INTERNAL_SERVER_ERROR.getMessage(),
+				com.linkeleven.msa.area.libs.exception.ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus(),
+				com.linkeleven.msa.area.libs.exception.ErrorCode.INTERNAL_SERVER_ERROR.getMessage(),
 				null)
 		);
 	}

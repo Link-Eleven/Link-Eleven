@@ -1,7 +1,6 @@
 package com.linkeleven.msa.area.presentation.controller.external;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +16,7 @@ public class AreaExternalController {
 
 
 	// 내가 해당하는 지역의 행정구역
-	@GetMapping("/location")
+	@GetMapping("/location/coordinate")
 	public AdministrativeRegionDto findAdministrativeRegion(
 		@RequestParam double latitude,
 		@RequestParam double longitude
@@ -29,9 +28,9 @@ public class AreaExternalController {
 	}
 
 	// 해당 주소 입력의 지역 행정구역
-	@GetMapping("/location/{address}")
+	@GetMapping("/location/address")
 	public AdministrativeRegionDto findAddressRegion(
-		@PathVariable String address
+		@RequestParam String address
 	){
 		return AdministrativeRegionDto.builder()
 			.regionName("서울특별시")

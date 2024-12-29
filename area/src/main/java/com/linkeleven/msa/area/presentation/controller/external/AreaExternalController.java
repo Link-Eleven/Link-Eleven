@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/external")
+@RequestMapping("/external/area")
 public class AreaExternalController {
 
 

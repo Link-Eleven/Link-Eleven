@@ -1,4 +1,4 @@
-package com.linkeleven.msa.area.libs.exception;
+package com.linkeleven.msa.feed.libs.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

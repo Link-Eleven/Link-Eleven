@@ -1,4 +1,4 @@
-package com.linkeleven.msa.area.libs.dto;
+package com.linkeleven.msa.feed.libs.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -11,8 +11,14 @@ public enum ErrorCode {
 	/*  400 BAD_REQUEST : 잘못된 요청  */
 	EXPIRED_TOKEN(400, "만료된 토큰입니다."),
 	CONTENT_CANNOT_BE_NULL_OR_EMPTY(400, "댓글 내용은 null 또는 빈 값일 수 없습니다."),
-	CONTENT_TOO_LONG(400, "댓글은 500자 이내로 작성해야 합니다."),
+	CONTENT_TOO_LONG(400, "100자 이내로 작성해야 합니다."),
 	INVALID_USERID(400, "유효하지않은 유저ID입니다"),
+	COMMENT_ALREADY_DELETED(400, "이미 삭제된 댓글입니다"),
+	COMMENT_ALREADY_REPORTED(400, "이미 신고 처리된 댓글입니다"),
+	COMMENT_IS_NOT_REPORTED(400, "신고된 댓글이 아닙니다"),
+	REPLY_ALREADY_DELETED(400, "이미 삭제된 대댓글입니다"),
+	REPLY_ALREADY_REPORTED(400, "이미 신고 처리된 대댓글입니다"),
+	REPLY_IS_NOT_REPORTED(400, "신고된 대댓글이 아닙니다"),
 
 	/*  401 UNAUTHORIZED : 인증 안됨  */
 	UNAUTHORIZED(401, "인증되지 않았습니다."),
@@ -23,6 +29,7 @@ public enum ErrorCode {
 	/*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
 	ACCESS_DENIED(404, "접근 권한이 없습니다."),
 	USER_NOT_FOUND(404, "유저를 찾을 수 없습니다."),
+	COMMENT_NOT_FOUND(404, "댓글을 찾을 수 없습니다."),
 
 	/*  408 REQUEST_TIMEOUT : 요청에 대한 응답 시간 초과  */
 	TIMEOUT_ERROR(408, "응답시간을 초과하였습니다."),

@@ -13,6 +13,7 @@ public enum ErrorCode {
 
 	/*  401 UNAUTHORIZED : 인증 안됨  */
 	UNAUTHORIZED(401, "인증되지 않았습니다."),
+	INVALID_PASSWORD(401, "비밀번호가 틀렸습니다."),
 
 	/*  403 FORBIDDEN : 권한 없음  */
 	FORBIDDEN(403, "권한이 없습니다."),
@@ -20,11 +21,13 @@ public enum ErrorCode {
 
 	/*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
 	ACCESS_DENIED(404, "접근 권한이 없습니다."),
+	USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
 
 	/*  408 REQUEST_TIMEOUT : 요청에 대한 응답 시간 초과  */
 	TIMEOUT_ERROR(408, "응답시간을 초과하였습니다."),
 
 	/*  409 CONFLICT : Resource 중복  */
+	USERNAME_ALREADY_EXISTS(409, "이미 존재하는 사용자 이름입니다."),
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
 	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다.");

@@ -19,6 +19,7 @@ public enum ErrorCode {
 	REPLY_ALREADY_DELETED(400, "이미 삭제된 대댓글입니다"),
 	REPLY_ALREADY_REPORTED(400, "이미 신고 처리된 대댓글입니다"),
 	REPLY_IS_NOT_REPORTED(400, "신고된 대댓글이 아닙니다"),
+	USER_IS_NOT_COMMENT_OWNER(400, "댓글 작성자가 아닙니다"),
 
 	/*  401 UNAUTHORIZED : 인증 안됨  */
 	UNAUTHORIZED(401, "인증되지 않았습니다."),

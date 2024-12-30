@@ -63,14 +63,6 @@ public class Comment extends BaseTime{
 	}
 
 	public void updateComment(String newContent) {
-		if (isDeleted()) {
-			throw new CustomException(ErrorCode.COMMENT_ALREADY_DELETED);
-		}
-		/**
-		 *   0. 위 검증로직 서비스로 이동하기
-		 *   1. 헤더로 받은 userId 검증
-		 *   2. 파라미터로 받은 feedId가 같은지 검증
-		 */
 		this.contentDetails = ContentDetails.of(newContent, this.contentDetails.getUserId());
 	}
 

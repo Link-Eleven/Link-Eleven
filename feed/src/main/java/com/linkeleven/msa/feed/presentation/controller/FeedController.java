@@ -15,27 +15,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
+import com.linkeleven.msa.feed.application.dto.FeedResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
+import com.linkeleven.msa.feed.application.service.FeedService;
 import com.linkeleven.msa.feed.libs.dto.SuccessResponseDto;
+import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;
 import com.linkeleven.msa.feed.presentation.request.FeedRequestDto;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/feeds")
+@RequiredArgsConstructor
 public class FeedController {
 
+	private final FeedService feedService;
+
 	@PostMapping
-	public ResponseEntity<SuccessResponseDto<FeedCreateResponseDto>> createFeed(
-		@RequestBody FeedRequestDto feedRequestDto) {
-		// TODO : 게시글 생성 실제 구현
-		// 더미 데이터 생성 로직
-		FeedCreateResponseDto response = FeedCreateResponseDto.builder()
-			.feedId(1L)
-			.title(feedRequestDto.getTitle())
-			.content(feedRequestDto.getContent())
-			.category(feedRequestDto.getCategory())
-			.views(feedRequestDto.getViews())
-			.popularityScore(feedRequestDto.getPopularityScore())
-			.build();
+	public ResponseEntity<SuccessResponseDto<FeedResponseDto>> createFeed(
+		@RequestBody FeedCreateRequestDto feedCreateRequestDto) {
+
+		FeedResponseDto response = feedService.createFeed(feedCreateRequestDto);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 생성 성공", response));
 	}
 

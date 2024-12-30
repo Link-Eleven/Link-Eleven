@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
-import com.linkeleven.msa.feed.application.dto.FeedDeleteResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.libs.dto.SuccessResponseDto;
@@ -40,12 +39,12 @@ public class FeedController {
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 생성 성공", response));
 	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<SuccessResponseDto<FeedReadResponseDto>> getDetailFeed(@PathVariable Long id) {
+	@GetMapping("/{feedId}")
+	public ResponseEntity<SuccessResponseDto<FeedReadResponseDto>> getDetailFeed(@PathVariable Long feedId) {
 		// TODO : 게시글 단건 조회 실제 구현
 		// 더미 데이터 조회 로직
 		FeedReadResponseDto response = FeedReadResponseDto.builder()
-			.feedId(id)
+			.feedId(feedId)
 			.areaId(1L)
 			.userId(123L)
 			.title("Sample Title")
@@ -90,13 +89,13 @@ public class FeedController {
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 조회 완료", responses));
 	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<SuccessResponseDto<FeedUpdateResponseDto>> updateFeed(@PathVariable Long id,
+	@PutMapping("/{feedId}")
+	public ResponseEntity<SuccessResponseDto<FeedUpdateResponseDto>> updateFeed(@PathVariable Long feedId,
 		@RequestBody FeedRequestDto feedRequestDto) {
 		// TODO : 게시글 수정 실제 구현
 		// 더미 데이터 업데이트 로직
 		FeedUpdateResponseDto response = FeedUpdateResponseDto.builder()
-			.feedId(id)
+			.feedId(feedId)
 			.userId(feedRequestDto.getUserId())
 			.title(feedRequestDto.getTitle())
 			.content(feedRequestDto.getContent())
@@ -107,13 +106,9 @@ public class FeedController {
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<SuccessResponseDto<FeedDeleteResponseDto>> deleteFeed(@PathVariable Long id) {
+	@DeleteMapping("/{feedId}")
+	public ResponseEntity<SuccessResponseDto<Void>> deleteFeed(@PathVariable Long feedId) {
 		// TODO : 게시글 삭제 실제 구현
-		// 더미 데이터 삭제 로직
-		FeedDeleteResponseDto response = FeedDeleteResponseDto.builder()
-			.feedId(id)
-			.build();
-		return ResponseEntity.ok(SuccessResponseDto.success("게시글 삭제 완료", response));
+		return ResponseEntity.ok(SuccessResponseDto.success("게시글 삭제 완료", null));
 	}
 }

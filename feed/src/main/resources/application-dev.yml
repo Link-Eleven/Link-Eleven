@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: feed-service
+
   datasource:
     url: ${FEED_DB_URL}
     username: ${FEED_DB_USER}

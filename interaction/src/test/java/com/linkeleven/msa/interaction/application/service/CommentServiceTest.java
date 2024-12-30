@@ -66,4 +66,23 @@ class CommentServiceTest {
 			.orElseThrow(() -> new AssertionError("수정된 댓글이 없습니다."));
 		assertThat(updateComment.getContentDetails().getContent()).isEqualTo(newContent);
 	}
+
+	@Test
+	@Order(3)
+	@DisplayName("댓글 삭제 성공")
+	void deletedComment() {
+		String content = "테스트";
+		CommentRequestDto requestDto = new CommentRequestDto();
+		requestDto.setContent(content);
+		CommentCreateResponseDto responseDto = commentService.createComment(userId, feedId, requestDto);
+		Long commentId = responseDto.getCommentId();
+
+		commentService.deleteComment(userId, feedId, commentId);
+
+		var deleteComment = commentRepository.findById(commentId)
+			.orElseThrow(() -> new AssertionError("삭제됨.  존재하지 않습니다."));
+		assertThat(deleteComment.getDeletedAt()).isNotNull();
+		assertThat(deleteComment.getContentDetails().getContent())
+			.isEqualTo("삭제된 댓글입니다.");
+	}
 }

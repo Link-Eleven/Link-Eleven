@@ -13,6 +13,7 @@ public enum ErrorCode {
 	CONTENT_CANNOT_BE_NULL_OR_EMPTY(400, "댓글 내용은 null 또는 빈 값일 수 없습니다."),
 	CONTENT_TOO_LONG(400, "100자 이내로 작성해야 합니다."),
 	INVALID_USERID(400, "유효하지않은 유저ID입니다"),
+	INVALID_FEED_FOR_COMMENT(400, "유효하지않은 게시글입니다"),
 	COMMENT_ALREADY_DELETED(400, "이미 삭제된 댓글입니다"),
 	COMMENT_ALREADY_REPORTED(400, "이미 신고 처리된 댓글입니다"),
 	COMMENT_IS_NOT_REPORTED(400, "신고된 댓글이 아닙니다"),

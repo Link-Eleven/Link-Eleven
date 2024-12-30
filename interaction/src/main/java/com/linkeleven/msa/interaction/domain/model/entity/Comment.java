@@ -3,8 +3,6 @@ package com.linkeleven.msa.interaction.domain.model.entity;
 import java.time.LocalDateTime;
 
 import com.linkeleven.msa.interaction.domain.model.vo.ContentDetails;
-import com.linkeleven.msa.interaction.libs.exception.CustomException;
-import com.linkeleven.msa.interaction.libs.exception.ErrorCode;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.AttributeOverride;
@@ -67,12 +65,8 @@ public class Comment extends BaseTime{
 	}
 
 	public void deleteComment() {
-		if (isDeleted()) {
 			this.setDeletedAt(LocalDateTime.now());
 			this.contentDetails = ContentDetails.of("삭제된 댓글입니다.", this.contentDetails.getUserId());
-		} else {
-			throw new CustomException(ErrorCode.COMMENT_ALREADY_DELETED);
-		}
 	}
 
 
@@ -95,9 +89,4 @@ public class Comment extends BaseTime{
 	// 	this.isReported = false;
 	// 	this.reportReason = null;
 	// }
-
-
-	private boolean isDeleted() {
-		return this.getDeletedAt() == null;
-	}
 }

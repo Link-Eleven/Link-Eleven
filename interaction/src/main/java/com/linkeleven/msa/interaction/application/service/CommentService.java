@@ -49,6 +49,14 @@ public class CommentService {
 			comment.getContentDetails().getContent());
 	}
 
+	public void deleteComment(Long userId, Long feedId, Long commentId) {
+		Comment comment = getComment(commentId);
+		// checkFeedExists(feedId);
+		checkValidateComment(userId, feedId, comment);
+
+		comment.deleteComment();
+	}
+
 	private void checkValidateComment(Long userId, Long feedId, Comment comment) {
 		checkUserId(userId, comment);
 		feedExists(feedId, comment);
@@ -63,7 +71,7 @@ public class CommentService {
 
 	private void feedExists(Long feedId, Comment comment) {
 		if (!feedId.equals(comment.getFeedId())) {
-			throw new CustomException(ErrorCode.FEED_NOT_FOUND);
+			throw new CustomException(ErrorCode.INVALID_FEED_FOR_COMMENT);
 		}
 	}
 

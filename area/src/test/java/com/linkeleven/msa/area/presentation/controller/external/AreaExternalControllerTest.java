@@ -18,26 +18,26 @@ class AreaExternalControllerTest {
 
 	@Test
 	void testFindAdministrativeRegion() throws Exception {
-		mockMvc.perform(get("/external/area/location/coordinate")
+		mockMvc.perform(get("/external/areas/locations/coordinates")
 				.param("latitude", "37.5665")
 				.param("longitude", "126.9780"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.regionName").value("서울특별시"));
+			.andExpect(jsonPath("$.regionName").value(556028620837202474L));
 	}
 
 	@Test
 	void testFindAddressRegion() throws Exception {
-		mockMvc.perform(get("/external/area/location/address")
+		mockMvc.perform(get("/external/areas/locations/address")
 				.param("address", "서울특별시 강남구 강남대로 390"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.regionName").value("서울특별시"));
+			.andExpect(jsonPath("$.regionName").value(556028620837202474L));
 	}
 
 	@Test
 	void testFindKeywordByRegion() throws Exception {
-		mockMvc.perform(get("/external/area/location/keyword")
+		mockMvc.perform(get("/external/areas/locations/keyword")
 				.param("keyword", "강남"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.regionName").value("서울특별시"));
+			.andExpect(jsonPath("$.regionName").value(556028620837202474L));
 	}
 }

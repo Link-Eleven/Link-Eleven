@@ -59,4 +59,23 @@ class ReplyServiceTest {
 		assertThat(responseDto.getReplyId()).isNotNull();
 		assertThat(responseDto.getContent()).isEqualTo(content);
 	}
+
+	@Test
+	@DisplayName("대댓글 수정 성공")
+	void updateReply() {
+		String content = "테스트";
+		ReplyRequestDto requestDto = new ReplyRequestDto();
+		requestDto.setContent(content);
+		ReplyCreateResponseDto responseDto = replyService.createReply(userId, commentId, requestDto);
+		Long replyId = responseDto.getReplyId();
+
+		String newContent = "수정 테스트";
+		ReplyRequestDto newRequestDto = new ReplyRequestDto();
+		newRequestDto.setContent(newContent);
+		replyService.updateReply(userId, replyId, commentId, newRequestDto);
+
+		var updateReply = replyRepository.findById(replyId)
+			.orElseThrow(() -> new AssertionError("수정된 댓글이 없습니다."));
+		assertThat(updateReply.getContentDetails().getContent()).isEqualTo(newContent);
+	}
 }

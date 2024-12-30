@@ -60,17 +60,9 @@ public class Reply extends BaseTime{
 			.contentDetails(contentDetails)
 			.commentId(commentId)
 			.build();
-	} // TODO: 대댓글 생성시 댓글 id exists 체크,  삭제유무 체크
+	}
 
 	public void updateReply(String newContent) {
-		if (isDeleted()) {
-			throw new CustomException(ErrorCode.REPLY_ALREADY_DELETED);
-		}
-		/**
-		 *  0. 위 검증로직 서비스로 이동
-		 *  1. 댓글  id  검사
-		 *  2. 헤더로 받은 userId 검증
-		 */
 		this.contentDetails = ContentDetails.of(newContent, this.contentDetails.getUserId());
 	}
 
@@ -82,6 +74,9 @@ public class Reply extends BaseTime{
 		}
 	}
 
+	private boolean isDeleted() {
+		return this.getDeletedAt() == null;
+	}
 
 	// public void reportReply(String reason) {
 	// 	if (this.isReported) {
@@ -97,9 +92,6 @@ public class Reply extends BaseTime{
 	// 	}
 	// 	this.isReported = false;
 	// 	this.reportReason = null;
-	// }
 
-	private boolean isDeleted() {
-		return this.getDeletedAt() == null;
-	}
+	// }
 }

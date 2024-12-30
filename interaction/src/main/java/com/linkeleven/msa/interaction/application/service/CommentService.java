@@ -59,7 +59,7 @@ public class CommentService {
 
 	private void checkValidateComment(Long userId, Long feedId, Comment comment) {
 		checkUserId(userId, comment);
-		feedExists(feedId, comment);
+		checkValidFeed(feedId, comment);
 		commentIsDeleted(comment);
 	}
 
@@ -69,7 +69,7 @@ public class CommentService {
 		}
 	}
 
-	private void feedExists(Long feedId, Comment comment) {
+	private void checkValidFeed(Long feedId, Comment comment) {
 		if (!feedId.equals(comment.getFeedId())) {
 			throw new CustomException(ErrorCode.INVALID_FEED_FOR_COMMENT);
 		}

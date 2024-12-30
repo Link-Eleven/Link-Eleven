@@ -16,17 +16,19 @@ public class FeedResponseDto {
 	private Long feedId;
 	private Long userId;
 	private Long areaId;
+	private Long locationId;
 	private String title;
 	private String content;
 	private Category category;
 	private int views;
 	private Double popularityScore;
 
-	public static FeedResponseDto from(Feed feed){
+	public static FeedResponseDto from(Feed feed) {
 		return FeedResponseDto.builder()
-			.feedId(feed.getId())
+			.feedId(feed.getFeedId())
 			.userId(feed.getUserId())
 			.areaId(feed.getAreaId())
+			.locationId(feed.getLocationId())
 			.title(feed.getTitle())
 			.content(feed.getContent())
 			.category(feed.getCategory())

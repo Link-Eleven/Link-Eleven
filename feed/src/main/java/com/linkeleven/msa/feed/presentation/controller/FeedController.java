@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
@@ -22,7 +21,6 @@ import com.linkeleven.msa.feed.libs.dto.SuccessResponseDto;
 import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;
 import com.linkeleven.msa.feed.presentation.request.FeedRequestDto;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController

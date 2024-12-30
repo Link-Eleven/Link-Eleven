@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class FeedCreateRequestDto {
 	private Long userId;
 	private Long areaId;
+	private Long locationId;
 	private String title;
 	private String content;
 	private Category category;

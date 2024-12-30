@@ -22,13 +22,16 @@ public class Feed extends BaseTime {
 
 	@Id
 	@Tsid
-	private Long id;
+	private Long feedId;
 
 	@Column
 	private Long userId;
 
 	@Column
 	private Long areaId;
+
+	@Column
+	private Long locationId;
 
 	@Column(nullable = false)
 	private String title;

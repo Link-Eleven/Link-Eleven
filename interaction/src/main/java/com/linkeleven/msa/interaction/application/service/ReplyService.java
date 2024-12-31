@@ -49,6 +49,12 @@ public class ReplyService {
 			reply.getContentDetails().getContent());
 	}
 
+	public void deleteReply(Long userId, Long commentId, Long replyId) {
+		Reply reply = getReply(replyId);
+		checkValidateReply(commentId, userId, reply);
+		reply.deleteReply();
+	}
+
 	private void checkValidateReply(Long commentId, Long userId, Reply reply) {
 		checkCommentExists(commentId);
 		checkUserId(userId, reply);

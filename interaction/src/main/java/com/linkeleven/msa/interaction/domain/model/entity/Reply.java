@@ -3,8 +3,6 @@ package com.linkeleven.msa.interaction.domain.model.entity;
 import java.time.LocalDateTime;
 
 import com.linkeleven.msa.interaction.domain.model.vo.ContentDetails;
-import com.linkeleven.msa.interaction.libs.exception.CustomException;
-import com.linkeleven.msa.interaction.libs.exception.ErrorCode;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.AttributeOverride;
@@ -67,15 +65,7 @@ public class Reply extends BaseTime{
 	}
 
 	public void deleteReply() {
-		if (isDeleted()) {
 			this.setDeletedAt(LocalDateTime.now());
-		} else {
-			throw new CustomException(ErrorCode.REPLY_ALREADY_DELETED);
-		}
-	}
-
-	private boolean isDeleted() {
-		return this.getDeletedAt() == null;
 	}
 
 	// public void reportReply(String reason) {

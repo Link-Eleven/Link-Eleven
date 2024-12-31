@@ -2,6 +2,7 @@ package com.linkeleven.msa.interaction.presentation.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,5 +47,16 @@ public class ReplyController {
 		ReplyUpdateResponseDto responseDto = replyService.updateReply(userId, replyId, commentId, requestDto);
 		return ResponseEntity.ok()
 			.body(SuccessResponseDto.success("대댓글 수정 완료", responseDto));
+	}
+
+	@DeleteMapping("/{commentId}/{replyId}")
+	public ResponseEntity<SuccessResponseDto<Void>> deleteReply(
+		@RequestHeader("X-User-Id") Long userId,
+		@PathVariable Long commentId,
+		@PathVariable Long replyId
+	) {
+		replyService.deleteReply(userId, commentId, replyId);
+		return ResponseEntity.ok()
+			.body(SuccessResponseDto.success("대댓글 삭제 완료"));
 	}
 }

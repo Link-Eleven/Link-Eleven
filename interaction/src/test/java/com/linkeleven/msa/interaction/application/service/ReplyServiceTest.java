@@ -78,4 +78,22 @@ class ReplyServiceTest {
 			.orElseThrow(() -> new AssertionError("수정된 댓글이 없습니다."));
 		assertThat(updateReply.getContentDetails().getContent()).isEqualTo(newContent);
 	}
+
+	@Test
+	@DisplayName("대댓글 삭제 성공")
+	void deleteReply() {
+		String content = "테스트";
+		ReplyRequestDto requestDto = new ReplyRequestDto();
+		requestDto.setContent(content);
+		ReplyCreateResponseDto responseDto = replyService.createReply(userId, commentId, requestDto);
+		Long replyId = responseDto.getReplyId();
+
+		replyService.deleteReply(userId, commentId, replyId);
+
+		var deleteReply = replyRepository.findById(replyId)
+			.orElseThrow(() -> new AssertionError("삭제됨. 존재하지 않습니다."));
+		assertThat(deleteReply.getDeletedAt()).isNotNull();
+		assertThat(deleteReply.getId()).isEqualTo(replyId);
+		assertThat(deleteReply.getContentDetails().getUserId()).isEqualTo(userId);
+	}
 }

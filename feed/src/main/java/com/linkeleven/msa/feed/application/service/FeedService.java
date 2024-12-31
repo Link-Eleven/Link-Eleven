@@ -35,8 +35,7 @@ public class FeedService {
 
 	@Transactional
 	public FeedUpdateResponseDto updateFeed(FeedUpdateRequestDto feedUpdateRequestDto) {
-		Feed feed = feedRepository.findById(feedUpdateRequestDto.getFeedId())
-		// Feed feed = feedRepository.findByIdAndDeletedAt(feedUpdateRequestDto.getFeedId())
+		Feed feed = feedRepository.findByIdAndDeletedAt(feedUpdateRequestDto.getFeedId())
 			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
 
 		feed.update(

@@ -12,7 +12,8 @@ import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
 import com.linkeleven.msa.interaction.libs.exception.CustomException;
 import com.linkeleven.msa.interaction.libs.exception.ErrorCode;
-import com.linkeleven.msa.interaction.presentation.dto.ReplyRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.ReplyUpdateRequestDto;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class ReplyService {
 	private final ReplyRepository replyRepository;
 	private final CommentRepository commentRepository;
 
-	public ReplyCreateResponseDto createReply(Long userId, Long commentId, ReplyRequestDto requestDto) {
+	public ReplyCreateResponseDto createReply(Long userId, Long commentId, ReplyCreateRequestDto requestDto) {
 		checkCommentExists(commentId);
 		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId);
 		Reply reply = Reply.of(contentDetails, commentId);
@@ -37,7 +38,7 @@ public class ReplyService {
 			reply.getContentDetails().getContent());
 	}
 
-	public ReplyUpdateResponseDto updateReply(Long userId, Long replyId, Long commentId, ReplyRequestDto requestDto) {
+	public ReplyUpdateResponseDto updateReply(Long userId, Long replyId, Long commentId, ReplyUpdateRequestDto requestDto) {
 		Reply reply = getReply(replyId);
 		checkValidateReply(commentId, userId ,reply);
 		reply.updateReply(requestDto.getContent());

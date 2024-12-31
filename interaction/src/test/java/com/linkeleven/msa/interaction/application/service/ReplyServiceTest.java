@@ -13,8 +13,9 @@ import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyCreateResponseDto;
 import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
-import com.linkeleven.msa.interaction.presentation.dto.CommentRequestDto;
-import com.linkeleven.msa.interaction.presentation.dto.ReplyRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.CommentCreateRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.ReplyUpdateRequestDto;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -41,7 +42,7 @@ class ReplyServiceTest {
 		Long feedId = 50L;
 
 		String content = "테스트";
-		CommentRequestDto requestDto = new CommentRequestDto();
+		CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
 		requestDto.setContent(content);
 
 		CommentCreateResponseDto responseDto = commentService.createComment(userId, feedId, requestDto);
@@ -51,7 +52,7 @@ class ReplyServiceTest {
 	@DisplayName("대댓글 생성 성공")
 	void createReply() {
 		String content = "테스트";
-		ReplyRequestDto requestDto = new ReplyRequestDto();
+		ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto();
 		requestDto.setContent(content);
 
 		ReplyCreateResponseDto responseDto = replyService.createReply(userId, commentId, requestDto);
@@ -64,13 +65,13 @@ class ReplyServiceTest {
 	@DisplayName("대댓글 수정 성공")
 	void updateReply() {
 		String content = "테스트";
-		ReplyRequestDto requestDto = new ReplyRequestDto();
+		ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto();
 		requestDto.setContent(content);
 		ReplyCreateResponseDto responseDto = replyService.createReply(userId, commentId, requestDto);
 		Long replyId = responseDto.getReplyId();
 
 		String newContent = "수정 테스트";
-		ReplyRequestDto newRequestDto = new ReplyRequestDto();
+		ReplyUpdateRequestDto newRequestDto = new ReplyUpdateRequestDto();
 		newRequestDto.setContent(newContent);
 		replyService.updateReply(userId, replyId, commentId, newRequestDto);
 
@@ -83,7 +84,7 @@ class ReplyServiceTest {
 	@DisplayName("대댓글 삭제 성공")
 	void deleteReply() {
 		String content = "테스트";
-		ReplyRequestDto requestDto = new ReplyRequestDto();
+		ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto();
 		requestDto.setContent(content);
 		ReplyCreateResponseDto responseDto = replyService.createReply(userId, commentId, requestDto);
 		Long replyId = responseDto.getReplyId();

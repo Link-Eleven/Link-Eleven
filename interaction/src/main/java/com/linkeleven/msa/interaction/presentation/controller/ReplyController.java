@@ -15,7 +15,8 @@ import com.linkeleven.msa.interaction.application.dto.ReplyCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyUpdateResponseDto;
 import com.linkeleven.msa.interaction.application.service.ReplyService;
 import com.linkeleven.msa.interaction.libs.dto.SuccessResponseDto;
-import com.linkeleven.msa.interaction.presentation.dto.ReplyRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.ReplyUpdateRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +31,7 @@ public class ReplyController {
 	public ResponseEntity<SuccessResponseDto<ReplyCreateResponseDto>> createReply(
 		@RequestHeader("X-User-Id") Long userId,
 		@PathVariable Long commentId,
-		@RequestBody ReplyRequestDto requestDto
+		@RequestBody ReplyCreateRequestDto requestDto
 	) {
 		ReplyCreateResponseDto responseDto = replyService.createReply(userId, commentId, requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED)
@@ -42,7 +43,7 @@ public class ReplyController {
 		@RequestHeader("X-User-Id") Long userId,
 		@PathVariable Long replyId,
 		@PathVariable Long commentId,
-		@RequestBody ReplyRequestDto requestDto
+		@RequestBody ReplyUpdateRequestDto requestDto
 	) {
 		ReplyUpdateResponseDto responseDto = replyService.updateReply(userId, replyId, commentId, requestDto);
 		return ResponseEntity.ok()

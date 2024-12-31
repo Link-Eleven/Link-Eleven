@@ -1,5 +1,6 @@
 package com.linkeleven.msa.interaction.domain.model.entity;
 
+import com.linkeleven.msa.interaction.domain.model.enums.ContentType;
 import com.linkeleven.msa.interaction.domain.model.vo.Target;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
@@ -42,5 +43,14 @@ public class Like extends BaseTime{
 			.target(target)
 			.userId(userId)
 			.build();
+	}
+
+	public static Like createLike(ContentType contentType, Long targetId, Long userId) {
+		Target target = Target.of(contentType, targetId);
+		return Like.of(target, userId);
+	}
+
+	public boolean alreadyAddLike(Target anotherTarget) {
+		return this.target.equals(anotherTarget);
 	}
 }

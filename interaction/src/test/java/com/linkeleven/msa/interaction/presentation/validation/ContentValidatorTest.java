@@ -10,11 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.linkeleven.msa.interaction.presentation.dto.CommentCreateRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.CommentRequestDto;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-
 @SpringBootTest
 @ActiveProfiles("test")
 class ContentValidatorTest {
@@ -24,10 +23,10 @@ class ContentValidatorTest {
 	@Test
 	@DisplayName("dto의 content에 null값이 들어감")
 	void nullTest() {
-		CommentCreateRequestDto dto = new CommentCreateRequestDto();
+		CommentRequestDto dto = new CommentRequestDto();
 		dto.setContent(null);
 
-		Set<ConstraintViolation<CommentCreateRequestDto>> violations = validator.validate(dto);
+		Set<ConstraintViolation<CommentRequestDto>> violations = validator.validate(dto);
 
 		assertThat(violations)
 			.isNotEmpty()
@@ -38,10 +37,10 @@ class ContentValidatorTest {
 	@Test
 	@DisplayName("dto의 content에 빈 값이 들어감")
 	void blankTest() {
-		CommentCreateRequestDto dto = new CommentCreateRequestDto();
+		CommentRequestDto dto = new CommentRequestDto();
 		dto.setContent("  ");
 
-		Set<ConstraintViolation<CommentCreateRequestDto>> violations = validator.validate(dto);
+		Set<ConstraintViolation<CommentRequestDto>> violations = validator.validate(dto);
 
 		assertThat(violations)
 			.isNotEmpty()
@@ -52,10 +51,10 @@ class ContentValidatorTest {
 	@Test
 	@DisplayName("dto의 content 길이가 100이 넘어감")
 	void lengthTest() {
-		CommentCreateRequestDto dto = new CommentCreateRequestDto();
+		CommentRequestDto dto = new CommentRequestDto();
 		dto.setContent("z".repeat(101));
 
-		Set<ConstraintViolation<CommentCreateRequestDto>> violations = validator.validate(dto);
+		Set<ConstraintViolation<CommentRequestDto>> violations = validator.validate(dto);
 
 		assertThat(violations)
 			.isNotEmpty()
@@ -66,10 +65,10 @@ class ContentValidatorTest {
 	@Test
 	@DisplayName("이상한 특수문자 포함")
 	void invalidSpecialCharacterTest() {
-		CommentCreateRequestDto dto = new CommentCreateRequestDto();
+		CommentRequestDto dto = new CommentRequestDto();
 		dto.setContent("⎝ᑒ⎠");
 
-		Set<ConstraintViolation<CommentCreateRequestDto>> violations = validator.validate(dto);
+		Set<ConstraintViolation<CommentRequestDto>> violations = validator.validate(dto);
 
 		assertThat(violations)
 			.isNotEmpty()
@@ -80,10 +79,10 @@ class ContentValidatorTest {
 	@Test
 	@DisplayName("멀쩡한 테스트")
 	void successTest() {
-		CommentCreateRequestDto dto = new CommentCreateRequestDto();
+		CommentRequestDto dto = new CommentRequestDto();
 		dto.setContent("테스트 성공 success 😊 サクセス ひらがな 成功  éxito  succès  успех ");
 
-		Set<ConstraintViolation<CommentCreateRequestDto>> violations = validator.validate(dto);
+		Set<ConstraintViolation<CommentRequestDto>> violations = validator.validate(dto);
 
 		assertThat(violations).isNotEmpty();
 	}

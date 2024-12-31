@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CommentCreateResponseDto {
+public class CommentUpdateResponseDto {
 
 	private Long commentId;
 	private Long userId;
 	private String content;
 
-	public static CommentCreateResponseDto of(Long commentId, Long userId, String content) {
-		return CommentCreateResponseDto.builder()
+	public static CommentUpdateResponseDto of(Long commentId, Long userId, String content) {
+		return CommentUpdateResponseDto.builder()
 			.commentId(commentId)
 			.userId(userId)
 			.content(content)

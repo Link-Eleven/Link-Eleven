@@ -17,6 +17,7 @@ import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.service.FeedService;
+import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.libs.dto.SuccessResponseDto;
 import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;
 import com.linkeleven.msa.feed.presentation.request.FeedUpdateRequestDto;
@@ -56,19 +57,8 @@ public class FeedController {
 
 	@GetMapping("/{feedId}")
 	public ResponseEntity<SuccessResponseDto<FeedReadResponseDto>> getDetailFeed(@PathVariable Long feedId) {
-		// TODO : 게시글 단건 조회 실제 구현
-		// 더미 데이터 조회 로직
-		FeedReadResponseDto response = FeedReadResponseDto.builder()
-			.feedId(feedId)
-			.areaId(1L)
-			.userId(123L)
-			.title("Sample Title")
-			.content("Sample Content")
-			.category("PLACE")
-			.views(10)
-			.popularityScore(4.5)
-			.build();
-		return ResponseEntity.ok(SuccessResponseDto.success("게시글 단건 조회", response));
+		FeedReadResponseDto response = feedService.getDetailsByFeedId(feedId);
+		return ResponseEntity.ok(SuccessResponseDto.success("게시글 단건 조회 완료", response));
 	}
 
 	@GetMapping
@@ -80,7 +70,7 @@ public class FeedController {
 				.feedId(1L)
 				.title("Title 1")
 				.content("Content 1")
-				.category("HOTEL")
+				.category(Category.valueOf("HOTEL"))
 				.views(15)
 				.popularityScore(4.0)
 				.build(),
@@ -88,7 +78,7 @@ public class FeedController {
 				.feedId(2L)
 				.title("Title 2")
 				.content("Content 2")
-				.category("RESTAURANT")
+				.category(Category.valueOf("RESTAURANT"))
 				.views(20)
 				.popularityScore(4.2)
 				.build(),
@@ -96,7 +86,7 @@ public class FeedController {
 				.feedId(3L)
 				.title("Title 3")
 				.content("Content 3")
-				.category("PLACE")
+				.category(Category.valueOf("PLACE"))
 				.views(25)
 				.popularityScore(4.5)
 				.build()

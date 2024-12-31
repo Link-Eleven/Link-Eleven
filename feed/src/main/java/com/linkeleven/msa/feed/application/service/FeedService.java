@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
+import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
+import com.linkeleven.msa.feed.application.dto.FeedResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.domain.model.Feed;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
@@ -55,6 +57,13 @@ public class FeedService {
 		// feedRepository.delete(feed);
 		feed.delete();
 		feedRepository.save(feed);
+	}
+
+	@Transactional(readOnly = true)
+	public FeedReadResponseDto getDetailsByFeedId(Long feedId){
+		Feed feed = feedRepository.findByIdAndDeletedAt(feedId)
+			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
+		return FeedReadResponseDto.from(feed);
 	}
 
 	public boolean checkFeedExists(Long feedId) {

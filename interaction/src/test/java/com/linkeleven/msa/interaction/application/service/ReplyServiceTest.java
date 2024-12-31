@@ -11,8 +11,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyCreateResponseDto;
-import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
+import com.linkeleven.msa.interaction.domain.service.ValidationService;
 import com.linkeleven.msa.interaction.presentation.dto.CommentCreateRequestDto;
 import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
 import com.linkeleven.msa.interaction.presentation.dto.ReplyUpdateRequestDto;
@@ -28,7 +28,7 @@ class ReplyServiceTest {
 	private ReplyService replyService;
 
 	@Autowired
-	private CommentRepository commentRepository;
+	private ValidationService validationService;
 
 	@Autowired
 	private ReplyRepository replyRepository;

@@ -22,12 +22,12 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/comments/replies")
+@RequestMapping("/api/comments")
 public class ReplyController {
 
 	private final ReplyService replyService;
 
-	@PostMapping("/{commentId}")
+	@PostMapping("/{commentId}/replies")
 	public ResponseEntity<SuccessResponseDto<ReplyCreateResponseDto>> createReply(
 		@RequestHeader("X-User-Id") Long userId,
 		@PathVariable Long commentId,
@@ -38,7 +38,7 @@ public class ReplyController {
 			.body(SuccessResponseDto.success("대댓글 작성 완료", responseDto));
 	}
 
-	@PatchMapping("/{commentId}/{replyId}")
+	@PatchMapping("/{commentId}/replies/{replyId}")
 	public ResponseEntity<SuccessResponseDto<ReplyUpdateResponseDto>> updateReply(
 		@RequestHeader("X-User-Id") Long userId,
 		@PathVariable Long replyId,
@@ -50,7 +50,7 @@ public class ReplyController {
 			.body(SuccessResponseDto.success("대댓글 수정 완료", responseDto));
 	}
 
-	@DeleteMapping("/{commentId}/{replyId}")
+	@DeleteMapping("/{commentId}/replies/{replyId}")
 	public ResponseEntity<SuccessResponseDto<Void>> deleteReply(
 		@RequestHeader("X-User-Id") Long userId,
 		@PathVariable Long commentId,

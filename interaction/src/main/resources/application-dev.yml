@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: interaction
+
   datasource:
     url: ${INTERACTION_DB_URL}
     username: ${INTERACTION_DB_USER}

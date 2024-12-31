@@ -1,5 +1,7 @@
 package com.linkeleven.msa.feed.domain.model;
 
+import java.time.LocalDateTime;
+
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -62,5 +64,9 @@ public class Feed extends BaseTime {
 		this.title = title;
 		this.content = content;
 		this.category = category;
+	}
+
+	public void delete(){
+		this.setDeletedAt(LocalDateTime.now());
 	}
 }

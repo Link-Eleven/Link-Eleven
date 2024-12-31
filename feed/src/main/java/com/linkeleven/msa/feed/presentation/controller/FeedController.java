@@ -48,6 +48,12 @@ public class FeedController {
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
 	}
 
+	@DeleteMapping("/{feedId}")
+	public ResponseEntity<SuccessResponseDto<Void>> deleteFeed(@PathVariable Long feedId) {
+		feedService.deleteFeed(feedId);
+		return ResponseEntity.ok(SuccessResponseDto.success("게시글 삭제 완료"));
+	}
+
 	@GetMapping("/{feedId}")
 	public ResponseEntity<SuccessResponseDto<FeedReadResponseDto>> getDetailFeed(@PathVariable Long feedId) {
 		// TODO : 게시글 단건 조회 실제 구현
@@ -96,11 +102,5 @@ public class FeedController {
 				.build()
 		);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 조회 완료", responses));
-	}
-
-	@DeleteMapping("/{feedId}")
-	public ResponseEntity<SuccessResponseDto<Void>> deleteFeed(@PathVariable Long feedId) {
-		// TODO : 게시글 삭제 실제 구현
-		return ResponseEntity.ok(SuccessResponseDto.success("게시글 삭제 완료", null));
 	}
 }

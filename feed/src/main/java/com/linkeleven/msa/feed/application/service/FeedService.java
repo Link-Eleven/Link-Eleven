@@ -36,6 +36,7 @@ public class FeedService {
 	@Transactional
 	public FeedUpdateResponseDto updateFeed(FeedUpdateRequestDto feedUpdateRequestDto) {
 		Feed feed = feedRepository.findById(feedUpdateRequestDto.getFeedId())
+		// Feed feed = feedRepository.findByIdAndDeletedAt(feedUpdateRequestDto.getFeedId())
 			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
 
 		feed.update(
@@ -45,6 +46,16 @@ public class FeedService {
 		);
 		Feed updatedFeed = feedRepository.save(feed);
 		return FeedUpdateResponseDto.from(updatedFeed);
+	}
+
+	@Transactional
+	public void deleteFeed(Long feedId){
+		Feed feed = feedRepository.findById(feedId)
+			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
+
+		// feedRepository.delete(feed);
+		feed.delete();
+		feedRepository.save(feed);
 	}
 
 	public boolean checkFeedExists(Long feedId) {

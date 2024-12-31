@@ -29,4 +29,8 @@ public class FeedService {
 		Feed savedFeed = feedRepository.save(feed);
 		return FeedResponseDto.from(savedFeed);
 	}
+
+	public boolean checkFeedExists(Long feedId){
+		return feedRepository.existsById(feedId);
+	}
 }

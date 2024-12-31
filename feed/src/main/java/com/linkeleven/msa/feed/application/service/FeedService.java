@@ -18,19 +18,18 @@ public class FeedService {
 
 	@Transactional
 	public FeedResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto) {
-		Feed feed = Feed.builder()
-			.userId(feedCreateRequestDto.getUserId())
-			.areaId(feedCreateRequestDto.getAreaId())
-			.locationId(feedCreateRequestDto.getLocationId())
-			.title(feedCreateRequestDto.getTitle())
-			.content(feedCreateRequestDto.getContent())
-			.category(feedCreateRequestDto.getCategory())
-			.build();
+		Feed feed = Feed.of(
+			feedCreateRequestDto.getUserId(),
+			feedCreateRequestDto.getLocationId(),
+			feedCreateRequestDto.getTitle(),
+			feedCreateRequestDto.getContent(),
+			feedCreateRequestDto.getCategory()
+		);
 		Feed savedFeed = feedRepository.save(feed);
 		return FeedResponseDto.from(savedFeed);
 	}
 
-	public boolean checkFeedExists(Long feedId){
+	public boolean checkFeedExists(Long feedId) {
 		return feedRepository.existsById(feedId);
 	}
 }

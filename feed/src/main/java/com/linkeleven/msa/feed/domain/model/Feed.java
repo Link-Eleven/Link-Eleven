@@ -24,31 +24,37 @@ public class Feed extends BaseTime {
 	@Tsid
 	private Long feedId;
 
-	@Column
+	@Column (name = "user_id")
 	private Long userId;
 
-	@Column
-	private Long areaId;
-
-	@Column
+	@Column(name = "location_id")
 	private Long locationId;
 
-	@Column(nullable = false)
+	@Column(name = "title", nullable = false)
 	private String title;
 
-	@Column(nullable = false)
+	@Column(name = "content", nullable = false)
 	private String content;
 
-	@Column(nullable = false)
+	@Column(name = "category", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Category category;
 
 	@Builder.Default
-	@Column(nullable = false)
+	@Column(name = "views", nullable = false)
 	private int views = 0;
 
 	@Builder.Default
-	@Column(nullable = false)
+	@Column(name = "popularity_score", nullable = false)
 	private Double popularityScore = 0.0;
 
+	public static Feed of(Long userId, Long locationId, String title, String content, Category category){
+		return Feed.builder()
+			.userId(userId)
+			.locationId(locationId)
+			.title(title)
+			.content(content)
+			.category(category)
+			.build();
+	}
 }

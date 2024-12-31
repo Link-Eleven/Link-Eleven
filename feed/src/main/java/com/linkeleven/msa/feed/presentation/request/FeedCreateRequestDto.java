@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class FeedCreateRequestDto {
 	private Long userId;
-	private Long areaId;
 	private Long locationId;
 	private String title;
 	private String content;

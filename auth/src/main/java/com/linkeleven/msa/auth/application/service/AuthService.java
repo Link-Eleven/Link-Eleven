@@ -29,13 +29,12 @@ public class AuthService {
 		existUsername(signUpRequestDto.getUsername());
 
 		String password = passwordEncoder.encode(signUpRequestDto.getPassword());
-		User user= User.builder()
-			.username(signUpRequestDto.getUsername())
-			.password(password)
-			.role(signUpRequestDto.getRole())
-			.isAnonymous(signUpRequestDto.isAnonymous())
-			.isCouponIssued(true)
-			.build();
+		User user= User.createUser(
+			signUpRequestDto.getUsername(),
+			password,
+			signUpRequestDto.getRole(),
+			signUpRequestDto.isAnonymous()
+		);
 		userRepository.save(user);
 
 		return AuthResponseDto.from(user.getUserId());

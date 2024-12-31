@@ -26,22 +26,30 @@ public class User extends BaseTime {
 	@Tsid
 	private Long userId;
 
-	@Column(nullable = false)
+	@Column(name="username",nullable = false)
 	private String username;
 
-	@Column(nullable = false)
+	@Column(name="password",nullable = false)
 	private String password;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(name="role",nullable = false)
 	private UserRole role;
 
-	@Column(nullable = false)
+	@Column(name="is_anonymouss",nullable = false)
 	private boolean isAnonymous;
 
-	@Column
+	@Column(name="is_coupon_issued")
 	private boolean isCouponIssued;
-
+	public static User createUser(String username, String password, UserRole role, boolean isAnonymous) {
+		return User.builder()
+			.username(username)
+			.password(password)
+			.role(role)
+			.isAnonymous(isAnonymous)
+			.isCouponIssued(true)
+			.build();
+	}
 
 
 }

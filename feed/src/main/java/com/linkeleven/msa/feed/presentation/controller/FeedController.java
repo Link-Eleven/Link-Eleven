@@ -15,11 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedResponseDto;
-import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.service.FeedService;
 import com.linkeleven.msa.feed.libs.dto.SuccessResponseDto;
 import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;
-import com.linkeleven.msa.feed.presentation.request.FeedRequestDto;
+import com.linkeleven.msa.feed.presentation.request.FeedUpdateRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +35,16 @@ public class FeedController {
 
 		FeedResponseDto response = feedService.createFeed(feedCreateRequestDto);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 생성 성공", response));
+	}
+
+	@PutMapping("/{feedId}")
+	public ResponseEntity<SuccessResponseDto<FeedResponseDto>> updateFeed(
+		@PathVariable Long feedId,
+		@RequestBody FeedUpdateRequestDto feedUpdateRequestDto) {
+
+		feedUpdateRequestDto.setFeedId(feedId);
+		FeedResponseDto response = feedService.updateFeed(feedUpdateRequestDto);
+		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
 	}
 
 	@GetMapping("/{feedId}")
@@ -86,23 +95,6 @@ public class FeedController {
 				.build()
 		);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 조회 완료", responses));
-	}
-
-	@PutMapping("/{feedId}")
-	public ResponseEntity<SuccessResponseDto<FeedUpdateResponseDto>> updateFeed(@PathVariable Long feedId,
-		@RequestBody FeedRequestDto feedRequestDto) {
-		// TODO : 게시글 수정 실제 구현
-		// 더미 데이터 업데이트 로직
-		FeedUpdateResponseDto response = FeedUpdateResponseDto.builder()
-			.feedId(feedId)
-			.userId(feedRequestDto.getUserId())
-			.title(feedRequestDto.getTitle())
-			.content(feedRequestDto.getContent())
-			.category(feedRequestDto.getCategory())
-			.views(feedRequestDto.getViews())
-			.popularityScore(feedRequestDto.getPopularityScore())
-			.build();
-		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
 	}
 
 	@DeleteMapping("/{feedId}")

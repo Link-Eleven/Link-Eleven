@@ -24,7 +24,7 @@ public class Feed extends BaseTime {
 	@Tsid
 	private Long feedId;
 
-	@Column (name = "user_id")
+	@Column(name = "user_id")
 	private Long userId;
 
 	@Column(name = "location_id")
@@ -48,7 +48,7 @@ public class Feed extends BaseTime {
 	@Column(name = "popularity_score", nullable = false)
 	private Double popularityScore = 0.0;
 
-	public static Feed of(Long userId, Long locationId, String title, String content, Category category){
+	public static Feed of(Long userId, Long locationId, String title, String content, Category category) {
 		return Feed.builder()
 			.userId(userId)
 			.locationId(locationId)
@@ -56,5 +56,11 @@ public class Feed extends BaseTime {
 			.content(content)
 			.category(category)
 			.build();
+	}
+
+	public void update(String title, String content, Category category) {
+		this.title = title;
+		this.content = content;
+		this.category = category;
 	}
 }

@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
-import com.linkeleven.msa.feed.application.dto.FeedResponseDto;
+import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.service.FeedService;
 import com.linkeleven.msa.feed.libs.dto.SuccessResponseDto;
-import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;
 import com.linkeleven.msa.feed.presentation.request.FeedUpdateRequestDto;
 
 import lombok.RequiredArgsConstructor;
@@ -29,21 +27,21 @@ public class FeedController {
 
 	private final FeedService feedService;
 
-	@PostMapping
-	public ResponseEntity<SuccessResponseDto<FeedResponseDto>> createFeed(
-		@RequestBody FeedCreateRequestDto feedCreateRequestDto) {
-
-		FeedResponseDto response = feedService.createFeed(feedCreateRequestDto);
-		return ResponseEntity.ok(SuccessResponseDto.success("게시글 생성 성공", response));
-	}
+	// @PostMapping
+	// public ResponseEntity<SuccessResponseDto<FeedCreateResponseDto>> createFeed(
+	// 	@RequestBody FeedCreateRequestDto feedCreateRequestDto) {
+	//
+	// 	FeedCreateResponseDto response = feedService.createFeed(feedCreateRequestDto);
+	// 	return ResponseEntity.ok(SuccessResponseDto.success("게시글 생성 성공", response));
+	// }
 
 	@PutMapping("/{feedId}")
-	public ResponseEntity<SuccessResponseDto<FeedResponseDto>> updateFeed(
+	public ResponseEntity<SuccessResponseDto<FeedUpdateResponseDto>> updateFeed(
 		@PathVariable Long feedId,
 		@RequestBody FeedUpdateRequestDto feedUpdateRequestDto) {
 
 		feedUpdateRequestDto.setFeedId(feedId);
-		FeedResponseDto response = feedService.updateFeed(feedUpdateRequestDto);
+		FeedUpdateResponseDto response = feedService.updateFeed(feedUpdateRequestDto);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
 	}
 

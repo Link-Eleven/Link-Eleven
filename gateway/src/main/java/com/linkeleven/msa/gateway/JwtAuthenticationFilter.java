@@ -1,27 +1,29 @@
 package com.linkeleven.msa.gateway;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
-import javax.crypto.SecretKey;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+
+import com.linkeleven.msa.gateway.libs.exception.CustomException;
+
+import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
 public class JwtAuthenticationFilter implements GlobalFilter {
+  private final JwtProvider jwtProvider;
+
+  @Autowired
+  public JwtAuthenticationFilter(JwtProvider jwtProvider) {
+    this.jwtProvider = jwtProvider;
+  }
+
   @Value("${service.jwt.secret-key}")
   private String secretKey;
 
@@ -49,30 +51,24 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     }
     return null;
   }
+
   public boolean validateToken(String token,ServerWebExchange exchange) {
     try {
-      SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secretKey));
-      Jws<Claims> claimsJws = Jwts.parserBuilder()
-          .setSigningKey(key)
-          .build()
-          .parseClaimsJws(token);
-      log.info("#####body :: " + claimsJws.getBody().toString());
-      Claims claims = checkValidateAuthService(claimsJws.getBody());
+      Claims claims = jwtProvider.parseToken(token);
+      Claims validatedClaims = jwtProvider.validateClaims(claims);
+
       exchange.getRequest().mutate()
-          .header("X-User-Id", claims.get("user_id",String.class))
-          .header("X-Role", claims.get("role",String.class))
+          .header("X-User-Id", validatedClaims.get("user_id", String.class))
+          .header("X-Role", validatedClaims.get("role", String.class))
           .build();
-    } catch (SecurityException | MalformedJwtException | SignatureException e) {
-      log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-    } catch (ExpiredJwtException e) {
-      log.error("Expired JWT token, 만료된 JWT token 입니다.");
-    } catch (UnsupportedJwtException e) {
-      log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-    } catch (IllegalArgumentException e) {
-      log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+
+      return true; // 토큰이 유효하면 true 반환
+    } catch (CustomException e) {
+      log.error("Authentication failed: {}", e.getMessage());
+      return false; // 토큰이 유효하지 않으면 false 반환
     }
-    return false;
   }
+
 
   private Claims checkValidateAuthService(Claims body) {
     String userId = body.get("user_id",String.class);

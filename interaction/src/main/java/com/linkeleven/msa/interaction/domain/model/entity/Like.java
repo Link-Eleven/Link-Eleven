@@ -26,13 +26,12 @@ public class Like extends BaseTime{
 	private Long id;
 
 	@Embedded
-	@Column
 	private Target target;
 
 	@Column(nullable = false)
 	private Long userId;
 
-	@Builder
+	@Builder(access = AccessLevel.PRIVATE)
 	private Like(Target target, Long userId) {
 		this.target = target;
 		this.userId = userId;

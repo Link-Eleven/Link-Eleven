@@ -45,7 +45,7 @@ public class Comment extends BaseTime{
 	// @Column
 	// private String reportReason;
 
-	@Builder
+	@Builder(access = AccessLevel.PRIVATE)
 	private Comment(ContentDetails contentDetails, Long feedId) {
 		this.contentDetails = contentDetails;
 		this.feedId = feedId;

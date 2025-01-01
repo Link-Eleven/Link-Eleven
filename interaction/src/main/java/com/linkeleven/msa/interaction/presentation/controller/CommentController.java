@@ -15,7 +15,8 @@ import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.CommentUpdateResponseDto;
 import com.linkeleven.msa.interaction.application.service.CommentService;
 import com.linkeleven.msa.interaction.libs.dto.SuccessResponseDto;
-import com.linkeleven.msa.interaction.presentation.dto.CommentRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.CommentCreateRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.CommentUpdateRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +31,7 @@ public class CommentController {
 	public ResponseEntity<SuccessResponseDto<CommentCreateResponseDto>> createComment(
 		@RequestHeader("X-User-Id") Long userId,
 		@PathVariable Long feedId,
-		@RequestBody CommentRequestDto requestDto
+		@RequestBody CommentCreateRequestDto requestDto
 	) {
 		CommentCreateResponseDto responseDto = commentService.createComment(userId, feedId, requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED)
@@ -42,7 +43,7 @@ public class CommentController {
 		@RequestHeader("X-User-Id") Long userId,
 		@PathVariable Long feedId,
 		@PathVariable Long commentId,
-		@RequestBody CommentRequestDto requestDto
+		@RequestBody CommentUpdateRequestDto requestDto
 	) {
 		CommentUpdateResponseDto responseDto = commentService.updateComment(userId, feedId, commentId, requestDto);
 		return ResponseEntity.ok()

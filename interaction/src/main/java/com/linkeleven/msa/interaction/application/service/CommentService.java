@@ -12,7 +12,8 @@ import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
 import com.linkeleven.msa.interaction.infrastructure.client.FeedClient;
 import com.linkeleven.msa.interaction.libs.exception.CustomException;
 import com.linkeleven.msa.interaction.libs.exception.ErrorCode;
-import com.linkeleven.msa.interaction.presentation.dto.CommentRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.CommentCreateRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.CommentUpdateRequestDto;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class CommentService {
 	private final CommentRepository commentRepository;
 	private final FeedClient feedClient;
 
-	public CommentCreateResponseDto createComment(Long userId, Long feedId, CommentRequestDto requestDto) {
+	public CommentCreateResponseDto createComment(Long userId, Long feedId, CommentCreateRequestDto requestDto) {
 		// checkFeedExists(feedId);
 		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId);
 		Comment comment = Comment.of(contentDetails, feedId);
@@ -36,7 +37,7 @@ public class CommentService {
 			comment.getContentDetails().getContent());
 	}
 
-	public CommentUpdateResponseDto updateComment(Long userId, Long feedId, Long commentId, CommentRequestDto requestDto) {
+	public CommentUpdateResponseDto updateComment(Long userId, Long feedId, Long commentId, CommentUpdateRequestDto requestDto) {
 		Comment comment = getComment(commentId);
 		// checkFeedExists(feedId);
 		checkValidateComment(userId, feedId, comment);

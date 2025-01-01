@@ -37,3 +37,7 @@ out/
 .vscode/
 .DS_Store
 .idea/**
+
+### Docker compose yml ###
+docker-compose.yml
+/.env

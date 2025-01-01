@@ -15,41 +15,42 @@ import com.linkeleven.msa.interaction.application.dto.ReplyCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyUpdateResponseDto;
 import com.linkeleven.msa.interaction.application.service.ReplyService;
 import com.linkeleven.msa.interaction.libs.dto.SuccessResponseDto;
-import com.linkeleven.msa.interaction.presentation.dto.ReplyRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.ReplyUpdateRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/replies")
+@RequestMapping("/api/comments")
 public class ReplyController {
 
 	private final ReplyService replyService;
 
-	@PostMapping("/{commentId}")
+	@PostMapping("/{commentId}/replies")
 	public ResponseEntity<SuccessResponseDto<ReplyCreateResponseDto>> createReply(
 		@RequestHeader("X-User-Id") Long userId,
 		@PathVariable Long commentId,
-		@RequestBody ReplyRequestDto requestDto
+		@RequestBody ReplyCreateRequestDto requestDto
 	) {
 		ReplyCreateResponseDto responseDto = replyService.createReply(userId, commentId, requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(SuccessResponseDto.success("대댓글 작성 완료", responseDto));
 	}
 
-	@PatchMapping("/{commentId}/{replyId}")
+	@PatchMapping("/{commentId}/replies/{replyId}")
 	public ResponseEntity<SuccessResponseDto<ReplyUpdateResponseDto>> updateReply(
 		@RequestHeader("X-User-Id") Long userId,
 		@PathVariable Long replyId,
 		@PathVariable Long commentId,
-		@RequestBody ReplyRequestDto requestDto
+		@RequestBody ReplyUpdateRequestDto requestDto
 	) {
 		ReplyUpdateResponseDto responseDto = replyService.updateReply(userId, replyId, commentId, requestDto);
 		return ResponseEntity.ok()
 			.body(SuccessResponseDto.success("대댓글 수정 완료", responseDto));
 	}
 
-	@DeleteMapping("/{commentId}/{replyId}")
+	@DeleteMapping("/{commentId}/replies/{replyId}")
 	public ResponseEntity<SuccessResponseDto<Void>> deleteReply(
 		@RequestHeader("X-User-Id") Long userId,
 		@PathVariable Long commentId,

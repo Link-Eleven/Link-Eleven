@@ -12,7 +12,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
 import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
-import com.linkeleven.msa.interaction.presentation.dto.CommentRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.CommentCreateRequestDto;
+import com.linkeleven.msa.interaction.presentation.dto.CommentUpdateRequestDto;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -38,7 +39,7 @@ class CommentServiceTest {
 	@DisplayName("댓글 생성 성공")
 	void createComment() {
 		String content = "테스트";
-		CommentRequestDto requestDto = new CommentRequestDto();
+		CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
 		requestDto.setContent(content);
 
 		CommentCreateResponseDto responseDto = commentService.createComment(userId, feedId, requestDto);
@@ -52,13 +53,13 @@ class CommentServiceTest {
 	@DisplayName("댓글 수정 성공")
 	void updatedComment() {
 		String content = "테스트";
-		CommentRequestDto requestDto = new CommentRequestDto();
+		CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
 		requestDto.setContent(content);
 		CommentCreateResponseDto responseDto = commentService.createComment(userId, feedId, requestDto);
 		Long commentId = responseDto.getCommentId();
 
 		String newContent = "수정 테스트";
-		CommentRequestDto newRequestDto = new CommentRequestDto();
+		CommentUpdateRequestDto newRequestDto = new CommentUpdateRequestDto();
 		newRequestDto.setContent(newContent);
 		commentService.updateComment(userId, feedId, commentId, newRequestDto);
 
@@ -72,7 +73,7 @@ class CommentServiceTest {
 	@DisplayName("댓글 삭제 성공")
 	void deletedComment() {
 		String content = "테스트";
-		CommentRequestDto requestDto = new CommentRequestDto();
+		CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
 		requestDto.setContent(content);
 		CommentCreateResponseDto responseDto = commentService.createComment(userId, feedId, requestDto);
 		Long commentId = responseDto.getCommentId();

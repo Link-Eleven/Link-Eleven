@@ -60,6 +60,7 @@ class CommentServiceTest {
 
 		assertThat(responseDto.getCommentId()).isNotNull();
 		assertThat(responseDto.getContent()).isEqualTo(content);
+		assertThat(responseDto.getUsername()).isEqualTo("username");
 	}
 
 	@Test

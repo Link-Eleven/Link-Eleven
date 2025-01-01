@@ -61,7 +61,7 @@ public class Reply extends BaseTime{
 	}
 
 	public void updateReply(String newContent) {
-		this.contentDetails = ContentDetails.of(newContent, this.contentDetails.getUserId());
+		this.contentDetails = ContentDetails.of(newContent, this.contentDetails.getUserId(), this.contentDetails.getUsername());
 	}
 
 	public void deleteReply() {

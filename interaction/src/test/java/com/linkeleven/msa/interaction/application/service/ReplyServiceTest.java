@@ -5,14 +5,17 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyCreateResponseDto;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
 import com.linkeleven.msa.interaction.domain.service.ValidationService;
+import com.linkeleven.msa.interaction.infrastructure.client.FeedClient;
 import com.linkeleven.msa.interaction.presentation.dto.CommentCreateRequestDto;
 import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
 import com.linkeleven.msa.interaction.presentation.dto.ReplyUpdateRequestDto;
@@ -33,6 +36,9 @@ class ReplyServiceTest {
 	@Autowired
 	private ReplyRepository replyRepository;
 
+	@MockitoBean
+	private FeedClient feedClient;
+
 	private Long userId;
 	private Long commentId;
 
@@ -40,6 +46,8 @@ class ReplyServiceTest {
 	void setUp() {
 		userId = 1L;
 		Long feedId = 50L;
+
+		Mockito.when(feedClient.checkFeedExists(50L)).thenReturn(true);
 
 		String content = "테스트";
 		CommentCreateRequestDto requestDto = new CommentCreateRequestDto();

@@ -13,12 +13,14 @@ public class CommentUpdateResponseDto {
 
 	private Long commentId;
 	private Long userId;
+	private String username;
 	private String content;
 
-	public static CommentUpdateResponseDto of(Long commentId, Long userId, String content) {
+	public static CommentUpdateResponseDto of(Long commentId, Long userId, String username, String content) {
 		return CommentUpdateResponseDto.builder()
 			.commentId(commentId)
 			.userId(userId)
+			.username(username)
 			.content(content)
 			.build();
 	}

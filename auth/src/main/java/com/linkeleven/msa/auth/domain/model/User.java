@@ -36,7 +36,7 @@ public class User extends BaseTime {
 	@Column(name="role",nullable = false)
 	private UserRole role;
 
-	@Column(name="is_anonymouss",nullable = false)
+	@Column(name="is_anonymous",nullable = false)
 	private boolean isAnonymous;
 
 	@Column(name="is_coupon_issued")

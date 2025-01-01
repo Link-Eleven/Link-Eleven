@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
-	private UserJpaRepository userJpaRepository;
+	private final UserJpaRepository userJpaRepository;
 
 	@Override
 	public Optional<User> findById(Long userId) {

@@ -1,7 +1,6 @@
 package com.linkeleven.msa.feed.application.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
@@ -50,7 +49,7 @@ public class FeedService {
 	}
 
 	@Transactional
-	public void deleteFeed(Long feedId){
+	public void deleteFeed(Long feedId) {
 		Feed feed = feedRepository.findById(feedId)
 			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
 
@@ -59,11 +58,16 @@ public class FeedService {
 	}
 
 	@Transactional
-	public FeedReadResponseDto getDetailsByFeedId(Long feedId){
-		Feed feed = feedRepository.findByIdAndDeletedAt(feedId)
-			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
+	public FeedReadResponseDto getDetailsByFeedId(Long feedId) {
+		boolean exists = feedRepository.existsByFeedId(feedId);
+		if (!exists) {
+			throw new CustomException(ErrorCode.FEED_NOT_FOUND);
+		}
 
 		feedRepository.incrementViews(feedId);
+
+		Feed feed = feedRepository.findByIdAndDeletedAt(feedId)
+			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
 		return FeedReadResponseDto.from(feed);
 	}
 

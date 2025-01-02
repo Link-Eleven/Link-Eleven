@@ -15,6 +15,8 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 	@Query("SELECT f from Feed f where f.feedId = :feedId AND f.deletedAt IS NULL")
 	Optional<Feed> findByIdAndDeletedAt(Long feedId);
 
+	boolean existsByFeedId(Long feedId);
+
 	@Query("UPDATE Feed f SET f.views = f.views + 1 WHERE f.feedId = :feedId")
 	@Modifying
 	@Transactional

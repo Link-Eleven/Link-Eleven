@@ -24,13 +24,11 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     this.jwtProvider = jwtProvider;
   }
 
-  @Value("${service.jwt.secret-key}")
-  private String secretKey;
-
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
     String path = exchange.getRequest().getURI().getPath();
-    if (path.equals("/auth/signIn")||path.equals("/auth/signUp")) {
+
+    if (path.equals("/api/auth/signin")||path.equals("/api/auth/signup")) {;
       return chain.filter(exchange);  // /signIn 경로는 필터를 적용하지 않음
     }
 
@@ -40,7 +38,14 @@ public class JwtAuthenticationFilter implements GlobalFilter {
       exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
       return exchange.getResponse().setComplete();
     }
+    Claims claims = jwtProvider.parseToken(token);
 
+    exchange = exchange.mutate()
+        .request(exchange.getRequest().mutate()
+            .header("X-User-Id", claims.get("user_id").toString())  // 원하는 값으로 설정
+            .header("X-Role", claims.get("role").toString())     // 원하는 값으로 설정
+            .build())  // 새로운 요청 객체를 생성
+        .build();  // 변경된 요청 객체를 exchange에 반영
     return chain.filter(exchange);
   }
 
@@ -56,11 +61,6 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     try {
       Claims claims = jwtProvider.parseToken(token);
       Claims validatedClaims = jwtProvider.validateClaims(claims);
-
-      exchange.getRequest().mutate()
-          .header("X-User-Id", validatedClaims.get("user_id", String.class))
-          .header("X-Role", validatedClaims.get("role", String.class))
-          .build();
 
       return true; // 토큰이 유효하면 true 반환
     } catch (CustomException e) {

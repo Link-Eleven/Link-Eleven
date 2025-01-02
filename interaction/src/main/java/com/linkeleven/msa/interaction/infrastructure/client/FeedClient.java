@@ -4,10 +4,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "FEED")
+@FeignClient(name = "feed-service")
 public interface FeedClient {
 
-	@GetMapping("/external/{feedId}")
+	@GetMapping("/external/feeds/{feedId}")
 	boolean checkFeedExists(@PathVariable Long feedId);
 
 }

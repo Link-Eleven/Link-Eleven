@@ -45,7 +45,7 @@ public class Reply extends BaseTime{
 	// @Column
 	// private String reportReason;
 
-	@Builder
+	@Builder(access = AccessLevel.PRIVATE)
 	private Reply(ContentDetails contentDetails, Long commentId) {
 		this.contentDetails = contentDetails;
 		this.commentId = commentId;

@@ -28,6 +28,9 @@ ext {
 }
 
 dependencies {
+	// H2 Database 의존성 추가
+	testImplementation 'com.h2database:h2'
+
 	// Jwt
 	compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.5'

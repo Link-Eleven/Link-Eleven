@@ -56,12 +56,24 @@ public class LikeService {
 
 	private void validateTarget(Long targetId, ContentType contentType) {
 		boolean isValid = switch (contentType) {
-			case FEED -> feedClient.checkFeedExists(targetId);
-			case COMMENT -> validationService.existsComment(targetId);
-			case REPLY -> validationService.existsReply(targetId);
+			case FEED -> validateFeed(targetId);
+			case COMMENT -> validateComment(targetId);
+			case REPLY -> validateReply(targetId);
 		};
 		if (!isValid) {
 			throw new CustomException(ErrorCode.TARGET_NOT_FOUND);
 		}
+	}
+
+	private boolean validateReply(Long targetId) {
+		return validationService.existsReply(targetId);
+	}
+
+	private boolean validateComment(Long targetId) {
+		return validationService.existsComment(targetId);
+	}
+
+	private boolean validateFeed(Long targetId) {
+		return feedClient.checkFeedExists(targetId);
 	}
 }

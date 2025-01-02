@@ -47,6 +47,7 @@ class CommentServiceTest {
 
 		UserInfoResponseDto userInfo = new UserInfoResponseDto("username");
 		Mockito.when(authClient.getUsername(1L)).thenReturn(userInfo);
+
 	}
 
 	@Test

@@ -4,14 +4,16 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
 import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
+import com.linkeleven.msa.interaction.infrastructure.client.FeedClient;
 import com.linkeleven.msa.interaction.presentation.dto.CommentCreateRequestDto;
 import com.linkeleven.msa.interaction.presentation.dto.CommentUpdateRequestDto;
 
@@ -25,6 +27,9 @@ class CommentServiceTest {
 	@Autowired
 	private CommentRepository commentRepository;
 
+	@MockitoBean
+	private FeedClient feedClient;
+
 	private Long userId;
 	private Long feedId;
 
@@ -32,10 +37,11 @@ class CommentServiceTest {
 	void setUp() {
 		userId = 1L;
 		feedId = 100L;
+
+		Mockito.when(feedClient.checkFeedExists(100L)).thenReturn(true);
 	}
 
 	@Test
-	@Order(1)
 	@DisplayName("댓글 생성 성공")
 	void createComment() {
 		String content = "테스트";
@@ -49,7 +55,6 @@ class CommentServiceTest {
 	}
 
 	@Test
-	@Order(2)
 	@DisplayName("댓글 수정 성공")
 	void updatedComment() {
 		String content = "테스트";
@@ -69,7 +74,6 @@ class CommentServiceTest {
 	}
 
 	@Test
-	@Order(3)
 	@DisplayName("댓글 삭제 성공")
 	void deletedComment() {
 		String content = "테스트";

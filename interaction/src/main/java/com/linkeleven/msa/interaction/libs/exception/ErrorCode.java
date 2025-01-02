@@ -26,6 +26,7 @@ public enum ErrorCode {
 	REPLY_IS_NOT_REPORTED(400, "신고된 대댓글이 아닙니다."),
 	USER_IS_NOT_COMMENT_OWNER(400, "댓글 작성자가 아닙니다."),
 	USER_IS_NOT_REPLY_OWNER(400, "대댓글 작성자가 아닙니다."),
+	ALREADY_LIKE(400, "이미 좋아요를 누른 컨텐츠입니다."),
 
 	/*  401 UNAUTHORIZED : 인증 안됨  */
 	UNAUTHORIZED(401, "인증되지 않았습니다."),
@@ -39,6 +40,8 @@ public enum ErrorCode {
 	FEED_NOT_FOUND(404, "게시글을 찾을 수 없습니다."),
 	COMMENT_NOT_FOUND(404, "댓글을 찾을 수 없습니다."),
 	REPLY_NOT_FOUND(404, "대댓글을 찾을 수 없습니다."),
+	TARGET_NOT_FOUND(404, "좋아요 대상을 찾을 수 없습니다."),
+	LIKE_NOT_FOUND(404, "좋아요를 찾을 수 없습니다."),
 
 	/*  408 REQUEST_TIMEOUT : 요청에 대한 응답 시간 초과  */
 	TIMEOUT_ERROR(408, "응답시간을 초과하였습니다."),

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.interaction.application.dto.ReplyQueryResponseDto;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReplyQueryService {
 
 	private final ReplyRepository replyRepository;

@@ -11,7 +11,9 @@ import com.linkeleven.msa.interaction.domain.model.entity.Reply;
 import com.linkeleven.msa.interaction.domain.model.vo.ContentDetails;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
 import com.linkeleven.msa.interaction.domain.service.ValidationService;
+
 import com.linkeleven.msa.interaction.infrastructure.client.AuthClient;
+
 import com.linkeleven.msa.interaction.libs.exception.CustomException;
 import com.linkeleven.msa.interaction.libs.exception.ErrorCode;
 import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
@@ -28,6 +30,7 @@ public class ReplyService {
 	private final ReplyRepository replyRepository;
 	private final ValidationService validationService;
 	private final AuthClient authClient;
+
 
 	public ReplyCreateResponseDto createReply(Long userId, Long commentId, ReplyCreateRequestDto requestDto) {
 		UserInfoResponseDto userInfo = getUsername(userId);

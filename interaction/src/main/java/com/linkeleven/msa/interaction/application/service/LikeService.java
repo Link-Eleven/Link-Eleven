@@ -76,4 +76,5 @@ public class LikeService {
 	private boolean validateFeed(Long targetId) {
 		return feedClient.checkFeedExists(targetId);
 	}
+
 }

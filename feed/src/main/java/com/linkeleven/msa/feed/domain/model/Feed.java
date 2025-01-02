@@ -66,7 +66,7 @@ public class Feed extends BaseTime {
 		this.category = category;
 	}
 
-	public void delete(){
+	public void delete() {
 		this.setDeletedAt(LocalDateTime.now());
 	}
 }

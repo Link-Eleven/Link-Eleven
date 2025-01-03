@@ -8,8 +8,8 @@ import com.linkeleven.msa.interaction.application.dto.ReplyCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyUpdateResponseDto;
 import com.linkeleven.msa.interaction.domain.model.entity.Reply;
 import com.linkeleven.msa.interaction.domain.model.vo.ContentDetails;
-import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
+import com.linkeleven.msa.interaction.domain.service.ValidationService;
 import com.linkeleven.msa.interaction.libs.exception.CustomException;
 import com.linkeleven.msa.interaction.libs.exception.ErrorCode;
 import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class ReplyService {
 
 	private final ReplyRepository replyRepository;
-	private final CommentRepository commentRepository;
+	private final ValidationService validationService;
 
 	public ReplyCreateResponseDto createReply(Long userId, Long commentId, ReplyCreateRequestDto requestDto) {
 		checkCommentExists(commentId);
@@ -76,7 +76,7 @@ public class ReplyService {
 	}
 
 	private boolean existsComment(Long commentId) {
-		return commentRepository.existsByIdAndDeletedAtIsNull(commentId);
+		return validationService.existsCommentNotDeleted(commentId);
 	}
 
 	private void checkUserId(Long userId, Reply reply) {

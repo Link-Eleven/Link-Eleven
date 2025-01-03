@@ -27,7 +27,7 @@ public class CommentService {
 	private final FeedClient feedClient;
 
 	public CommentCreateResponseDto createComment(Long userId, Long feedId, CommentCreateRequestDto requestDto) {
-		// checkFeedExists(feedId);
+		checkFeedExists(feedId);
 		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId);
 		Comment comment = Comment.of(contentDetails, feedId);
 		commentRepository.save(comment);
@@ -39,7 +39,6 @@ public class CommentService {
 
 	public CommentUpdateResponseDto updateComment(Long userId, Long feedId, Long commentId, CommentUpdateRequestDto requestDto) {
 		Comment comment = getComment(commentId);
-		// checkFeedExists(feedId);
 		checkValidateComment(userId, feedId, comment);
 
 		comment.updateComment(requestDto.getContent());
@@ -52,7 +51,6 @@ public class CommentService {
 
 	public void deleteComment(Long userId, Long feedId, Long commentId) {
 		Comment comment = getComment(commentId);
-		// checkFeedExists(feedId);
 		checkValidateComment(userId, feedId, comment);
 
 		comment.deleteComment();

@@ -17,11 +17,11 @@ import com.linkeleven.msa.auth.presentation.dto.SignUpRequestDto;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 	private final AuthService authService;
 
-	@PostMapping("/signUp")
+	@PostMapping("/signup")
 	public ResponseEntity<SuccessResponseDto<AuthResponseDto>> signUp(
 		@RequestBody SignUpRequestDto signUpRequestDto)
 	{
@@ -32,7 +32,7 @@ public class AuthController {
 		);
 	}
 
-	@PostMapping("/signIn")
+	@PostMapping("/signin")
 	public ResponseEntity<SuccessResponseDto<AuthTokenResponseDto>> signIn(
 		@RequestBody SignInRequestDto signInRequestDto)
 	{

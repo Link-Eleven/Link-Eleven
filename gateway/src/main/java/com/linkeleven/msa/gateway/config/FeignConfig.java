@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 import feign.codec.Decoder;
 
+/*
 @Configuration
 public class FeignConfig {
 	@Bean
@@ -21,3 +22,4 @@ public class FeignConfig {
 		return new SpringDecoder(messageConverters);
 	}
 }
+*/

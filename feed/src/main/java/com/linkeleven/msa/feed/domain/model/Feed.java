@@ -1,6 +1,7 @@
 package com.linkeleven.msa.feed.domain.model;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.Column;
@@ -61,9 +62,9 @@ public class Feed extends BaseTime {
 	}
 
 	public void update(String title, String content, Category category) {
-		this.title = title;
-		this.content = content;
-		this.category = category;
+		this.title = Optional.ofNullable(title).orElse(this.title);
+		this.content = Optional.ofNullable(content).orElse(this.content);
+		this.category = Optional.ofNullable(category).orElse(this.category);
 	}
 
 	public void delete() {

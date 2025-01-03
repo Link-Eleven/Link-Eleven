@@ -15,10 +15,10 @@ spring:
         format_sql: true
     open-in-view: false
 
-    eureka:
-      client:
-        service-url:
-          defaultZone: ${SERVER_URL}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${SERVER_URL}
 
 server:
   port: ${COUPON_PORT}

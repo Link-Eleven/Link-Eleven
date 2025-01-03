@@ -11,28 +11,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.linkeleven.msa.feed.application.service.ImageService;
+import com.linkeleven.msa.feed.application.service.FileService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/images")
+@RequestMapping("/api/files")
 @RequiredArgsConstructor
-public class ImageController {
+public class FileController {
 
-	private final ImageService imageService;
+	private final FileService fileService;
 
 	@PostMapping("/upload")
 	public List<String> uploadImage(@RequestParam("file") List<MultipartFile> files) throws IOException {
 		List<String> urls = new ArrayList<>();
 		for (MultipartFile file : files) {
-			urls.add(imageService.uploadImage(file));
+			urls.add(fileService.uploadImage(file));
 		}
 		return urls;
 	}
 
 	@DeleteMapping("/delete")
 	public void deleteImage(@RequestParam("fileUrl") String fileUrl) {
-		imageService.deleteImage(fileUrl);
+		fileService.deleteImage(fileUrl);
 	}
 }

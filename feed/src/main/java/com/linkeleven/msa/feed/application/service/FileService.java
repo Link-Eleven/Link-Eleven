@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ImageService {
+public class FileService {
 
 	private final AmazonS3 amazonS3;
 

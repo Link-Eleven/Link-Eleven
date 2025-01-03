@@ -16,8 +16,7 @@ public class FeedExternalController {
 	private final FeedService feedService;
 
 	@GetMapping("/external/feeds/{feedId}")
-	public ResponseEntity<Boolean> checkFeedExits(@PathVariable Long feedId) {
-		boolean exits = feedService.checkFeedExists(feedId);
-		return ResponseEntity.ok(exits);
+	public boolean checkFeedExits(@PathVariable Long feedId) {
+		return feedService.checkFeedExists(feedId);
 	}
 }

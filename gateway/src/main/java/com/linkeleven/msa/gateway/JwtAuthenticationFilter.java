@@ -1,13 +1,14 @@
 package com.linkeleven.msa.gateway;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+import com.linkeleven.msa.gateway.application.service.UserService;
 import com.linkeleven.msa.gateway.libs.exception.CustomException;
 
 import io.jsonwebtoken.Claims;
@@ -18,10 +19,12 @@ import reactor.core.publisher.Mono;
 @Component
 public class JwtAuthenticationFilter implements GlobalFilter {
   private final JwtProvider jwtProvider;
+  private final UserService userService;
 
   @Autowired
-  public JwtAuthenticationFilter(JwtProvider jwtProvider) {
+  public JwtAuthenticationFilter(JwtProvider jwtProvider,@Lazy UserService userService) {
     this.jwtProvider = jwtProvider;
+    this.userService = userService;
   }
 
   @Override

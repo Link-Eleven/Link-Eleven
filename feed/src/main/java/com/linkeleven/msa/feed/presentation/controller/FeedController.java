@@ -44,8 +44,7 @@ public class FeedController {
 		@PathVariable Long feedId,
 		@RequestBody FeedUpdateRequestDto feedUpdateRequestDto) {
 
-		feedUpdateRequestDto.setFeedId(feedId);
-		FeedUpdateResponseDto response = feedService.updateFeed(feedUpdateRequestDto);
+		FeedUpdateResponseDto response = feedService.updateFeed(feedId, feedUpdateRequestDto);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
 	}
 

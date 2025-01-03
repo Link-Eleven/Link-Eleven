@@ -1,5 +1,7 @@
 package com.linkeleven.msa.interaction.application.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,21 +11,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CommentUpdateResponseDto {
+public class CommentQueryResponseDto {
 
 	private Long commentId;
 	private Long userId;
 	private String username;
 	private String content;
+	private LocalDateTime createdAt;
+	private Long likeCount;
+	private Long replyCount;
 
-	public static CommentUpdateResponseDto of(Long commentId, Long userId, String username, String content) {
-		return CommentUpdateResponseDto.builder()
-			.commentId(commentId)
-			.userId(userId)
-			.username(username)
-			.content(content)
-			.build();
-	}
 }
-
-

@@ -1,14 +1,20 @@
 package com.linkeleven.msa.feed.domain.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,6 +56,11 @@ public class Feed extends BaseTime {
 	@Builder.Default
 	@Column(name = "popularity_score", nullable = false)
 	private Double popularityScore = 0.0;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "feed_id")
+	@Builder.Default
+	private List<File> files = new ArrayList<>();
 
 	public static Feed of(Long userId, Long locationId, String title, String content, Category category) {
 		return Feed.builder()

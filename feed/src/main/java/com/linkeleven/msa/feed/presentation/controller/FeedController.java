@@ -1,5 +1,6 @@
 package com.linkeleven.msa.feed.presentation.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
@@ -33,18 +36,20 @@ public class FeedController {
 
 	@PostMapping
 	public ResponseEntity<SuccessResponseDto<FeedCreateResponseDto>> createFeed(
-		@RequestBody FeedCreateRequestDto feedCreateRequestDto) {
+		@RequestPart FeedCreateRequestDto feedCreateRequestDto,
+		@RequestParam(value = "file", required = false) List<MultipartFile> files) throws IOException {
 
-		FeedCreateResponseDto response = feedService.createFeed(feedCreateRequestDto);
+		FeedCreateResponseDto response = feedService.createFeed(feedCreateRequestDto, files);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 생성 성공", response));
 	}
 
 	@PutMapping("/{feedId}")
 	public ResponseEntity<SuccessResponseDto<FeedUpdateResponseDto>> updateFeed(
 		@PathVariable Long feedId,
-		@RequestBody FeedUpdateRequestDto feedUpdateRequestDto) {
+		@RequestBody FeedUpdateRequestDto feedUpdateRequestDto,
+		@RequestPart(value = "files", required = false) List<MultipartFile> files) throws IOException {
 
-		FeedUpdateResponseDto response = feedService.updateFeed(feedId, feedUpdateRequestDto);
+		FeedUpdateResponseDto response = feedService.updateFeed(feedId, feedUpdateRequestDto, files);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
 	}
 

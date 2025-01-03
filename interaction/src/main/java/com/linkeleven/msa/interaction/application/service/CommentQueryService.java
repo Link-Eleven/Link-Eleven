@@ -1,8 +1,8 @@
 package com.linkeleven.msa.interaction.application.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class CommentQueryService {
 
 	private final CommentRepository commentRepository;
-	public List<CommentQueryResponseDto> getCommentsWithCursor(
+	public Slice<CommentQueryResponseDto> getCommentsWithCursor(
 		Long feedId, Long cursorId, LocalDateTime cursorCreatedAt, Long cursorLikeCount,
 		int pageSize, String sortByEnum)
 	{

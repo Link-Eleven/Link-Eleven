@@ -1,8 +1,8 @@
 package com.linkeleven.msa.interaction.presentation.controller;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.linkeleven.msa.interaction.application.dto.PageResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyQueryResponseDto;
 import com.linkeleven.msa.interaction.application.service.ReplyQueryService;
 import com.linkeleven.msa.interaction.libs.dto.SuccessResponseDto;
@@ -26,7 +27,7 @@ public class ReplyQueryController {
 	private final ReplyQueryService replyQueryService;
 
 	@GetMapping("/{commentId}/replies")
-	public ResponseEntity<SuccessResponseDto<List<ReplyQueryResponseDto>>> getReplyList(
+	public ResponseEntity<SuccessResponseDto<PageResponseDto<ReplyQueryResponseDto>>> getReplyList(
 		@PathVariable Long commentId,
 		@RequestParam(required = false) Long cursorId,
 		@RequestParam(required = false) LocalDateTime cursorCreatedAt,
@@ -35,12 +36,13 @@ public class ReplyQueryController {
 		@RequestParam(required = false) String sortBy)
 	{
 		String sortByEnum = String.valueOf(SortBy.fromString(sortBy));
-		List<ReplyQueryResponseDto> responseDtoList = replyQueryService.getRepliesWithCursor(
+		Slice<ReplyQueryResponseDto> slice = replyQueryService.getRepliesWithCursor(
 			commentId, cursorId, cursorCreatedAt, cursorLikeCount, pageSize, sortByEnum
 		);
+
+		PageResponseDto<ReplyQueryResponseDto> responseDto = PageResponseDto.from(slice);
+
 		return ResponseEntity.ok()
-			.body(SuccessResponseDto.success("조회 성공", responseDtoList));
+			.body(SuccessResponseDto.success("조회 성공", responseDto));
 	}
-
-
 }

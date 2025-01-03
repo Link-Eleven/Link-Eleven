@@ -7,6 +7,9 @@ import static com.linkeleven.msa.interaction.domain.model.entity.QReply.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import com.linkeleven.msa.interaction.application.dto.CommentQueryResponseDto;
@@ -25,11 +28,12 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<CommentQueryResponseDto> findCommentByFeedWithCursor(
+	public Slice<CommentQueryResponseDto> findCommentByFeedWithCursor(
 		Long feedId, Long cursorId, int pageSize, String sortBy,
 		Long cursorLikeCount, LocalDateTime cursorCreatedAt)
 	{
-		return queryFactory.select(Projections.constructor(CommentQueryResponseDto.class,
+		List<CommentQueryResponseDto> responseDtoList =
+			queryFactory.select(Projections.constructor(CommentQueryResponseDto.class,
 				comment.id,
 				comment.contentDetails.userId,
 				comment.contentDetails.username,
@@ -47,8 +51,15 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 				cursorCondition(cursorId, sortBy, cursorLikeCount, cursorCreatedAt))
 			.groupBy(comment.id)
 			.orderBy(getOrderSpecifier(sortBy), comment.id.desc())
-			.limit(pageSize)
+			.limit(pageSize + 1)
 			.fetch();
+
+		boolean hasNext = responseDtoList.size() > pageSize;
+		if (hasNext) {
+			responseDtoList.remove(responseDtoList.size() - 1);
+		}
+
+		return new SliceImpl<>(responseDtoList, PageRequest.of(0, pageSize), hasNext);
 	}
 
 	private BooleanExpression cursorCondition(Long cursorId, String sortBy, Long cursorLikeCount, LocalDateTime cursorCreatedAt) {

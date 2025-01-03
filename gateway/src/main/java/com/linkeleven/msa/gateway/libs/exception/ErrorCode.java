@@ -20,7 +20,7 @@ public enum ErrorCode {
 
 	/*  403 FORBIDDEN : 권한 없음  */
 	FORBIDDEN(403, "권한이 없습니다."),
-
+	ROLE_NOT_EQUALS(403,"유저 권한이 일치하지 않습니다."),
 
 	/*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
 	ACCESS_DENIED(404, "접근 권한이 없습니다."),

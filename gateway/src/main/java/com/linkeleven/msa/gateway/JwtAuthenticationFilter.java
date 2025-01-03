@@ -8,8 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+import com.linkeleven.msa.gateway.application.dto.UserRoleResponseDto;
 import com.linkeleven.msa.gateway.application.service.UserService;
 import com.linkeleven.msa.gateway.libs.exception.CustomException;
+import com.linkeleven.msa.gateway.libs.exception.ErrorCode;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
       return exchange.getResponse().setComplete();
     }
     Claims claims = jwtProvider.parseToken(token);
+    validateUserRoleUserService(claims);
 
     exchange = exchange.mutate()
         .request(exchange.getRequest().mutate()
@@ -73,19 +76,16 @@ public class JwtAuthenticationFilter implements GlobalFilter {
   }
 
 
-  private Claims checkValidateAuthService(Claims body) {
-    String userId = body.get("user_id",String.class);
-    String role = body.get("role",String.class);
+  private void validateUserRoleUserService(Claims claims) {
+    String role = claims.get("role").toString();
+    long userId = Long.parseLong(claims.get("user_id").toString());
 
-    if(userId!=null){
-      //if(auth check)  false -> 에러 반환
-      return body;
+    if(role.equals("MASTER")||role.equals("COMPANY")) {
+      UserRoleResponseDto userRoleResponseDto=userService.getUserRole(userId);
+      if(!userRoleResponseDto.getRole().equals(role)) {
+        throw new CustomException(ErrorCode.ROLE_NOT_EQUALS);
+      }
     }
-    if(role!=null){
-      //if(auth check) 권한 같은지 확인 후 반환
-      return body;
-    }
-    return body;
   }
 
 }

@@ -43,7 +43,15 @@ public class FeedService {
 		);
 
 		if (files != null && !files.isEmpty()) {
-			feed.getFiles().addAll(uploadFiles(files));
+			for (MultipartFile file : files) {
+				String s3Url = fileService.uploadImage(file);
+				File fileEntity = File.of(
+					s3Url,
+					file.getOriginalFilename(),
+					file.getSize()
+				);
+				feed.getFiles().add(fileEntity);
+			}
 		}
 
 		Feed savedFeed = feedRepository.save(feed);
@@ -64,6 +72,15 @@ public class FeedService {
 
 		if (files != null && !files.isEmpty()) {
 			feed.getFiles().addAll(uploadFiles(files));
+			// for (MultipartFile file : files) {
+			// 	String s3Url = fileService.uploadImage(file);
+			// 	File fileEntity = File.of (
+			// 		s3Url,
+			// 		file.getOriginalFilename(),
+			// 		file.getSize()
+			// 	);
+			// 	feed.getFiles().add(fileEntity);
+			// }
 		}
 
 		Feed updatedFeed = feedRepository.save(feed);
@@ -75,13 +92,10 @@ public class FeedService {
 		Feed feed = feedRepository.findById(feedId)
 			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
 
-		for (File file : feed.getFiles()) {
-			fileService.deleteImage(file.getS3Url());
-			fileRepository.delete(file);
-		}
-
+		deleteFiles(feed);
 		feed.delete();
 		feedRepository.save(feed);
+
 	}
 
 	@Transactional
@@ -114,10 +128,12 @@ public class FeedService {
 		}).collect(Collectors.toList());
 	}
 
-	private void deleteFiles(List<File> files) {
+	private void deleteFiles(Feed feed) {
+		List<File> files = feed.getFiles();
 		files.forEach(file -> {
 			fileService.deleteImage(file.getS3Url());
 			fileRepository.delete(file);
 		});
+		feed.getFiles().clear();
 	}
 }

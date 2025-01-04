@@ -42,12 +42,13 @@ public class UserController {
 	@PatchMapping("/{userId}/isanonymous")
 	public ResponseEntity<SuccessResponseDto<UserUpdateAnonymousResponseDto>> updateAnonymous (
 		@RequestHeader("X-User-Id")String headerId,
+		@RequestHeader("X-Role")String role,
 		@PathVariable Long userId,
 		@RequestBody UserUpdateAnonymousRequestDto userUpdateAnonymousRequestDto
 	){
 		return ResponseEntity.ok(SuccessResponseDto.success(
 			"유저 익명성 정보가 변경되었습니다.",
-			userService.updateAnonymous(headerId,userId,userUpdateAnonymousRequestDto)
+			userService.updateAnonymous(headerId,role,userId,userUpdateAnonymousRequestDto)
 			));
 	}
 
@@ -67,23 +68,25 @@ public class UserController {
 	@PatchMapping("/{userId}/username")
 	public ResponseEntity<SuccessResponseDto<UserUpdateUsernameResponseDto>> updateUsername(
 		@RequestHeader("X-User-Id")String headerId,
+		@RequestHeader("X-Role")String role,
 		@PathVariable Long userId,
 		@RequestBody UserUpdateUsernameRequestDto userUpdateUsernameRequestDto
 	){
 		return ResponseEntity.ok(SuccessResponseDto.success(
 			"유저 이름 정보가 변경되었습니다.",
-			userService.updateUsername(headerId,userId,userUpdateUsernameRequestDto)
+			userService.updateUsername(headerId,role,userId,userUpdateUsernameRequestDto)
 		));
 	}
 
 	@DeleteMapping("/{userId}")
 	public ResponseEntity<SuccessResponseDto<UserDeleteResponseDto>> deleteUser(
 		@RequestHeader("X-User-Id")String headerId,
+		@RequestHeader("X-Role")String role,
 		@PathVariable Long userId
 	){
 		return ResponseEntity.ok(SuccessResponseDto.success(
 			"유저가 삭제되었습니다.",
-			userService.deleteUser(headerId,userId)
+			userService.deleteUser(headerId,role,userId)
 		));
 	}
  }

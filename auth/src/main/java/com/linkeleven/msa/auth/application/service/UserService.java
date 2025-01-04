@@ -38,10 +38,11 @@ public class UserService {
 	@Transactional
 	public UserUpdateAnonymousResponseDto updateAnonymous(
 		String headerId,
+		String role,
 		Long userId,
 		UserUpdateAnonymousRequestDto userUpdateAnonymousRequestDto
 	) {
-		User user=validateSameUser(Long.valueOf(headerId),userId);
+		User user=validateSameUser(Long.valueOf(headerId),userId,role);
 		if(!isBooleanValuesDifferent(user.getIsAnonymous(), userUpdateAnonymousRequestDto.getIsAnonymous())){
 			return UserUpdateAnonymousResponseDto.of(user.getUserId(),user.getIsAnonymous());
 		}
@@ -57,10 +58,10 @@ public class UserService {
 		Long userId,
 		UserUpdateCouponIssuedRequestDto userUpdateCouponIssuedRequestDto
 	) {
-		User user=validateSameUser(Long.valueOf(headerId),userId);
+		User user=validateSameUser(Long.valueOf(headerId),userId,role);
 		validateUserRole(role,user.getRole());
 
-		if(!role.equals("COMPANY")){
+		if(!user.getRole().toString().equals("COMPANY")){
 			throw new CustomException(ErrorCode.ONLY_COMPANY_USER);
 		}
 		if(!isBooleanValuesDifferent(user.getIsCouponIssued(), userUpdateCouponIssuedRequestDto.getIsCouponIssued())){
@@ -73,11 +74,12 @@ public class UserService {
 	@Transactional
 	public UserUpdateUsernameResponseDto updateUsername(
 		String headerId,
+		String role,
 		Long userId,
 		UserUpdateUsernameRequestDto userUpdateUsernameRequestDto
 	) {
 		validateUsernameDuplicate(userUpdateUsernameRequestDto.getUsername());
-		User user=validateSameUser(Long.valueOf(headerId),userId);
+		User user=validateSameUser(Long.valueOf(headerId),userId,role);
 
 		user.updateUsername(userUpdateUsernameRequestDto.getUsername());
 		return UserUpdateUsernameResponseDto.of(user.getUserId(),user.getUsername());
@@ -85,8 +87,8 @@ public class UserService {
 	}
 
 	@Transactional
-	public UserDeleteResponseDto deleteUser(String headerId, Long userId) {
-		User user=validateSameUser(Long.valueOf(headerId),userId);
+	public UserDeleteResponseDto deleteUser(String headerId,String role, Long userId) {
+		User user=validateSameUser(Long.valueOf(headerId),userId,role);
 		user.deleteUser(user.getUserId());
 
 		return UserDeleteResponseDto.from(user.getUserId());
@@ -101,16 +103,29 @@ public class UserService {
 		return user;
 	}
 
-	private User validateSameUser(Long headerId, Long userId) {
+	private User validateSameUser(Long headerId, Long userId,String role) {
+		if(role.equals("MASTER")){
+			return validateUserMaster(headerId,userId);
+		}
 		if(!headerId.equals(userId)){
 			throw new CustomException(ErrorCode.USER_SELF_ACCESS_ONLY);
 		}
 		return validateUserById(userId);
 	}
 
-	private void validateUserRole(String headerRole, UserRole role) {
-		if(!role.toString().equals(headerRole)){
+	private User validateUserMaster(Long headerId, Long userId) {
+		User master=validateUserById(headerId);
+		if(!master.getRole().toString().equals("MASTER")){
 			throw new CustomException(ErrorCode.USER_ROLE_NOT_EQUEALS);
+		}
+		return validateUserById(userId);
+	}
+
+	private void validateUserRole(String headerRole, UserRole role) {
+		if(!role.toString().equals("MASTER")){
+			if (!role.toString().equals(headerRole)) {
+				throw new CustomException(ErrorCode.USER_ROLE_NOT_EQUEALS);
+			}
 		}
 	}
 	private void validateUsernameDuplicate(String username) {

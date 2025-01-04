@@ -3,6 +3,7 @@ package com.linkeleven.msa.coupon.application.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.coupon.application.dto.IssuedCouponDto;
 import com.linkeleven.msa.coupon.domain.model.CouponPolicy;
@@ -21,6 +22,7 @@ public class CouponIssuingService {
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final IssuedCouponRepository issuedCouponRepository;
 
+	@Transactional
 	public IssuedCouponDto issueCoupon(Long userId, Long couponId) {
 		// 유저가 이미 해당 쿠폰을 발급받았는지 확인
 		if (issuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
@@ -38,9 +40,23 @@ public class CouponIssuingService {
 		couponPolicyRepository.save(selectedPolicy);
 
 		// 발급 쿠폰 생성
-		IssuedCoupon issuedCoupon = IssuedCoupon.of(userId, couponId, IssuedCouponStatus.ISSUED);
+		IssuedCoupon issuedCoupon = IssuedCoupon.of(userId, couponId);
 		issuedCoupon = issuedCouponRepository.save(issuedCoupon);
 
+		return IssuedCouponDto.from(issuedCoupon);
+	}
+
+	// 쿠폰 사용 메서드 추가
+	@Transactional
+	public IssuedCouponDto useCoupon(Long userId, Long couponId) {
+		IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(userId, couponId)
+			.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
+
+		if (issuedCoupon.getStatus() != IssuedCouponStatus.ISSUED) {
+			throw new CustomException(ErrorCode.EXPIRED_COUPON);
+		}
+
+		issuedCoupon.updateStatus(IssuedCouponStatus.USED);
 		return IssuedCouponDto.from(issuedCoupon);
 	}
 

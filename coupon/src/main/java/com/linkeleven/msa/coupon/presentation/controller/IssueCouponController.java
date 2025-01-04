@@ -29,6 +29,14 @@ public class IssueCouponController {
 		IssuedCouponDto issuedCoupon = couponIssuingService.issueCoupon(userId, couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 발급 완료", issuedCoupon));
 	}
+
+	@PostMapping("/{couponId}/use")
+	public ResponseEntity<SuccessResponseDto<IssuedCouponDto>> useCoupon(
+		@RequestHeader(value = "X-User-Id", required = false) Long userId,
+		@PathVariable Long couponId) {
+		IssuedCouponDto usedCoupon = couponIssuingService.useCoupon(userId, couponId);
+		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 사용 완료", usedCoupon));
+	}
 }
 
 

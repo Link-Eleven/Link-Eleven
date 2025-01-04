@@ -7,8 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.linkeleven.msa.coupon.domain.model.Coupon;
+import com.linkeleven.msa.coupon.infrastructure.repository.CouponRepositoryCustom;
 
-public interface CouponRepository extends JpaRepository<Coupon, Long> {
+public interface CouponRepository extends JpaRepository<Coupon, Long>, CouponRepositoryCustom {
 
 	boolean existsByFeedId(Long feedId);
 

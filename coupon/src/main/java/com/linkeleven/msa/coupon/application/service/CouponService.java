@@ -3,14 +3,18 @@ package com.linkeleven.msa.coupon.application.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.coupon.application.dto.CouponResponseDto;
+import com.linkeleven.msa.coupon.application.dto.CouponSearchResponseDto;
 import com.linkeleven.msa.coupon.application.dto.CouponWithStatsDto;
 import com.linkeleven.msa.coupon.domain.model.Coupon;
 import com.linkeleven.msa.coupon.domain.model.CouponPolicy;
+import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
 import com.linkeleven.msa.coupon.domain.repository.CouponPolicyRepository;
 import com.linkeleven.msa.coupon.domain.repository.CouponRepository;
 import com.linkeleven.msa.coupon.libs.exception.CustomException;
@@ -68,22 +72,10 @@ public class CouponService {
 
 	// 모든 쿠폰 조회
 	@Transactional(readOnly = true)
-	public List<CouponResponseDto> getAllCoupons() {
-		List<Coupon> coupons = couponRepository.findAll();
-		return coupons.stream()
-			.map(CouponResponseDto::from)
-			.toList();
-	}
-
-	@Transactional(readOnly = true)
-	public List<CouponWithStatsDto> getCouponsWithStats(Long userId, String role, Long feedId) {
-		if (!"COMPANY".equals(role)) {
-			throw new CustomException(ErrorCode.FORBIDDEN);
-		}
-		List<Object[]> results = couponRepository.findCouponsWithIssuedStatsByFeedId(feedId);
-		return results.stream()
-			.map(CouponWithStatsDto::of)
-			.toList();
+	public Page<CouponSearchResponseDto> searchCoupons(CouponPolicyStatus status, Long feedId, String validFrom,
+		String validTo,
+		Pageable pageable) {
+		return couponRepository.findCouponsByFilter(status, feedId, validFrom, validTo, pageable);
 	}
 
 	private void validateCouponRequest(CreateCouponRequestDto request, String role) throws CustomException {

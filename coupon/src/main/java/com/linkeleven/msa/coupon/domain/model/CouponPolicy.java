@@ -41,7 +41,7 @@ public class CouponPolicy extends BaseTime {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private CouponPolicyStatus status = CouponPolicyStatus.ACTIVE;
+	private CouponPolicyStatus status;
 
 	public static CouponPolicy of(Long couponId, int discountRate, int quantity) {
 		return CouponPolicy.builder()

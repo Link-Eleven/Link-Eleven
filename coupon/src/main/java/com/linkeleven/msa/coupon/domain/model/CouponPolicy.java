@@ -56,7 +56,7 @@ public class CouponPolicy extends BaseTime {
 	// issuedCount 증가 및 검증 메서드
 	public void issueCoupon() {
 		if (this.issuedCount < this.quantity) {
-			this.issuedCount++; // 발급 수량 증가
+			this.issuedCount++;
 		} else {
 			throw new CustomException(ErrorCode.NO_AVAILABLE_COUPON);
 		}

@@ -25,6 +25,12 @@ public class CouponService {
 	// 쿠폰 생성
 	public CouponResponseDto createCoupon(Long userId, String role, CreateCouponRequestDto request) {
 		// todo: 컨트롤러 require 제거시 null 체크 제거하기
+		// feed id 확인 (중복 생성 방지)
+		boolean exists = couponRepository.existsByFeedId((request.getFeedId()));
+		if (exists) {
+			throw new CustomException(ErrorCode.DUPLICATE_FEED_ID);
+		}
+		// 권한 확인
 		if (role == null || role.equals("USER")) {
 			throw new CustomException(ErrorCode.FORBIDDEN);
 		}

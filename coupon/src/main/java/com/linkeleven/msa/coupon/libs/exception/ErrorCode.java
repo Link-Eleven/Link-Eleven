@@ -18,16 +18,18 @@ public enum ErrorCode {
 
 	/*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
 	ACCESS_DENIED(404, "접근 권한이 없습니다."),
+	COUPON_NOT_FOUND(404, "쿠폰이 존재하지 않습니다."),
+	NO_AVAILABLE_POLICY(404, "유효한 쿠폰 정책이 없습니다."),
+	NO_AVAILABLE_COUPON(404, "유효한 쿠폰이 없습니다."),
+	COUPON_ALREADY_ISSUED(404, "이미 쿠폰이 발급되었습니다."),
 
 	/*  408 REQUEST_TIMEOUT : 요청에 대한 응답 시간 초과  */
 	TIMEOUT_ERROR(408, "응답시간을 초과하였습니다."),
 
-	// 쿠폰 예외처리
-	NO_AVAILABLE_POLICY(404, "유효한 쿠폰 정책이 없습니다."),
-	NO_AVAILABLE_COUPON(404, "유효한 쿠폰이 없습니다."),
-	COUPON_ALREADY_ISSUED(404, "이미 쿠폰이 발급되었습니다."),
-	DUPLICATE_FEED_ID(404, "중복된 쿠폰 피드 ID 입니다."),
 	/*  409 CONFLICT : Resource 중복  */
+	DUPLICATE_FEED_ID(409, "중복된 쿠폰 피드 ID 입니다."),
+
+	EXPIRED_COUPON(410, "쿠폰이 만료되었습니다."),
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
 	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다.");

@@ -43,15 +43,7 @@ public class FeedService {
 		);
 
 		if (files != null && !files.isEmpty()) {
-			for (MultipartFile file : files) {
-				String s3Url = fileService.uploadImage(file);
-				File fileEntity = File.of(
-					s3Url,
-					file.getOriginalFilename(),
-					file.getSize()
-				);
-				feed.getFiles().add(fileEntity);
-			}
+			feed.getFiles().addAll(uploadFiles(files));
 		}
 
 		Feed savedFeed = feedRepository.save(feed);
@@ -72,15 +64,6 @@ public class FeedService {
 
 		if (files != null && !files.isEmpty()) {
 			feed.getFiles().addAll(uploadFiles(files));
-			// for (MultipartFile file : files) {
-			// 	String s3Url = fileService.uploadImage(file);
-			// 	File fileEntity = File.of (
-			// 		s3Url,
-			// 		file.getOriginalFilename(),
-			// 		file.getSize()
-			// 	);
-			// 	feed.getFiles().add(fileEntity);
-			// }
 		}
 
 		Feed updatedFeed = feedRepository.save(feed);
@@ -118,13 +101,12 @@ public class FeedService {
 
 	private List<File> uploadFiles(List<MultipartFile> files) {
 		return files.stream().map(file -> {
-			String s3Url = null;
 			try {
-				s3Url = fileService.uploadImage(file);
+				String s3Url = fileService.uploadImage(file);
+				return File.of(s3Url, file.getOriginalFilename(), file.getSize());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			return File.of(s3Url, file.getOriginalFilename(), file.getSize());
 		}).collect(Collectors.toList());
 	}
 

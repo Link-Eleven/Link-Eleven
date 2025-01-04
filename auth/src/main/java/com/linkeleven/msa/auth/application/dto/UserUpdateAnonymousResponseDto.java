@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserUpdateAnonymousResponseDto {
 	private Long userId;
-	private boolean isAnonymous;
+	private Boolean isAnonymous;
 
-	public static UserUpdateAnonymousResponseDto of(Long userId,boolean isAnonymous) {
+	public static UserUpdateAnonymousResponseDto of(Long userId,Boolean isAnonymous) {
 		return UserUpdateAnonymousResponseDto.builder()
 			.userId(userId)
 			.isAnonymous(isAnonymous)

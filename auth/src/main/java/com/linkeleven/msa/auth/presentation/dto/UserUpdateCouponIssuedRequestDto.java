@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class UserUpdateCouponIssuedRequestDto {
-	private boolean isCouponIssued;
+	private Boolean isCouponIssued;
 }

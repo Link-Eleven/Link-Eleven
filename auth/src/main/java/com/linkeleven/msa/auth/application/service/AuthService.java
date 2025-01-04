@@ -32,7 +32,7 @@ public class AuthService {
 			signUpRequestDto.getUsername(),
 			password,
 			signUpRequestDto.getRole(),
-			signUpRequestDto.isAnonymous()
+			signUpRequestDto.getIsAnonymous()
 		);
 		userRepository.save(user);
 

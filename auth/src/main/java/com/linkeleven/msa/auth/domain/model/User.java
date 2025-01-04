@@ -37,11 +37,11 @@ public class User extends BaseTime {
 	private UserRole role;
 
 	@Column(name="is_anonymous",nullable = false)
-	private boolean isAnonymous;
+	private Boolean isAnonymous;
 
 	@Column(name="is_coupon_issued")
-	private boolean isCouponIssued;
-	public static User createUser(String username, String password, UserRole role, boolean isAnonymous) {
+	private Boolean isCouponIssued;
+	public static User createUser(String username, String password, UserRole role, Boolean isAnonymous) {
 		return User.builder()
 			.username(username)
 			.password(password)
@@ -51,10 +51,10 @@ public class User extends BaseTime {
 			.build();
 	}
 
-	public void updateAnonymous(boolean isAnonymous) {
+	public void updateAnonymous(Boolean isAnonymous) {
 		this.isAnonymous = isAnonymous;
 	}
-	public void updateCouponIssued(boolean isCouponIssued) {
+	public void updateCouponIssued(Boolean isCouponIssued) {
 		this.isCouponIssued = isCouponIssued;
 	}
 	public void updateUsername(String username) {

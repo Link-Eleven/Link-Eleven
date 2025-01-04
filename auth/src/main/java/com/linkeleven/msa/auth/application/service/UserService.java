@@ -41,12 +41,11 @@ public class UserService {
 		UserUpdateAnonymousRequestDto userUpdateAnonymousRequestDto
 	) {
 		User user=validateSameUser(Long.valueOf(headerId),userId);
-		//같은 경우 바로 return
-		if(user.isAnonymous()==userUpdateAnonymousRequestDto.isAnonymous()){
-			return UserUpdateAnonymousResponseDto.of(user.getUserId(), user.isAnonymous());
+		if(!isBooleanValuesDifferent(user.getIsAnonymous(), userUpdateAnonymousRequestDto.getIsAnonymous())){
+			return UserUpdateAnonymousResponseDto.of(user.getUserId(),user.getIsAnonymous());
 		}
-		user.updateAnonymous(userUpdateAnonymousRequestDto.isAnonymous());
-		return UserUpdateAnonymousResponseDto.of(user.getUserId(),user.isAnonymous());
+		user.updateAnonymous(userUpdateAnonymousRequestDto.getIsAnonymous());
+		return UserUpdateAnonymousResponseDto.of(user.getUserId(),user.getIsAnonymous());
 
 	}
 
@@ -61,11 +60,13 @@ public class UserService {
 		validateUserRole(role,user.getRole());
 
 		if(!role.equals("COMPANY")){
-			throw new CustomException(ErrorCode.FORBIDDEN);
+			throw new CustomException(ErrorCode.ONLY_COMPANY_USER);
 		}
-
-		user.updateCouponIssued(userUpdateCouponIssuedRequestDto.isCouponIssued());
-		return UserUpdateCouponIssuedResponseDto.of(user.getUserId(), user.isCouponIssued());
+		if(!isBooleanValuesDifferent(user.getIsCouponIssued(), userUpdateCouponIssuedRequestDto.getIsCouponIssued())){
+			return UserUpdateCouponIssuedResponseDto.of(user.getUserId(),user.getIsCouponIssued());
+		}
+		user.updateCouponIssued(userUpdateCouponIssuedRequestDto.getIsCouponIssued());
+		return UserUpdateCouponIssuedResponseDto.of(user.getUserId(), user.getIsCouponIssued());
 	}
 
 	@Transactional
@@ -97,7 +98,7 @@ public class UserService {
 	}
 
 	private void validateUserRole(String headerRole, UserRole role) {
-		if(!role.equals(headerRole)){
+		if(!role.toString().equals(headerRole)){
 			throw new CustomException(ErrorCode.USER_ROLE_NOT_EQUEALS);
 		}
 	}
@@ -106,5 +107,17 @@ public class UserService {
 			throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
 		}
 	}
-
+	//2개의 boolean값이 다른경우 true 같은경우 false
+	private Boolean isBooleanValuesDifferent(Boolean original,Boolean change){
+		if(original){
+			if(!change){
+				return true;
+			}
+			else return false;
+		}else{
+			if(change){
+				return true;
+			}else return false;
+		}
+	}
 }

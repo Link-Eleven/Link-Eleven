@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.auth.application.dto.UserMyInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateAnonymousResponseDto;
+import com.linkeleven.msa.auth.application.dto.UserUpdateCouponIssuedResponseDto;
 import com.linkeleven.msa.auth.application.service.UserService;
 import com.linkeleven.msa.auth.libs.dto.SuccessResponseDto;
 import com.linkeleven.msa.auth.presentation.dto.UserUpdateAnonymousRequestDto;
+import com.linkeleven.msa.auth.presentation.dto.UserUpdateCouponIssuedRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,4 +47,16 @@ public class UserController {
 			));
 	}
 
+	@PatchMapping("/{userId}/iscouponissued")
+	public ResponseEntity<SuccessResponseDto<UserUpdateCouponIssuedResponseDto>> updateCouponIssued (
+		@RequestHeader("X-User-Id")String headerId,
+		@RequestHeader("X-Role")String role,
+		@PathVariable Long userId,
+		@RequestBody UserUpdateCouponIssuedRequestDto userUpdateCouponIssuedRequestDto
+		){
+		return ResponseEntity.ok(SuccessResponseDto.success(
+			"유저 쿠폰 발급 정보가 변경되었습니다.",
+			userService.updateCouponIssued(headerId,role,userId,userUpdateCouponIssuedRequestDto)
+		));
+	}
 }

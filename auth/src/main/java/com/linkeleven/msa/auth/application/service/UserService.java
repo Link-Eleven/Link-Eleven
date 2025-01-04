@@ -5,11 +5,14 @@ import org.springframework.stereotype.Service;
 import com.linkeleven.msa.auth.application.dto.UserMyInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserRoleResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateAnonymousResponseDto;
+import com.linkeleven.msa.auth.application.dto.UserUpdateCouponIssuedResponseDto;
+import com.linkeleven.msa.auth.domain.common.UserRole;
 import com.linkeleven.msa.auth.domain.model.User;
 import com.linkeleven.msa.auth.domain.repository.UserRepository;
 import com.linkeleven.msa.auth.libs.exception.CustomException;
 import com.linkeleven.msa.auth.libs.exception.ErrorCode;
 import com.linkeleven.msa.auth.presentation.dto.UserUpdateAnonymousRequestDto;
+import com.linkeleven.msa.auth.presentation.dto.UserUpdateCouponIssuedRequestDto;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +38,7 @@ public class UserService {
 		Long userId,
 		UserUpdateAnonymousRequestDto userUpdateAnonymousRequestDto
 	) {
-		if(headerId.equals(userId)){
-			throw new CustomException(ErrorCode.USER_SELF_ACCESS_ONLY);
-		}
+		validateSameUser(Long.valueOf(headerId),userId);
 		User user=validateUserById(userId);
 		//같은 경우 바로 return
 		if(user.isAnonymous()==userUpdateAnonymousRequestDto.isAnonymous()){
@@ -47,9 +48,42 @@ public class UserService {
 		return UserUpdateAnonymousResponseDto.from(user.getUserId());
 
 	}
-	private User validateUserById(long userId) {
+
+	@Transactional
+	public UserUpdateCouponIssuedResponseDto updateCouponIssued(
+		String headerId,
+		String role,
+		Long userId,
+		UserUpdateCouponIssuedRequestDto userUpdateCouponIssuedRequestDto
+	) {
+		validateSameUser(Long.valueOf(headerId),userId);
+		User user=validateUserById(userId);
+		validateUserRole(role,user.getRole());
+
+		if(!role.equals("COMPANY")){
+			throw new CustomException(ErrorCode.FORBIDDEN);
+		}
+
+		user.updateCouponIssued(userUpdateCouponIssuedRequestDto.isCouponIssued());
+		return UserUpdateCouponIssuedResponseDto.from(user.getUserId());
+	}
+
+
+	private User validateUserById(Long userId) {
 		return userRepository.findById(userId).orElseThrow(
 			()->new CustomException(ErrorCode.USER_NOT_FOUND));
+	}
+
+	private void validateSameUser(Long headerId, Long userId) {
+		if(!headerId.equals(userId)){
+			throw new CustomException(ErrorCode.USER_SELF_ACCESS_ONLY);
+		}
+	}
+
+	private void validateUserRole(String headerRole, UserRole role) {
+		if(!role.equals(headerRole)){
+			throw new CustomException(ErrorCode.USER_ROLE_NOT_EQUEALS);
+		}
 	}
 
 }

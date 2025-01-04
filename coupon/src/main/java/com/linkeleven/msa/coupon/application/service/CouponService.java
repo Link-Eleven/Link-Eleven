@@ -1,12 +1,16 @@
 package com.linkeleven.msa.coupon.application.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.coupon.application.dto.CouponResponseDto;
 import com.linkeleven.msa.coupon.domain.model.Coupon;
 import com.linkeleven.msa.coupon.domain.model.CouponPolicy;
+import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
 import com.linkeleven.msa.coupon.domain.repository.CouponPolicyRepository;
 import com.linkeleven.msa.coupon.domain.repository.CouponRepository;
 import com.linkeleven.msa.coupon.libs.exception.CustomException;
@@ -40,7 +44,6 @@ public class CouponService {
 	// 쿠폰 생성
 	@Transactional
 	public CouponResponseDto createCoupon(Long userId, String role, CreateCouponRequestDto request) {
-		// todo: 컨트롤러 require 제거시 null 체크 제거하기
 		// feed id 확인 (중복 생성 방지)
 		boolean exists = couponRepository.existsByFeedId((request.getFeedId()));
 		if (exists) {

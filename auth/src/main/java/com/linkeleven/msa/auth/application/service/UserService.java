@@ -2,6 +2,7 @@ package com.linkeleven.msa.auth.application.service;
 
 import org.springframework.stereotype.Service;
 
+import com.linkeleven.msa.auth.application.dto.UserDeleteResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserMyInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserRoleResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateAnonymousResponseDto;
@@ -70,7 +71,7 @@ public class UserService {
 	}
 
 	@Transactional
-	public UserUpdateUsernameResponseDto updateUesrname(
+	public UserUpdateUsernameResponseDto updateUsername(
 		String headerId,
 		Long userId,
 		UserUpdateUsernameRequestDto userUpdateUsernameRequestDto
@@ -83,11 +84,21 @@ public class UserService {
 
 	}
 
+	@Transactional
+	public UserDeleteResponseDto deleteUser(String headerId, Long userId) {
+		User user=validateSameUser(Long.valueOf(headerId),userId);
+		user.deleteUser(user.getUserId());
 
+		return UserDeleteResponseDto.from(user.getUserId());
+	}
 
 	private User validateUserById(Long userId) {
-		return userRepository.findById(userId).orElseThrow(
+		User user =userRepository.findById(userId).orElseThrow(
 			()->new CustomException(ErrorCode.USER_NOT_FOUND));
+		if(user.getDeletedBy()!=null){
+			throw new CustomException(ErrorCode.USER_NOT_FOUND);
+		}
+		return user;
 	}
 
 	private User validateSameUser(Long headerId, Long userId) {

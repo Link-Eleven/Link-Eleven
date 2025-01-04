@@ -1,5 +1,7 @@
 package com.linkeleven.msa.auth.domain.model;
 
+import java.time.LocalDateTime;
+
 import com.linkeleven.msa.auth.domain.common.UserRole;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
@@ -59,5 +61,10 @@ public class User extends BaseTime {
 	}
 	public void updateUsername(String username) {
 		this.username = username;
+	}
+
+	public void deleteUser(Long userId) {
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(userId);
 	}
 }

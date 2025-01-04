@@ -31,7 +31,8 @@ public class FeedService {
 	private final FileRepository fileRepository;
 
 	@Transactional
-	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files) throws IOException {
+	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files) throws
+		IOException {
 
 		Feed feed = Feed.of(
 			feedCreateRequestDto.getUserId(),
@@ -50,7 +51,8 @@ public class FeedService {
 	}
 
 	@Transactional
-	public FeedUpdateResponseDto updateFeed(Long feedId, FeedUpdateRequestDto feedUpdateRequestDto, List<MultipartFile> files) throws IOException {
+	public FeedUpdateResponseDto updateFeed(Long feedId, FeedUpdateRequestDto feedUpdateRequestDto,
+		List<MultipartFile> files) throws IOException {
 		Feed feed = feedRepository.findByIdAndDeletedAt(feedId)
 			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
 
@@ -61,15 +63,7 @@ public class FeedService {
 		);
 
 		if (files != null && !files.isEmpty()) {
-			for (MultipartFile file : files) {
-				String s3Url = fileService.uploadImage(file);
-				File fileEntity = File.of (
-					s3Url,
-					file.getOriginalFilename(),
-					file.getSize()
-				);
-				feed.getFiles().add(fileEntity);
-			}
+			feed.getFiles().addAll(uploadFiles(files));
 		}
 
 		Feed updatedFeed = feedRepository.save(feed);
@@ -108,7 +102,7 @@ public class FeedService {
 		return feedRepository.existsById(feedId);
 	}
 
-	private List<File> uploadFiles(List<MultipartFile> files) throws IOException {
+	private List<File> uploadFiles(List<MultipartFile> files) {
 		return files.stream().map(file -> {
 			String s3Url = null;
 			try {

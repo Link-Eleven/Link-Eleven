@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -46,8 +45,8 @@ public class FeedController {
 	@PutMapping("/{feedId}")
 	public ResponseEntity<SuccessResponseDto<FeedUpdateResponseDto>> updateFeed(
 		@PathVariable Long feedId,
-		@RequestBody FeedUpdateRequestDto feedUpdateRequestDto,
-		@RequestPart(value = "files", required = false) List<MultipartFile> files) throws IOException {
+		@RequestPart FeedUpdateRequestDto feedUpdateRequestDto,
+		@RequestParam(value = "file", required = false) List<MultipartFile> files) throws IOException {
 
 		FeedUpdateResponseDto response = feedService.updateFeed(feedId, feedUpdateRequestDto, files);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));

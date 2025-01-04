@@ -40,11 +40,10 @@ public class Coupon extends BaseTime {
 	@OneToMany(mappedBy = "couponId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<CouponPolicy> policies;  // 쿠폰 정책 목록
 
-	public static Coupon of(Long feedId, List<CouponPolicy> policies,
+	public static Coupon of(Long feedId,
 		LocalDateTime validFrom, LocalDateTime validTo) {
 		return Coupon.builder()
 			.feedId(feedId)
-			.policies(policies)
 			.validFrom(validFrom)
 			.validTo(validTo)
 			.build();

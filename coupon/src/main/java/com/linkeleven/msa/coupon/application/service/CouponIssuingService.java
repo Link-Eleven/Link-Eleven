@@ -24,13 +24,13 @@ public class CouponIssuingService {
 	public IssuedCouponDto issueCoupon(Long userId, Long couponId) {
 		// 유저가 이미 해당 쿠폰을 발급받았는지 확인
 		if (issuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
-			throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED_EXCEPTION);
+			throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);
 		}
 		// 쿠폰 정책 확인
 		List<CouponPolicy> availablePolicies = couponPolicyRepository.findAvailablePolicies(couponId);
 
 		if (availablePolicies.isEmpty()) {
-			throw new CustomException(ErrorCode.NO_AVAILABLE_POLICY_EXCEPTION);
+			throw new CustomException(ErrorCode.NO_AVAILABLE_POLICY);
 		}
 
 		CouponPolicy selectedPolicy = availablePolicies.get(0); // 첫 번째 쿠폰정책 선택

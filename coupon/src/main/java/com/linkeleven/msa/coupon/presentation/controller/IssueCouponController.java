@@ -3,14 +3,13 @@ package com.linkeleven.msa.coupon.presentation.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.coupon.application.dto.IssuedCouponDto;
 import com.linkeleven.msa.coupon.application.service.CouponIssuingService;
 import com.linkeleven.msa.coupon.libs.dto.SuccessResponseDto;
-import com.linkeleven.msa.coupon.presentation.request.IssueCouponRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,9 +23,10 @@ public class IssueCouponController {
 	// 쿠폰 발급 API
 	@PostMapping("/{couponId}/issue")
 	public ResponseEntity<SuccessResponseDto<IssuedCouponDto>> issueCoupon(
-		@PathVariable Long couponId,
-		@RequestBody IssueCouponRequestDto request) {
-		IssuedCouponDto issuedCoupon = couponIssuingService.issueCoupon(couponId, request);
+		// todo: 게이트웨이 연결시 required 제거하기
+		@RequestHeader(value = "X-User-Id", required = false) Long userId,
+		@PathVariable Long couponId) {
+		IssuedCouponDto issuedCoupon = couponIssuingService.issueCoupon(userId, couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 발급 완료", issuedCoupon));
 	}
 }

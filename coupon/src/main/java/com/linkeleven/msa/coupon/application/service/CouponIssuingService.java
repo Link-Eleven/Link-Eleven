@@ -12,7 +12,6 @@ import com.linkeleven.msa.coupon.domain.repository.CouponPolicyRepository;
 import com.linkeleven.msa.coupon.domain.repository.IssuedCouponRepository;
 import com.linkeleven.msa.coupon.libs.exception.CustomException;
 import com.linkeleven.msa.coupon.libs.exception.ErrorCode;
-import com.linkeleven.msa.coupon.presentation.request.IssueCouponRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,9 +21,9 @@ public class CouponIssuingService {
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final IssuedCouponRepository issuedCouponRepository;
 
-	public IssuedCouponDto issueCoupon(Long couponId, IssueCouponRequestDto request) {
+	public IssuedCouponDto issueCoupon(Long userId, Long couponId) {
 		// 유저가 이미 해당 쿠폰을 발급받았는지 확인
-		if (issuedCouponRepository.existsByUserIdAndCouponId(request.getUserId(), couponId)) {
+		if (issuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
 			throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED_EXCEPTION);
 		}
 		// 쿠폰 정책 확인
@@ -39,7 +38,7 @@ public class CouponIssuingService {
 		couponPolicyRepository.save(selectedPolicy);
 
 		// 발급 쿠폰 생성
-		IssuedCoupon issuedCoupon = IssuedCoupon.of(request.getUserId(), couponId, IssuedCouponStatus.ISSUED);
+		IssuedCoupon issuedCoupon = IssuedCoupon.of(userId, couponId, IssuedCouponStatus.ISSUED);
 		issuedCoupon = issuedCouponRepository.save(issuedCoupon);
 
 		return IssuedCouponDto.from(issuedCoupon);

@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${COUPON_DB_URL}
-    username: ${COUPON_DB_USER}
-    password: ${COUPON_DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/coupon_db
+    username: postgres
+    password: 1234
     driver-class-name: org.postgresql.Driver
 
   jpa:

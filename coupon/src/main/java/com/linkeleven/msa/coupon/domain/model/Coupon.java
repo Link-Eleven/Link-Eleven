@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,10 +19,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "p_coupon")
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Coupon extends BaseTime {
 	@Id
 	@Tsid
@@ -28,20 +31,22 @@ public class Coupon extends BaseTime {
 	@Column(nullable = false)
 	private Long feedId;
 
-	@Column(updatable = false)
-	private int quantity;
-
-	@OneToMany(mappedBy = "coupon")
-	private List<IssuedCoupon> issuedCoupons; // 발급된 쿠폰 리스트
-	
-	@Column(columnDefinition = "int default 0")
-	private int issuedCount;
-
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime validFrom;
 
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime validTo;
 
-	private int discountRate;
+	@OneToMany(mappedBy = "couponId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<CouponPolicy> policies;  // 쿠폰 정책 목록
+
+	public static Coupon of(Long feedId, List<CouponPolicy> policies,
+		LocalDateTime validFrom, LocalDateTime validTo) {
+		return Coupon.builder()
+			.feedId(feedId)
+			.policies(policies)
+			.validFrom(validFrom)
+			.validTo(validTo)
+			.build();
+	}
 }

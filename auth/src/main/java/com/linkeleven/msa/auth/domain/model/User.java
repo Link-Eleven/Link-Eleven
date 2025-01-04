@@ -51,5 +51,13 @@ public class User extends BaseTime {
 			.build();
 	}
 
-
+	public void updateAnonymous(boolean isAnonymous) {
+		this.isAnonymous = isAnonymous;
+	}
+	public void updateCouponIssued(boolean isCouponIssued) {
+		this.isCouponIssued = isCouponIssued;
+	}
+	public void updateUsername(String username) {
+		this.username = username;
+	}
 }

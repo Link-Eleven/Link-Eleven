@@ -17,6 +17,7 @@ public enum ErrorCode {
 
 	/*  403 FORBIDDEN : 권한 없음  */
 	FORBIDDEN(403, "권한이 없습니다."),
+	USER_SELF_ACCESS_ONLY(403,"본인 정보만 가능합니다."),
 
 
 	/*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */

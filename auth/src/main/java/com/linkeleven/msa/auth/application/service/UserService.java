@@ -6,6 +6,7 @@ import com.linkeleven.msa.auth.application.dto.UserMyInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserRoleResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateAnonymousResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateCouponIssuedResponseDto;
+import com.linkeleven.msa.auth.application.dto.UserUpdateUsernameResponseDto;
 import com.linkeleven.msa.auth.domain.common.UserRole;
 import com.linkeleven.msa.auth.domain.model.User;
 import com.linkeleven.msa.auth.domain.repository.UserRepository;
@@ -13,6 +14,7 @@ import com.linkeleven.msa.auth.libs.exception.CustomException;
 import com.linkeleven.msa.auth.libs.exception.ErrorCode;
 import com.linkeleven.msa.auth.presentation.dto.UserUpdateAnonymousRequestDto;
 import com.linkeleven.msa.auth.presentation.dto.UserUpdateCouponIssuedRequestDto;
+import com.linkeleven.msa.auth.presentation.dto.UserUpdateUsernameRequestDto;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +70,22 @@ public class UserService {
 		return UserUpdateCouponIssuedResponseDto.from(user.getUserId());
 	}
 
+	@Transactional
+	public UserUpdateUsernameResponseDto updateUesrname(
+		String headerId,
+		Long userId,
+		UserUpdateUsernameRequestDto userUpdateUsernameRequestDto
+	) {
+		validateUsernameDuplicate(userUpdateUsernameRequestDto.getUsername());
+		validateSameUser(Long.valueOf(headerId),userId);
+		User user=validateUserById(userId);
+
+		user.updateUsername(userUpdateUsernameRequestDto.getUsername());
+		return UserUpdateUsernameResponseDto.from(user.getUserId());
+
+	}
+
+
 
 	private User validateUserById(Long userId) {
 		return userRepository.findById(userId).orElseThrow(
@@ -83,6 +101,11 @@ public class UserService {
 	private void validateUserRole(String headerRole, UserRole role) {
 		if(!role.equals(headerRole)){
 			throw new CustomException(ErrorCode.USER_ROLE_NOT_EQUEALS);
+		}
+	}
+	private void validateUsernameDuplicate(String username) {
+		if(userRepository.existsByUsername(username)){
+			throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
 		}
 	}
 

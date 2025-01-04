@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.linkeleven.msa.auth.application.dto.UserMyInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateAnonymousResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateCouponIssuedResponseDto;
+import com.linkeleven.msa.auth.application.dto.UserUpdateUsernameResponseDto;
 import com.linkeleven.msa.auth.application.service.UserService;
 import com.linkeleven.msa.auth.libs.dto.SuccessResponseDto;
 import com.linkeleven.msa.auth.presentation.dto.UserUpdateAnonymousRequestDto;
 import com.linkeleven.msa.auth.presentation.dto.UserUpdateCouponIssuedRequestDto;
+import com.linkeleven.msa.auth.presentation.dto.UserUpdateUsernameRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,6 +59,18 @@ public class UserController {
 		return ResponseEntity.ok(SuccessResponseDto.success(
 			"유저 쿠폰 발급 정보가 변경되었습니다.",
 			userService.updateCouponIssued(headerId,role,userId,userUpdateCouponIssuedRequestDto)
+		));
+	}
+
+	@PatchMapping("/{userId}/username")
+	public ResponseEntity<SuccessResponseDto<UserUpdateUsernameResponseDto>> updateUsername(
+		@RequestHeader("X-User-Id")String headerId,
+		@PathVariable Long userId,
+		@RequestBody UserUpdateUsernameRequestDto userUpdateUsernameRequestDto
+	){
+		return ResponseEntity.ok(SuccessResponseDto.success(
+			"유저 이름 정보가 변경되었습니다.",
+			userService.updateUesrname(headerId,userId,userUpdateUsernameRequestDto)
 		));
 	}
 }

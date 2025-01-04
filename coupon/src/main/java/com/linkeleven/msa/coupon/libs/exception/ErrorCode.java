@@ -23,9 +23,10 @@ public enum ErrorCode {
 	TIMEOUT_ERROR(408, "응답시간을 초과하였습니다."),
 
 	// 쿠폰 예외처리
-	NO_AVAILABLE_POLICY_EXCEPTION(404, "유효한 쿠폰 정책이 없습니다."),
+	NO_AVAILABLE_POLICY(404, "유효한 쿠폰 정책이 없습니다."),
 	NO_AVAILABLE_COUPON(404, "유효한 쿠폰이 없습니다."),
-	COUPON_ALREADY_ISSUED_EXCEPTION(404, "이미 쿠폰이 발급되었습니다."),
+	COUPON_ALREADY_ISSUED(404, "이미 쿠폰이 발급되었습니다."),
+	DUPLICATE_FEED_ID(404, "중복된 쿠폰 피드 ID 입니다."),
 	/*  409 CONFLICT : Resource 중복  */
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */

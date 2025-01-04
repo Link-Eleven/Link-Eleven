@@ -9,7 +9,7 @@ public enum ErrorCode {
 
 	/*  400 BAD_REQUEST : 잘못된 요청  */
 	ILLEGAL_ARGUMENT_ERROR(400, "잘못된 파라미터 전달"),
-
+	INVALID_DATE_RANGE(400, "유효 기간이 잘못되었습니다. 유효 시작 시간은 현재 시간보다 이후여야 하며, 유효 만료 시간은 현재 시간보다 이후이면서 시작 시간보다 이전이어야 합니다."),
 	/*  401 UNAUTHORIZED : 인증 안됨  */
 	UNAUTHORIZED(401, "인증되지 않았습니다."),
 

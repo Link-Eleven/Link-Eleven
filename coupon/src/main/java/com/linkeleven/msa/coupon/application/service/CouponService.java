@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.coupon.application.dto.CouponResponseDto;
+import com.linkeleven.msa.coupon.application.dto.CouponWithStatsDto;
 import com.linkeleven.msa.coupon.domain.model.Coupon;
 import com.linkeleven.msa.coupon.domain.model.CouponPolicy;
-import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
 import com.linkeleven.msa.coupon.domain.repository.CouponPolicyRepository;
 import com.linkeleven.msa.coupon.domain.repository.CouponRepository;
 import com.linkeleven.msa.coupon.libs.exception.CustomException;
@@ -27,33 +27,24 @@ public class CouponService {
 	private final CouponPolicyRepository couponPolicyRepository;
 
 	@Scheduled(cron = "0 0 0 * * *")  // 매일 자정에 실행
+	@Transactional
 	public void updateExpiredCouponsStatus() {
+		// 유효기한 지난 쿠폰 상태변경
 		LocalDateTime currentTime = LocalDateTime.now();
-		List<Coupon> expiredCoupons = couponRepository.findCouponsByValidToBeforeAndStatusNot(currentTime, "INACTIVE");
+		List<Coupon> expiredCoupons = couponRepository.findCouponsByValidToBeforeAndCouponPolicyStatusNot(currentTime);
 
 		for (Coupon coupon : expiredCoupons) {
-			List<CouponPolicy> couponPolicies = coupon.getPolicies();
-			for (CouponPolicy couponPolicy : couponPolicies) {
-				// 유효기간이 지난 쿠폰상태를 INACTIVE
-				couponPolicy.updateStatus(CouponPolicyStatus.INACTIVE);
-				couponPolicyRepository.save(couponPolicy);
-			}
+			couponPolicyRepository.updateCouponPolicyStatusToInactive(coupon.getCouponId());
 		}
 	}
 
 	// 쿠폰 생성
 	@Transactional
 	public CouponResponseDto createCoupon(Long userId, String role, CreateCouponRequestDto request) {
-		// feed id 확인 (중복 생성 방지)
-		boolean exists = couponRepository.existsByFeedId((request.getFeedId()));
-		if (exists) {
-			throw new CustomException(ErrorCode.DUPLICATE_FEED_ID);
-		}
-		// 권한 확인
-		if (role == null || role.equals("USER")) {
-			// todo: 컨트롤러 require 제거시 null 체크 제거하기
-			throw new CustomException(ErrorCode.FORBIDDEN);
-		}
+		// 유효한 요청인지 확인
+		validateCouponRequest(request, role);
+
+		// 쿠폰 생성
 		Coupon coupon = Coupon.of(request.getFeedId(), request.getValidFrom(), request.getValidTo());
 		coupon = couponRepository.save(coupon);
 
@@ -65,5 +56,52 @@ public class CouponService {
 		);
 		couponPolicyRepository.saveAll(policies);
 		return CouponResponseDto.from(coupon);
+	}
+
+	// 쿠폰 ID로 쿠폰 조회
+	@Transactional(readOnly = true)
+	public CouponResponseDto getCouponById(Long couponId) {
+		Coupon coupon = couponRepository.findById(couponId)
+			.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
+		return CouponResponseDto.from(coupon);
+	}
+
+	// 모든 쿠폰 조회
+	@Transactional(readOnly = true)
+	public List<CouponResponseDto> getAllCoupons() {
+		List<Coupon> coupons = couponRepository.findAll();
+		return coupons.stream()
+			.map(CouponResponseDto::from)
+			.toList();
+	}
+
+	@Transactional(readOnly = true)
+	public List<CouponWithStatsDto> getCouponsWithStats(Long userId, String role, Long feedId) {
+		if (!"COMPANY".equals(role)) {
+			throw new CustomException(ErrorCode.FORBIDDEN);
+		}
+		List<Object[]> results = couponRepository.findCouponsWithIssuedStatsByFeedId(feedId);
+		return results.stream()
+			.map(CouponWithStatsDto::of)
+			.toList();
+	}
+
+	private void validateCouponRequest(CreateCouponRequestDto request, String role) throws CustomException {
+		// feed id 확인 (중복 생성 방지)
+		boolean exists = couponRepository.existsByFeedId(request.getFeedId());
+		if (exists) {
+			throw new CustomException(ErrorCode.DUPLICATE_FEED_ID);
+		}
+		// 권한 확인
+		if (role == null || role.equals("USER")) {
+			throw new CustomException(ErrorCode.FORBIDDEN);
+		}
+		// 쿠폰 시작일 확인
+		if (!(request.getValidFrom().isAfter(LocalDateTime.now())
+			&& request.getValidTo().isAfter(LocalDateTime.now())
+			&& request.getValidFrom().isBefore(request.getValidTo()))) {
+			throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
+		}
+
 	}
 }

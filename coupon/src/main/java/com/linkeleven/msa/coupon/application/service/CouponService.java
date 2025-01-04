@@ -22,7 +22,23 @@ public class CouponService {
 	private final CouponRepository couponRepository;
 	private final CouponPolicyRepository couponPolicyRepository;
 
+	@Scheduled(cron = "0 0 0 * * *")  // 매일 자정에 실행
+	public void updateExpiredCouponsStatus() {
+		LocalDateTime currentTime = LocalDateTime.now();
+		List<Coupon> expiredCoupons = couponRepository.findCouponsByValidToBeforeAndStatusNot(currentTime, "INACTIVE");
+
+		for (Coupon coupon : expiredCoupons) {
+			List<CouponPolicy> couponPolicies = coupon.getPolicies();
+			for (CouponPolicy couponPolicy : couponPolicies) {
+				// 유효기간이 지난 쿠폰상태를 INACTIVE
+				couponPolicy.updateStatus(CouponPolicyStatus.INACTIVE);
+				couponPolicyRepository.save(couponPolicy);
+			}
+		}
+	}
+
 	// 쿠폰 생성
+	@Transactional
 	public CouponResponseDto createCoupon(Long userId, String role, CreateCouponRequestDto request) {
 		// todo: 컨트롤러 require 제거시 null 체크 제거하기
 		// feed id 확인 (중복 생성 방지)
@@ -32,6 +48,7 @@ public class CouponService {
 		}
 		// 권한 확인
 		if (role == null || role.equals("USER")) {
+			// todo: 컨트롤러 require 제거시 null 체크 제거하기
 			throw new CustomException(ErrorCode.FORBIDDEN);
 		}
 		Coupon coupon = Coupon.of(request.getFeedId(), request.getValidFrom(), request.getValidTo());
@@ -46,5 +63,4 @@ public class CouponService {
 		couponPolicyRepository.saveAll(policies);
 		return CouponResponseDto.from(coupon);
 	}
-
 }

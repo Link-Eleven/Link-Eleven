@@ -11,10 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserUpdateUsernameResponseDto {
 	private Long userId;
+	private String username;
 
-	public static UserUpdateUsernameResponseDto from(Long userId) {
+	public static UserUpdateUsernameResponseDto of(Long userId,String username) {
 		return UserUpdateUsernameResponseDto.builder()
 			.userId(userId)
+			.username(username)
 			.build();
 
 	}

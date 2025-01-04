@@ -40,14 +40,13 @@ public class UserService {
 		Long userId,
 		UserUpdateAnonymousRequestDto userUpdateAnonymousRequestDto
 	) {
-		validateSameUser(Long.valueOf(headerId),userId);
-		User user=validateUserById(userId);
+		User user=validateSameUser(Long.valueOf(headerId),userId);
 		//같은 경우 바로 return
 		if(user.isAnonymous()==userUpdateAnonymousRequestDto.isAnonymous()){
-			return UserUpdateAnonymousResponseDto.from(user.getUserId());
+			return UserUpdateAnonymousResponseDto.of(user.getUserId(), user.isAnonymous());
 		}
 		user.updateAnonymous(userUpdateAnonymousRequestDto.isAnonymous());
-		return UserUpdateAnonymousResponseDto.from(user.getUserId());
+		return UserUpdateAnonymousResponseDto.of(user.getUserId(),user.isAnonymous());
 
 	}
 
@@ -58,8 +57,7 @@ public class UserService {
 		Long userId,
 		UserUpdateCouponIssuedRequestDto userUpdateCouponIssuedRequestDto
 	) {
-		validateSameUser(Long.valueOf(headerId),userId);
-		User user=validateUserById(userId);
+		User user=validateSameUser(Long.valueOf(headerId),userId);
 		validateUserRole(role,user.getRole());
 
 		if(!role.equals("COMPANY")){
@@ -67,7 +65,7 @@ public class UserService {
 		}
 
 		user.updateCouponIssued(userUpdateCouponIssuedRequestDto.isCouponIssued());
-		return UserUpdateCouponIssuedResponseDto.from(user.getUserId());
+		return UserUpdateCouponIssuedResponseDto.of(user.getUserId(), user.isCouponIssued());
 	}
 
 	@Transactional
@@ -77,11 +75,10 @@ public class UserService {
 		UserUpdateUsernameRequestDto userUpdateUsernameRequestDto
 	) {
 		validateUsernameDuplicate(userUpdateUsernameRequestDto.getUsername());
-		validateSameUser(Long.valueOf(headerId),userId);
-		User user=validateUserById(userId);
+		User user=validateSameUser(Long.valueOf(headerId),userId);
 
 		user.updateUsername(userUpdateUsernameRequestDto.getUsername());
-		return UserUpdateUsernameResponseDto.from(user.getUserId());
+		return UserUpdateUsernameResponseDto.of(user.getUserId(),user.getUsername());
 
 	}
 
@@ -92,10 +89,11 @@ public class UserService {
 			()->new CustomException(ErrorCode.USER_NOT_FOUND));
 	}
 
-	private void validateSameUser(Long headerId, Long userId) {
+	private User validateSameUser(Long headerId, Long userId) {
 		if(!headerId.equals(userId)){
 			throw new CustomException(ErrorCode.USER_SELF_ACCESS_ONLY);
 		}
+		return validateUserById(userId);
 	}
 
 	private void validateUserRole(String headerRole, UserRole role) {

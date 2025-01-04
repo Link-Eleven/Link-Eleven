@@ -1,17 +1,13 @@
-package com.linkeleven.msa.gateway;
+package com.linkeleven.msa.gateway.filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
-import com.linkeleven.msa.gateway.application.dto.UserRoleResponseDto;
-import com.linkeleven.msa.gateway.application.service.UserService;
 import com.linkeleven.msa.gateway.libs.exception.CustomException;
-import com.linkeleven.msa.gateway.libs.exception.ErrorCode;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +17,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class JwtAuthenticationFilter implements GlobalFilter {
   private final JwtProvider jwtProvider;
-  private final UserService userService;
 
   @Autowired
-  public JwtAuthenticationFilter(JwtProvider jwtProvider,@Lazy UserService userService) {
+  public JwtAuthenticationFilter(JwtProvider jwtProvider) {
     this.jwtProvider = jwtProvider;
-    this.userService = userService;
   }
 
   @Override
@@ -44,8 +38,6 @@ public class JwtAuthenticationFilter implements GlobalFilter {
       return exchange.getResponse().setComplete();
     }
     Claims claims = jwtProvider.parseToken(token);
-    validateUserRoleUserService(claims);
-
     exchange = exchange.mutate()
         .request(exchange.getRequest().mutate()
             .header("X-User-Id", claims.get("user_id").toString())  // 원하는 값으로 설정
@@ -76,16 +68,16 @@ public class JwtAuthenticationFilter implements GlobalFilter {
   }
 
 
-  private void validateUserRoleUserService(Claims claims) {
+/*  private void validateUserRoleUserService(Claims claims) {
     String role = claims.get("role").toString();
     long userId = Long.parseLong(claims.get("user_id").toString());
 
     if(role.equals("MASTER")||role.equals("COMPANY")) {
-      UserRoleResponseDto userRoleResponseDto=userService.getUserRole(userId);
+      UserRoleResponseDto userRoleResponseDto=userClient.getUserRole(userId);
       if(!userRoleResponseDto.getRole().equals(role)) {
         throw new CustomException(ErrorCode.ROLE_NOT_EQUALS);
       }
     }
-  }
+  }*/
 
 }

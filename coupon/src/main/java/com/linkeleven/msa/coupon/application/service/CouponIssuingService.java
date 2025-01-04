@@ -46,7 +46,6 @@ public class CouponIssuingService {
 		return IssuedCouponDto.from(issuedCoupon);
 	}
 
-	// 쿠폰 사용 메서드 추가
 	@Transactional
 	public IssuedCouponDto useCoupon(Long userId, Long couponId) {
 		IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(userId, couponId)
@@ -60,4 +59,12 @@ public class CouponIssuingService {
 		return IssuedCouponDto.from(issuedCoupon);
 	}
 
+	// 사용자가 발급받은 쿠폰 목록 조회
+	@Transactional(readOnly = true)
+	public List<IssuedCouponDto> getIssuedCouponsByUserId(Long userId) {
+		List<IssuedCoupon> issuedCoupons = issuedCouponRepository.findActiveIssuedCouponsByUserId(userId);
+		return issuedCoupons.stream()
+			.map(IssuedCouponDto::from)
+			.toList();
+	}
 }

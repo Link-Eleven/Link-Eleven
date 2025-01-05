@@ -35,5 +35,9 @@ public class PlaceName {
 			throw new CustomException(ErrorCode.PLACE_NAME_LENGTH_EXCEEDED);
 		}
 	}
+	@Override
+	public String toString() {
+		return placeName;
+	}
 
 }

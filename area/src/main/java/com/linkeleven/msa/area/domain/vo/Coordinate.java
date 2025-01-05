@@ -25,7 +25,7 @@ public class Coordinate {
 	private double longitude;
 
 	public static Coordinate of(int mapX, int mapY) {
-		mapPixelValidator(mapX, mapY);
+		// mapPixelValidator(mapX, mapY);
 		return Coordinate.builder()
 			.mapX(mapX)
 			.mapY(mapY)
@@ -43,14 +43,15 @@ public class Coordinate {
 		}
 	}
 
+	// 범위 파악 불가 추후 수정 예정
 	private static void mapPixelValidator (int mapX, double mapY) {
-		if (mapX < 900000 || mapX > 1500000) {
-			throw new CustomException(ErrorCode.MAPX_OUT_OF_RANGE);
-		}
-
-		if (mapY < 1300000 || mapY > 2200000) {
-			throw new CustomException(ErrorCode.MAPY_OUT_OF_RANGE);
-		}
+		// if (mapX < 100000  || mapX > 1000000) {
+		// 	throw new CustomException(ErrorCode.MAPX_OUT_OF_RANGE);
+		// }
+		//
+		// if (mapY < 1800000  || mapY > 2500000) {
+		// 	throw new CustomException(ErrorCode.MAPY_OUT_OF_RANGE);
+		// }
 	}
 
 }

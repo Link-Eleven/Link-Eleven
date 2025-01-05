@@ -34,4 +34,9 @@ public class Address {
 			throw new CustomException(ErrorCode.ADDRESS_LENGTH_EXCEEDED);
 		}
 	}
+	@Override
+	public String toString(){
+		return address;
+	}
+
 }

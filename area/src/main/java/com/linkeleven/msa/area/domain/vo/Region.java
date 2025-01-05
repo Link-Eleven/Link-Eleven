@@ -16,56 +16,50 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class Region {
-	private String regionCode;
-	private String regionName;
-	private String cityCode;
-	private String cityName;
-	private String subregionCode;
-	private String subregionName;
+	private String code;
+	private String sido;
+	private String sigungu;
+	private String eupmyeondong;
+	private String ri;
 
 
 	public static Region of(
-		String regionCode,
-		String regionName,
-		String cityCode,
-		String cityName,
-		String subregionCode,
-		String subregionName
+		String code,
+		String sido,
+		String sigungu,
+		String eupmyeondong,
+		String ri
 	) {
-		validate(regionCode, regionName, cityCode, cityName, subregionCode, subregionCode);
+		validate(code, sido, sigungu, eupmyeondong, ri);
 		return Region.builder()
-			.regionCode(regionCode)
-			.regionName(regionName)
-			.cityCode(cityCode)
-			.cityName(cityName)
-			.subregionCode(subregionCode)
-			.subregionCode(subregionName)
+			.code(code)
+			.sido(sido)
+			.sigungu(sigungu)
+			.eupmyeondong(eupmyeondong)
+			.ri(ri)
 			.build();
 	}
 
 	private static void validate(
-		String regionCode,
-		String regionName,
-		String cityCode,
-		String cityName,
-		String subregionCode,
-		String subregionName
+		String code,
+		String sido,
+		String sigungu,
+		String eupmyeondong,
+		String ri
 	) {
-		if (regionCode == null || regionCode.trim().isEmpty()
-			&& regionName == null || regionName.trim().isEmpty()
-			&& cityCode == null || cityCode.trim().isEmpty()
-			&& cityName == null || cityName.trim().isEmpty()
-			&& subregionCode == null || subregionCode.trim().isEmpty()
-			&& subregionName == null || subregionName.trim().isEmpty()
+		if (code == null || code.trim().isEmpty()
+			&& sido == null || sido.trim().isEmpty()
+			&& sigungu == null || sigungu.trim().isEmpty()
+			&& eupmyeondong == null || eupmyeondong.trim().isEmpty()
+			&& ri == null || ri.trim().isEmpty()
 		) {
 			throw new CustomException(ErrorCode.REGION_CANNOT_BE_NULL_OR_EMPTY);
 		}
-		if (regionCode.length() > 50
-			&& regionName.length() > 50
-			&& cityCode.length() > 50
-			&& cityName.length() > 50
-			&& subregionCode.length() > 50
-			&& subregionName.length() > 50
+		if (code.length() > 50
+			&& sido.length() > 50
+			&& sigungu.length() > 50
+			&& eupmyeondong.length() > 50
+			&& ri.length() > 50
 		) {
 			throw new CustomException(ErrorCode.REGION_LENGTH_EXCEEDED);
 		}

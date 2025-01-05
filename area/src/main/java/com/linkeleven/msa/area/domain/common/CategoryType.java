@@ -1,7 +1,7 @@
 package com.linkeleven.msa.area.domain.common;
 
 
-public enum Type {
+public enum CategoryType {
 	HOTEL,
 	PLACE,
 	RESTAURANT,

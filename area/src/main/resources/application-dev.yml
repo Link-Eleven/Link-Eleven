@@ -1,6 +1,4 @@
 spring:
-  application:
-    name: area-service
   datasource:
     url: ${AREA_DB_URL}
     username: ${AREA_DB_USER}

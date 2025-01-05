@@ -38,5 +38,9 @@ aws:
     stack:
       auto: false
 
+service:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+
 server:
   port: 19093

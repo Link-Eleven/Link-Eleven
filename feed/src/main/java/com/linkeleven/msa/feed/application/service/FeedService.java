@@ -16,6 +16,7 @@ import com.linkeleven.msa.feed.domain.model.Feed;
 import com.linkeleven.msa.feed.domain.model.File;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
 import com.linkeleven.msa.feed.domain.repository.FileRepository;
+import com.linkeleven.msa.feed.infrastructure.config.TokenVerifier;
 import com.linkeleven.msa.feed.libs.exception.CustomException;
 import com.linkeleven.msa.feed.libs.exception.ErrorCode;
 import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;
@@ -30,13 +31,16 @@ public class FeedService {
 	private final FeedRepository feedRepository;
 	private final FileService fileService;
 	private final FileRepository fileRepository;
+	private final TokenVerifier tokenVerifier;
 
 	@Transactional
-	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files) throws
-		IOException {
+	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files,
+		String token) {
+
+		Long userId = tokenVerifier.getUserIdFromToken(token);
 
 		Feed feed = Feed.of(
-			feedCreateRequestDto.getUserId(),
+			userId,
 			feedCreateRequestDto.getLocationId(),
 			feedCreateRequestDto.getTitle(),
 			feedCreateRequestDto.getContent(),
@@ -52,9 +56,17 @@ public class FeedService {
 
 	@Transactional
 	public FeedUpdateResponseDto updateFeed(Long feedId, FeedUpdateRequestDto feedUpdateRequestDto,
-		List<MultipartFile> files) throws IOException {
+		List<MultipartFile> files, String token) {
+
+		Long userId = tokenVerifier.getUserIdFromToken(token);
+		String userRole = tokenVerifier.getRoleFromToken(token);
+
 		Feed feed = feedRepository.findByIdAndDeletedAt(feedId)
 			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
+
+		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER")) {
+			throw new CustomException(ErrorCode.NO_UPDATE_PERMISSION);
+		}
 
 		feed.update(
 			feedUpdateRequestDto.getTitle(),
@@ -70,12 +82,20 @@ public class FeedService {
 	}
 
 	@Transactional
-	public void deleteFeed(Long feedId) {
+	public void deleteFeed(Long feedId, String token) {
+
+		Long userId = tokenVerifier.getUserIdFromToken(token);
+		String userRole = tokenVerifier.getRoleFromToken(token);
+
 		Feed feed = feedRepository.findById(feedId)
 			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
 
+		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER")) {
+			throw new CustomException(ErrorCode.NO_DELETE_PERMISSION);
+		}
+
 		deleteFiles(feed);
-		feed.delete();
+		// feed.delete(userId);
 		feedRepository.save(feed);
 
 	}
@@ -120,4 +140,5 @@ public class FeedService {
 		});
 		feed.getFiles().clear();
 	}
+
 }

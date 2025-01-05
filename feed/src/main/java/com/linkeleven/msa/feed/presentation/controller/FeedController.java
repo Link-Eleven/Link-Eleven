@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -35,26 +36,29 @@ public class FeedController {
 
 	@PostMapping
 	public ResponseEntity<SuccessResponseDto<FeedCreateResponseDto>> createFeed(
+		@RequestHeader("Authorization") String token,
 		@RequestPart FeedCreateRequestDto feedCreateRequestDto,
 		@RequestParam(value = "file", required = false) List<MultipartFile> files) throws IOException {
 
-		FeedCreateResponseDto response = feedService.createFeed(feedCreateRequestDto, files);
+		FeedCreateResponseDto response = feedService.createFeed(feedCreateRequestDto, files, token);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 생성 성공", response));
 	}
 
 	@PutMapping("/{feedId}")
 	public ResponseEntity<SuccessResponseDto<FeedUpdateResponseDto>> updateFeed(
 		@PathVariable Long feedId,
+		@RequestHeader("Authorization") String token,
 		@RequestPart FeedUpdateRequestDto feedUpdateRequestDto,
 		@RequestParam(value = "file", required = false) List<MultipartFile> files) throws IOException {
 
-		FeedUpdateResponseDto response = feedService.updateFeed(feedId, feedUpdateRequestDto, files);
+		FeedUpdateResponseDto response = feedService.updateFeed(feedId, feedUpdateRequestDto, files, token);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
 	}
 
 	@DeleteMapping("/{feedId}")
-	public ResponseEntity<SuccessResponseDto<Void>> deleteFeed(@PathVariable Long feedId) {
-		feedService.deleteFeed(feedId);
+	public ResponseEntity<SuccessResponseDto<Void>> deleteFeed(@PathVariable Long feedId,
+		@RequestHeader("Authorization") String token) {
+		feedService.deleteFeed(feedId, token);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 삭제 완료"));
 	}
 

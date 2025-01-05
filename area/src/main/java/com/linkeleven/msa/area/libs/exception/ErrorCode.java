@@ -9,7 +9,19 @@ public enum ErrorCode {
 
 	/*  400 BAD_REQUEST : 잘못된 요청  */
 	ILLEGAL_ARGUMENT_ERROR(400, "잘못된 파라미터 전달"),
-
+	LATITUDE_OUT_OF_RANGE(400, "위도값은 33 이상 38.5 이하입니다."),
+	LONGITUDE_OUT_OF_RANGE(400, "경도값은 124 이상 132 이하입니다."),
+	MAPX_OUT_OF_RANGE(400, "지도의 X 픽셀값은 100000 이상 1000000 이하입니다."),
+	MAPY_OUT_OF_RANGE(400, "지도의 Y 픽셀값은 1800000 이상 2500000  이하입니다."),
+	PLACE_NAME_CANNOT_BE_NULL_OR_EMPTY(400, "장소 이름은 필수입니다."),
+	PLACE_NAME_LENGTH_EXCEEDED(400, "장소 이름은 최대 50자까지 가능합니다."),
+	ADDRESS_CANNOT_BE_NULL_OR_EMPTY(400, "주소값은 필수입니다."),
+	ADDRESS_LENGTH_EXCEEDED(400, "주소는 최대 100자까지 가능합니다."),
+	REGION_CANNOT_BE_NULL_OR_EMPTY(400, "지역 정보 입력은 필수입니다."),
+	REGION_LENGTH_EXCEEDED(400, "지역 정보는 최대 50자까지 가능합니다."),
+	NOT_FOUND_AREA(400, "찾으시는 지역 정보가 없습니다."),
+	ILLEGAL_MATCH_LOCATION(400, "잘못된 장소 매칭"),
+	ILLEGAL_MATCH_CATEGORY(400, "잘못된 카테고리 매칭"),
 
 	/*  401 UNAUTHORIZED : 인증 안됨  */
 	UNAUTHORIZED(401, "인증되지 않았습니다."),

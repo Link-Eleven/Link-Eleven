@@ -1,6 +1,7 @@
 package com.linkeleven.msa.feed.application.service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,11 +43,10 @@ public class FeedService {
 			feedCreateRequestDto.getCategory()
 		);
 
-		if (files != null && !files.isEmpty()) {
-			feed.getFiles().addAll(uploadFiles(files));
-		}
+		feed.getFiles().addAll(uploadFiles(files));
 
 		Feed savedFeed = feedRepository.save(feed);
+
 		return FeedCreateResponseDto.from(savedFeed);
 	}
 
@@ -62,11 +62,10 @@ public class FeedService {
 			feedUpdateRequestDto.getCategory()
 		);
 
-		if (files != null && !files.isEmpty()) {
-			feed.getFiles().addAll(uploadFiles(files));
-		}
+		feed.getFiles().addAll(uploadFiles(files));
 
 		Feed updatedFeed = feedRepository.save(feed);
+
 		return FeedUpdateResponseDto.from(updatedFeed);
 	}
 
@@ -100,6 +99,9 @@ public class FeedService {
 	}
 
 	private List<File> uploadFiles(List<MultipartFile> files) {
+		if (files == null || files.isEmpty()) {
+			return Collections.emptyList();
+		}
 		return files.stream().map(file -> {
 			try {
 				String s3Url = fileService.uploadImage(file);

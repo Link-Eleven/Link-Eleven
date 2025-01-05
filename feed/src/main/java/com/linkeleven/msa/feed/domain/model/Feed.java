@@ -78,7 +78,8 @@ public class Feed extends BaseTime {
 		this.category = Optional.ofNullable(category).orElse(this.category);
 	}
 
-	public void delete() {
+	public void delete(Long userId) {
 		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(userId);
 	}
 }

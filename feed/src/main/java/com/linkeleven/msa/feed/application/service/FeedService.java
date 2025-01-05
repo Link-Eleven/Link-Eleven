@@ -95,7 +95,7 @@ public class FeedService {
 		}
 
 		deleteFiles(feed);
-		// feed.delete(userId);
+		feed.delete(userId);
 		feedRepository.save(feed);
 
 	}

@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 
 import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.CommentUpdateResponseDto;
+import com.linkeleven.msa.interaction.application.dto.external.UserInfoResponseDto;
 import com.linkeleven.msa.interaction.domain.model.entity.Comment;
 import com.linkeleven.msa.interaction.domain.model.vo.ContentDetails;
 import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
+import com.linkeleven.msa.interaction.infrastructure.client.AuthClient;
 import com.linkeleven.msa.interaction.infrastructure.client.FeedClient;
 import com.linkeleven.msa.interaction.libs.exception.CustomException;
 import com.linkeleven.msa.interaction.libs.exception.ErrorCode;
@@ -25,15 +27,18 @@ public class CommentService {
 
 	private final CommentRepository commentRepository;
 	private final FeedClient feedClient;
+	private final AuthClient authClient;
 
 	public CommentCreateResponseDto createComment(Long userId, Long feedId, CommentCreateRequestDto requestDto) {
+		UserInfoResponseDto userInfo = getUsername(userId);
 		checkFeedExists(feedId);
-		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId);
+		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId, userInfo.getUsername());
 		Comment comment = Comment.of(contentDetails, feedId);
 		commentRepository.save(comment);
 		return CommentCreateResponseDto.of(
 			comment.getId(),
 			comment.getContentDetails().getUserId(),
+			comment.getContentDetails().getUsername(),
 			comment.getContentDetails().getContent());
 	}
 
@@ -46,6 +51,7 @@ public class CommentService {
 		return CommentUpdateResponseDto.of(
 			comment.getId(),
 			comment.getContentDetails().getUserId(),
+			comment.getContentDetails().getUsername(),
 			comment.getContentDetails().getContent());
 	}
 
@@ -93,5 +99,9 @@ public class CommentService {
 		if (!feedClient.checkFeedExists(feedId)) {
 			throw new CustomException(ErrorCode.FEED_NOT_FOUND);
 		}
+	}
+
+	private UserInfoResponseDto getUsername(Long userId) {
+		return authClient.getUsername(userId);
 	}
 }

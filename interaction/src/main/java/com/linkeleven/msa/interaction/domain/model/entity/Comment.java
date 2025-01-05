@@ -32,7 +32,8 @@ public class Comment extends BaseTime{
 	@Embedded
 	@AttributeOverrides({
 		@AttributeOverride(name = "content", column = @Column(name = "content", nullable = false)),
-		@AttributeOverride(name = "userId", column = @Column(name = "userId", nullable = false, updatable = false))
+		@AttributeOverride(name = "userId", column = @Column(name = "userId", nullable = false, updatable = false)),
+		@AttributeOverride(name = "username", column = @Column(name = "username", nullable = false))
 	})
 	private ContentDetails contentDetails;
 
@@ -61,12 +62,12 @@ public class Comment extends BaseTime{
 	}
 
 	public void updateComment(String newContent) {
-		this.contentDetails = ContentDetails.of(newContent, this.contentDetails.getUserId());
+		this.contentDetails = ContentDetails.of(newContent, this.contentDetails.getUserId(), this.contentDetails.getUsername());
 	}
 
 	public void deleteComment() {
 			this.setDeletedAt(LocalDateTime.now());
-			this.contentDetails = ContentDetails.of("삭제된 댓글입니다.", this.contentDetails.getUserId());
+			this.contentDetails = ContentDetails.of("삭제된 댓글입니다.", this.contentDetails.getUserId(), this.contentDetails.getUsername());
 	}
 
 

@@ -19,12 +19,14 @@ public class ContentDetails {
 
 	private Long userId;
 
-	public static ContentDetails of(String content, Long userId) {
-		validate(content, userId);
-		return new ContentDetails(content, userId);
+	private String username;
+
+	public static ContentDetails of(String content, Long userId, String username) {
+		validate(content, userId, username);
+		return new ContentDetails(content, userId, username);
 	}
 
-	private static void validate(String content, Long userId) {
+	private static void validate(String content, Long userId, String username) {
 		if (content == null || content.isBlank()) {
 			throw new CustomException(ErrorCode.CONTENT_CANNOT_BE_NULL_OR_EMPTY);
 		}
@@ -33,6 +35,9 @@ public class ContentDetails {
 		}
 		if (userId == null || userId <= 0) {
 			throw new CustomException(ErrorCode.INVALID_USERID);
+		}
+		if (username == null || username.isBlank()) {
+			throw new CustomException(ErrorCode.USERNAME_CANNOT_BE_NULL_OR_EMPTY);
 		}
 	}
 

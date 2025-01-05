@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE  # H2 in-memory DB URL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update  # 테스트 중 자동 스키마 업데이트
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+service:
+  jwt:
+    access-expiration: 3600000
+    secret-key: 8705302cde32f96006237732e159365b1f75a1b1d1df045e5094cbbc65cd2f84fdeb9e739f87609b574fcfe1b307d03163800d908b5737618dba64d32967d82a

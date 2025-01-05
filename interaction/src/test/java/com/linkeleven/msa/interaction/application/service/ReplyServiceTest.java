@@ -13,8 +13,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyCreateResponseDto;
+import com.linkeleven.msa.interaction.application.dto.external.UserInfoResponseDto;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
 import com.linkeleven.msa.interaction.domain.service.ValidationService;
+import com.linkeleven.msa.interaction.infrastructure.client.AuthClient;
 import com.linkeleven.msa.interaction.infrastructure.client.FeedClient;
 import com.linkeleven.msa.interaction.presentation.dto.CommentCreateRequestDto;
 import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
@@ -39,6 +41,9 @@ class ReplyServiceTest {
 	@MockitoBean
 	private FeedClient feedClient;
 
+	@MockitoBean
+	private AuthClient authClient;
+
 	private Long userId;
 	private Long commentId;
 
@@ -48,6 +53,9 @@ class ReplyServiceTest {
 		Long feedId = 50L;
 
 		Mockito.when(feedClient.checkFeedExists(50L)).thenReturn(true);
+
+		UserInfoResponseDto userInfo = new UserInfoResponseDto("username");
+		Mockito.when(authClient.getUsername(1L)).thenReturn(userInfo);
 
 		String content = "테스트";
 		CommentCreateRequestDto requestDto = new CommentCreateRequestDto();

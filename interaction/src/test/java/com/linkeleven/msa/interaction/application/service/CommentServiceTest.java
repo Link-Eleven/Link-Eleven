@@ -12,7 +12,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
+import com.linkeleven.msa.interaction.application.dto.external.UserInfoResponseDto;
 import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
+import com.linkeleven.msa.interaction.infrastructure.client.AuthClient;
 import com.linkeleven.msa.interaction.infrastructure.client.FeedClient;
 import com.linkeleven.msa.interaction.presentation.dto.CommentCreateRequestDto;
 import com.linkeleven.msa.interaction.presentation.dto.CommentUpdateRequestDto;
@@ -30,6 +32,9 @@ class CommentServiceTest {
 	@MockitoBean
 	private FeedClient feedClient;
 
+	@MockitoBean
+	private AuthClient authClient;
+
 	private Long userId;
 	private Long feedId;
 
@@ -39,6 +44,10 @@ class CommentServiceTest {
 		feedId = 100L;
 
 		Mockito.when(feedClient.checkFeedExists(100L)).thenReturn(true);
+
+		UserInfoResponseDto userInfo = new UserInfoResponseDto("username");
+		Mockito.when(authClient.getUsername(1L)).thenReturn(userInfo);
+
 	}
 
 	@Test
@@ -52,6 +61,7 @@ class CommentServiceTest {
 
 		assertThat(responseDto.getCommentId()).isNotNull();
 		assertThat(responseDto.getContent()).isEqualTo(content);
+		assertThat(responseDto.getUsername()).isEqualTo("username");
 	}
 
 	@Test

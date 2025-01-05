@@ -11,6 +11,7 @@ public enum ErrorCode {
 	/*  400 BAD_REQUEST : 잘못된 요청  */
 	EXPIRED_TOKEN(400, "만료된 토큰입니다."),
 	CONTENT_CANNOT_BE_NULL_OR_EMPTY(400, "댓글 내용은 null 또는 빈 값일 수 없습니다."),
+	USERNAME_CANNOT_BE_NULL_OR_EMPTY(400, "유저네임은 null 또는 빈 값일 수 없습니다."),
 	CONTENT_TYPE_CANNOT_BE_NULL(400, "컨텐츠 타입은 null일 수 없습니다."),
 	CONTENT_TOO_LONG(400, "100자 이내로 작성해야 합니다."),
 	INVALID_USERID(400, "유효하지않은 유저ID입니다."),

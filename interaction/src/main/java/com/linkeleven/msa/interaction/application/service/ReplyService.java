@@ -6,10 +6,14 @@ import org.springframework.stereotype.Service;
 
 import com.linkeleven.msa.interaction.application.dto.ReplyCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyUpdateResponseDto;
+import com.linkeleven.msa.interaction.application.dto.external.UserInfoResponseDto;
 import com.linkeleven.msa.interaction.domain.model.entity.Reply;
 import com.linkeleven.msa.interaction.domain.model.vo.ContentDetails;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
 import com.linkeleven.msa.interaction.domain.service.ValidationService;
+
+import com.linkeleven.msa.interaction.infrastructure.client.AuthClient;
+
 import com.linkeleven.msa.interaction.libs.exception.CustomException;
 import com.linkeleven.msa.interaction.libs.exception.ErrorCode;
 import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
@@ -25,16 +29,20 @@ public class ReplyService {
 
 	private final ReplyRepository replyRepository;
 	private final ValidationService validationService;
+	private final AuthClient authClient;
+
 
 	public ReplyCreateResponseDto createReply(Long userId, Long commentId, ReplyCreateRequestDto requestDto) {
+		UserInfoResponseDto userInfo = getUsername(userId);
 		checkCommentExists(commentId);
-		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId);
+		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId, userInfo.getUsername());
 		Reply reply = Reply.of(contentDetails, commentId);
 		replyRepository.save(reply);
 		return ReplyCreateResponseDto.of(
 			reply.getId(),
 			reply.getCommentId(),
 			reply.getContentDetails().getUserId(),
+			reply.getContentDetails().getUsername(),
 			reply.getContentDetails().getContent());
 	}
 
@@ -47,6 +55,7 @@ public class ReplyService {
 			reply.getId(),
 			reply.getCommentId(),
 			reply.getContentDetails().getUserId(),
+			reply.getContentDetails().getUsername(),
 			reply.getContentDetails().getContent());
 	}
 
@@ -98,5 +107,9 @@ public class ReplyService {
 	private Reply getReply(Long replyId) {
 		return replyRepository.findById(replyId)
 			.orElseThrow(() -> new CustomException(ErrorCode.REPLY_NOT_FOUND));
+	}
+
+	private UserInfoResponseDto getUsername(Long userId) {
+		return authClient.getUsername(userId);
 	}
 }

@@ -1,7 +1,5 @@
 package com.linkeleven.msa.area.domain.entity;
 
-import java.util.List;
-
 import com.linkeleven.msa.area.domain.vo.Address;
 import com.linkeleven.msa.area.domain.vo.Coordinate;
 import com.linkeleven.msa.area.domain.vo.PlaceName;
@@ -9,7 +7,6 @@ import com.linkeleven.msa.area.domain.vo.PlaceName;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -17,13 +14,13 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Getter
@@ -31,6 +28,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_location")
+@Slf4j
 public class Location extends BaseTime{
 
 	@Id
@@ -58,14 +56,37 @@ public class Location extends BaseTime{
 	)
 	private Address address;
 
-	@OneToMany(mappedBy = "location",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<AreaMatch> areaMatchList;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name =  "area_id", nullable = false)
+	private Area area;
+
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
 
+	public static Location createLocation(
+		Coordinate coordinate,
+		PlaceName placeName,
+		Address address
+	){
 
+		return Location.builder()
+			.coordinate(coordinate)
+			.placeName(placeName)
+			.address(address)
+			.build();
+	}
+
+	public void updateCategory(Category category){
+		log.info("Updating category for Location {} with Category {}", this.id, category.getId());
+		this.category = category;
+	}
+
+	public void updateArea(Area area){
+		log.info("Updating area for Location {} with Area {}", this.id, area.getId());
+		this.area = area;
+	}
 
 
 

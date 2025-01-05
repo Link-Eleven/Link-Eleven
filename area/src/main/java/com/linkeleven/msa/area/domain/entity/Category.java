@@ -1,6 +1,6 @@
 package com.linkeleven.msa.area.domain.entity;
 
-import com.linkeleven.msa.area.domain.common.Type;
+import com.linkeleven.msa.area.domain.common.CategoryType;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.Column;
@@ -28,12 +28,18 @@ public class Category extends BaseTime{
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false)
-	private Type type;
+	private CategoryType categoryType;
 
 	@Column(name = "category_name", nullable = false)
 	private String categoryName;
 
 
+	public static Category createCategory(CategoryType type, String categoryName){
+		return Category.builder()
+			.categoryType(type)
+			.categoryName(categoryName)
+			.build();
+	}
 
 
 }

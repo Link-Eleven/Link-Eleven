@@ -79,6 +79,9 @@ public class CouponService {
 	public Page<CouponSearchResponseDto> searchCoupons(CouponPolicyStatus status, Long feedId, String validFrom,
 		String validTo,
 		Pageable pageable) {
+		if (!"MASTER".equals(role)) {
+			throw new CustomException(ErrorCode.FORBIDDEN);
+		}
 		return couponRepository.findCouponsByFilter(status, feedId, validFrom, validTo, pageable);
 	}
 

@@ -14,6 +14,7 @@ public interface CouponPolicyRepository extends JpaRepository<CouponPolicy, Long
 	@Query("SELECT p FROM CouponPolicy p WHERE p.couponId = :couponId AND p.issuedCount < p.quantity AND p.status = 'ACTIVE' ORDER BY p.createdAt ASC")
 	List<CouponPolicy> findAvailablePolicies(@Param("couponId") Long couponId);
 
+	// 스케쥴러: 유효기한 지난 쿠폰 비활성화
 	@Query("UPDATE CouponPolicy p SET p.status = 'INACTIVE' WHERE p.couponId = :couponId AND p.status = 'ACTIVE'")
 	@Modifying
 	void updateCouponPolicyStatusToInactive(@Param("couponId") Long couponId);

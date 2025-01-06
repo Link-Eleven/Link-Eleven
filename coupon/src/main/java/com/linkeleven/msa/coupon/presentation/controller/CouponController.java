@@ -65,13 +65,15 @@ public class CouponController {
 	// Master: 쿠폰 검색 API
 	@GetMapping("/search")
 	public ResponseEntity<SuccessResponseDto<Page<CouponSearchResponseDto>>> searchCoupons(
+		@RequestHeader(value = "X-User-Id", required = false) Long userId,
+		@RequestHeader(value = "X-Role", required = false) String role,
 		@RequestParam(required = false) CouponPolicyStatus status,
 		@RequestParam(required = false) Long feedId,
 		@RequestParam(required = false) String validFrom,
 		@RequestParam(required = false) String validTo,
 		Pageable pageable) {
-		//todo: 권한 설정
-		Page<CouponSearchResponseDto> couponList = couponService.searchCoupons(status, feedId, validFrom, validTo,
+		Page<CouponSearchResponseDto> couponList = couponService.searchCoupons(userId, role, status, feedId, validFrom,
+			validTo,
 			pageable);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 조회 완료", couponList));
 	}

@@ -1,6 +1,7 @@
 package com.linkeleven.msa.coupon.infrastructure.repository;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -13,26 +14,33 @@ import com.linkeleven.msa.coupon.domain.model.QCoupon;
 import com.linkeleven.msa.coupon.domain.model.QCouponPolicy;
 import com.linkeleven.msa.coupon.domain.model.QIssuedCoupon;
 import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
-import com.linkeleven.msa.coupon.domain.model.enums.IssuedCouponStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class CouponRepositoryImpl implements CouponRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
+	private final QCoupon coupon = QCoupon.coupon;
+	private final QCouponPolicy couponPolicy = QCouponPolicy.couponPolicy;
+	private final QIssuedCoupon issuedCoupon = QIssuedCoupon.issuedCoupon;
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 	@Override
-	public Page<CouponSearchResponseDto> findCouponsByFilter(CouponPolicyStatus status, Long feedId, String validFrom,
-		String validTo, Pageable pageable) {
-		QCoupon coupon = QCoupon.coupon;
-		QCouponPolicy couponPolicy = QCouponPolicy.couponPolicy;
-		QIssuedCoupon issuedCoupon = QIssuedCoupon.issuedCoupon;
+	public Page<CouponSearchResponseDto> findCouponsByFilter(Long userId, CouponPolicyStatus status, Long feedId,
+		String validFrom, String validTo, Pageable pageable) {
+
+		log.debug("Search parameters - userId: {}, status: {}, feedId: {}, validFrom: {}, validTo: {}",
+			userId, status, feedId, validFrom, validTo);
+
+		BooleanExpression createdByCondition = userId != null ? coupon.createdBy.eq(userId) : null;
 
 		List<CouponSearchResponseDto> content = queryFactory
 			.select(Projections.constructor(CouponSearchResponseDto.class,
@@ -43,23 +51,18 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 				coupon.validTo,
 				queryFactory.select(issuedCoupon.count())
 					.from(issuedCoupon)
-					.where(issuedCoupon.couponId.eq(coupon.couponId)
-						.and(issuedCoupon.status.ne(IssuedCouponStatus.DELETED)))
-				,
+					.where(issuedCoupon.couponId.eq(coupon.couponId)),
 				queryFactory.select(issuedCoupon.count())
 					.from(issuedCoupon)
-					.where(issuedCoupon.couponId.eq(coupon.couponId)
-						.and(issuedCoupon.status.eq(IssuedCouponStatus.USED)))
-			))
+					.where(issuedCoupon.couponId.eq(coupon.couponId))))
 			.from(coupon)
 			.join(coupon.policies, couponPolicy)
 			.where(
+				createdByCondition,
 				policyStatusEq(status),
 				feedIdEq(feedId),
 				validFromGoe(validFrom),
-				validToLoe(validTo),
-				couponPolicy.status.ne(CouponPolicyStatus.DELETED)
-			)
+				validToLoe(validTo))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.groupBy(
@@ -67,43 +70,41 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 				coupon.feedId,
 				couponPolicy.status,
 				coupon.validFrom,
-				coupon.validTo
-			)
+				coupon.validTo)
 			.fetch();
 
 		long total = queryFactory.selectFrom(coupon)
 			.join(coupon.policies, couponPolicy)
 			.where(
+				createdByCondition,
 				policyStatusEq(status),
 				feedIdEq(feedId),
 				validFromGoe(validFrom),
-				validToLoe(validTo),
-				couponPolicy.status.ne(CouponPolicyStatus.DELETED)
-			)
+				validToLoe(validTo))
 			.fetchCount();
 
 		return new PageImpl<>(content, pageable, total);
 	}
 
 	private BooleanExpression policyStatusEq(CouponPolicyStatus status) {
-		return status != null ? QCouponPolicy.couponPolicy.status.eq(status) : null;
+		return status != null ? couponPolicy.status.eq(status) : null;
 	}
 
 	private BooleanExpression feedIdEq(Long feedId) {
-		return feedId != null ? QCoupon.coupon.feedId.eq(feedId) : null;
+		return feedId != null ? coupon.feedId.eq(feedId) : null;
 	}
 
 	private BooleanExpression validFromGoe(String validFrom) {
 		if (StringUtils.isEmpty(validFrom)) {
 			return null;
 		}
-		return QCoupon.coupon.validFrom.goe(LocalDateTime.parse(validFrom + "T00:00:00"));
+		return coupon.validFrom.goe(LocalDateTime.parse(validFrom + " 00:00:00", formatter));
 	}
 
 	private BooleanExpression validToLoe(String validTo) {
 		if (StringUtils.isEmpty(validTo)) {
 			return null;
 		}
-		return QCoupon.coupon.validTo.loe(LocalDateTime.parse(validTo + "T23:59:59"));
+		return coupon.validTo.loe(LocalDateTime.parse(validTo + " 23:59:59", formatter));
 	}
 }

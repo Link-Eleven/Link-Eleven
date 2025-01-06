@@ -75,14 +75,17 @@ public class CouponService {
 
 	// 모든 쿠폰 조회
 	@Transactional(readOnly = true)
-	public Page<CouponSearchResponseDto> searchCoupons(String role, CouponPolicyStatus status, Long feedId,
+	public Page<CouponSearchResponseDto> searchCoupons(Long userId, String role, CouponPolicyStatus status, Long feedId,
 		String validFrom,
 		String validTo,
 		Pageable pageable) {
-		if (!"MASTER".equals(role)) {
+		if ("MASTER".equals(role)) {
+			return couponRepository.findCouponsByFilter(null, status, feedId, validFrom, validTo, pageable);
+		} else if ("COMPANY".equals(role)) {
+			return couponRepository.findCouponsByFilter(userId, status, feedId, validFrom, validTo, pageable);
+		} else {
 			throw new CustomException(ErrorCode.FORBIDDEN);
 		}
-		return couponRepository.findCouponsByFilter(status, feedId, validFrom, validTo, pageable);
 	}
 
 	@Transactional

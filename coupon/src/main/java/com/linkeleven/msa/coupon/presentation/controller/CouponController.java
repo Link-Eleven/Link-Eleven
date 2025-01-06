@@ -62,7 +62,7 @@ public class CouponController {
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 삭제 완료", ""));
 	}
 
-	// Master: 쿠폰 검색 API
+	// Master & Company: 쿠폰 검색 API
 	@GetMapping("/search")
 	public ResponseEntity<SuccessResponseDto<Page<CouponSearchResponseDto>>> searchCoupons(
 		@RequestHeader(value = "X-User-Id", required = false) Long userId,
@@ -72,7 +72,7 @@ public class CouponController {
 		@RequestParam(required = false) String validFrom,
 		@RequestParam(required = false) String validTo,
 		Pageable pageable) {
-		Page<CouponSearchResponseDto> couponList = couponService.searchCoupons(role, status, feedId, validFrom,
+		Page<CouponSearchResponseDto> couponList = couponService.searchCoupons(userId, role, status, feedId, validFrom,
 			validTo,
 			pageable);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 조회 완료", couponList));

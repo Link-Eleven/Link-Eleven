@@ -17,7 +17,6 @@ import com.linkeleven.msa.area.domain.vo.PlaceName;
 import com.linkeleven.msa.area.libs.exception.CustomException;
 import com.linkeleven.msa.area.libs.exception.ErrorCode;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,15 +25,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LocationCommandService {
 	private final LocationRepository locationRepository;
-	private final EntityManager entityManager;
 
 	@Transactional
 	public List<Location> createLocation(
 		List<PlaceResponseDto> placeResponseDtoList,
 		List<Category> categoryList,
-		Long areaId
+		Area area
 	) {
-		Area area = entityManager.find(Area.class, areaId);
 		log.info("areaId: {}, sido {}", area.getId(), area.getRegion().getSido());
 
 		// 기존에 존재하는 Location 조회

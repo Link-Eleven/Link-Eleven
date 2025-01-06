@@ -14,9 +14,12 @@ import com.linkeleven.msa.area.application.service.CategoryCommandService;
 import com.linkeleven.msa.area.application.service.LocationCommandService;
 import com.linkeleven.msa.area.application.service.SearchLocationService;
 import com.linkeleven.msa.area.application.service.SearchNaverService;
+import com.linkeleven.msa.area.domain.entity.Area;
 import com.linkeleven.msa.area.domain.entity.Category;
 import com.linkeleven.msa.area.domain.entity.Location;
 import com.linkeleven.msa.area.domain.repository.AreaRepository;
+import com.linkeleven.msa.area.libs.exception.CustomException;
+import com.linkeleven.msa.area.libs.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,11 +50,14 @@ public class PlaceConsumerService {
 
 		List<Category> categoryList = categoryCommandService.createCategoryList(responseDtoList);
 
+		Area area = areaRepository.findById(placeMessage.getAreaId())
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_AREA));
+
 		List<Location> locationList;
 		locationList = locationCommandService.createLocation(
 			responseDtoList,
 			categoryList,
-			placeMessage.getAreaId()
+			area
 		);
 
 		searchLocationService.create(locationList, placeMessage.getKeyword());

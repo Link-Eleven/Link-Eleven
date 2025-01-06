@@ -30,6 +30,7 @@ public class CommentService {
 	private final AuthClient authClient;
 
 	public CommentCreateResponseDto createComment(Long userId, Long feedId, CommentCreateRequestDto requestDto) {
+		checkLogIn(userId);
 		UserInfoResponseDto userInfo = getUsername(userId);
 		checkFeedExists(feedId);
 		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId, userInfo.getUsername());
@@ -103,5 +104,11 @@ public class CommentService {
 
 	private UserInfoResponseDto getUsername(Long userId) {
 		return authClient.getUsername(userId);
+	}
+
+	private void checkLogIn(Long userId) {
+		if (userId == null) {
+			throw new CustomException(ErrorCode.INVALID_USERID);
+		}
 	}
 }

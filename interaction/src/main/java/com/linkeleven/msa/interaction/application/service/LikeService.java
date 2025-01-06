@@ -24,6 +24,7 @@ public class LikeService {
 	private final FeedClient feedClient;
 
 	public void createLike(Long userId, Long targetId, ContentType contentType) {
+		checkLogIn(userId);
 		checkAlreadyLike(userId, targetId);
 		validateTarget(targetId, contentType);
 
@@ -31,7 +32,6 @@ public class LikeService {
 		Like like = Like.of(target, userId);
 		likeRepository.save(like);
 	}
-
 	public void cancelLike(Long userId, Long targetId, ContentType contentType) {
 		Like like = getLike(userId, targetId);
 		validateTarget(targetId, contentType);
@@ -77,4 +77,10 @@ public class LikeService {
 		return feedClient.checkFeedExists(targetId);
 	}
 
+
+	private void checkLogIn(Long userId) {
+		if (userId == null) {
+			throw new CustomException(ErrorCode.INVALID_USERID);
+		}
+	}
 }

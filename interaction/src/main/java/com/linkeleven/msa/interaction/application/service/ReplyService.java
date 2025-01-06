@@ -33,6 +33,7 @@ public class ReplyService {
 
 
 	public ReplyCreateResponseDto createReply(Long userId, Long commentId, ReplyCreateRequestDto requestDto) {
+		checkLogIn(userId);
 		UserInfoResponseDto userInfo = getUsername(userId);
 		checkCommentExists(commentId);
 		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId, userInfo.getUsername());
@@ -111,5 +112,11 @@ public class ReplyService {
 
 	private UserInfoResponseDto getUsername(Long userId) {
 		return authClient.getUsername(userId);
+	}
+
+	private void checkLogIn(Long userId) {
+		if (userId == null) {
+			throw new CustomException(ErrorCode.INVALID_USERID);
+		}
 	}
 }

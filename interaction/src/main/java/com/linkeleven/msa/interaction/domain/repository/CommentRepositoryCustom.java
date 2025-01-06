@@ -11,4 +11,5 @@ public interface CommentRepositoryCustom {
 	Slice<CommentQueryResponseDto> findCommentByFeedWithCursor(
 		Long feedId, Long cursorId, int pageSize, String sortByEnum, Long cursorLikeCount, LocalDateTime cursorCreatedAt);
 
+	Long countByFeedId(Long feedId);
 }

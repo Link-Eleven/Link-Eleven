@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.interaction.application.dto.CommentQueryResponseDto;
+import com.linkeleven.msa.interaction.application.dto.external.CommentCountResponseDto;
 import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,10 @@ public class CommentQueryService {
 	{
 		return commentRepository.findCommentByFeedWithCursor(feedId, cursorId, pageSize, sortByEnum,
 			cursorLikeCount, cursorCreatedAt);
+	}
+
+	public CommentCountResponseDto getCommentCount(Long feedId) {
+		Long count = commentRepository.countByFeedId(feedId);
+		return new CommentCountResponseDto(count);
 	}
 }

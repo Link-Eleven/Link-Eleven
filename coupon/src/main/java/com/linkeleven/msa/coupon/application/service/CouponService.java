@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.coupon.application.dto.CouponResponseDto;
 import com.linkeleven.msa.coupon.application.dto.CouponSearchResponseDto;
-import com.linkeleven.msa.coupon.application.dto.CouponWithStatsDto;
 import com.linkeleven.msa.coupon.domain.model.Coupon;
 import com.linkeleven.msa.coupon.domain.model.CouponPolicy;
 import com.linkeleven.msa.coupon.domain.model.IssuedCoupon;
@@ -76,7 +75,8 @@ public class CouponService {
 
 	// 모든 쿠폰 조회
 	@Transactional(readOnly = true)
-	public Page<CouponSearchResponseDto> searchCoupons(CouponPolicyStatus status, Long feedId, String validFrom,
+	public Page<CouponSearchResponseDto> searchCoupons(String role, CouponPolicyStatus status, Long feedId,
+		String validFrom,
 		String validTo,
 		Pageable pageable) {
 		if (!"MASTER".equals(role)) {

@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: coupon-service
   datasource:
     url: ${COUPON_DB_URL}
     username: ${COUPON_DB_USER}

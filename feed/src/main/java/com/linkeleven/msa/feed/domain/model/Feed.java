@@ -55,7 +55,7 @@ public class Feed extends BaseTime {
 
 	@Builder.Default
 	@Column(name = "popularity_score", nullable = false)
-	private Double popularityScore = 0.0;
+	private double popularityScore = 0.0;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "feed_id")
@@ -76,6 +76,10 @@ public class Feed extends BaseTime {
 		this.title = Optional.ofNullable(title).orElse(this.title);
 		this.content = Optional.ofNullable(content).orElse(this.content);
 		this.category = Optional.ofNullable(category).orElse(this.category);
+	}
+
+	public void updatePopularityScore (double popularityScore) {
+		this.popularityScore = popularityScore;
 	}
 
 	public void delete(Long userId) {

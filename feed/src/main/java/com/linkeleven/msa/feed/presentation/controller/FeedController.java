@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
+import com.linkeleven.msa.feed.application.dto.FeedResponseDto;
+import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.service.FeedService;
 import com.linkeleven.msa.feed.domain.model.Category;
@@ -66,6 +68,12 @@ public class FeedController {
 	public ResponseEntity<SuccessResponseDto<FeedReadResponseDto>> getDetailFeed(@PathVariable Long feedId) {
 		FeedReadResponseDto response = feedService.getDetailsByFeedId(feedId);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 단건 조회 완료", response));
+	}
+
+	@GetMapping("/popular")
+	public ResponseEntity<SuccessResponseDto<List<FeedTopResponseDto>>> getTopFeed(@RequestParam(defaultValue = "3") int limit) {
+		List<FeedTopResponseDto> response = feedService.getTopFeed(limit);
+		return  ResponseEntity.ok(SuccessResponseDto.success("인기 게시글 조회 완료", response));
 	}
 
 	@GetMapping

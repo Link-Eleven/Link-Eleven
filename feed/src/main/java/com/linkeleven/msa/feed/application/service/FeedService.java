@@ -35,7 +35,6 @@ public class FeedService {
 
 	private final FeedRepository feedRepository;
 	private final FileService fileService;
-	private final FileRepository fileRepository;
 	private final TokenVerifier tokenVerifier;
 	private final InteractionClient interactionClient;
 
@@ -53,7 +52,7 @@ public class FeedService {
 			feedCreateRequestDto.getCategory()
 		);
 
-		feed.getFiles().addAll(uploadFiles(files));
+		feed.getFiles().addAll(fileService.uploadFiles(files));
 
 		Feed savedFeed = feedRepository.save(feed);
 
@@ -79,7 +78,7 @@ public class FeedService {
 			feedUpdateRequestDto.getCategory()
 		);
 
-		feed.getFiles().addAll(uploadFiles(files));
+		feed.getFiles().addAll(fileService.uploadFiles(files));
 
 		Feed updatedFeed = feedRepository.save(feed);
 
@@ -98,9 +97,11 @@ public class FeedService {
 			throw new CustomException(ErrorCode.NO_DELETE_PERMISSION);
 		}
 
-		deleteFiles(feed);
+		if (!feed.getFiles().isEmpty()) {
+			fileService.deleteFiles(feed);
+		}
+
 		feed.delete(userId);
-		feedRepository.save(feed);
 
 	}
 
@@ -158,27 +159,6 @@ public class FeedService {
 		return feedRepository.existsById(feedId);
 	}
 
-	private List<File> uploadFiles(List<MultipartFile> files) {
-		if (files == null || files.isEmpty()) {
-			return Collections.emptyList();
-		}
-		return files.stream().map(file -> {
-			try {
-				String s3Url = fileService.uploadImage(file);
-				return File.of(s3Url, file.getOriginalFilename(), file.getSize());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}).collect(Collectors.toList());
-	}
 
-	private void deleteFiles(Feed feed) {
-		List<File> files = feed.getFiles();
-		files.forEach(file -> {
-			fileService.deleteImage(file.getS3Url());
-			fileRepository.delete(file);
-		});
-		feed.getFiles().clear();
-	}
 
 }

@@ -15,10 +15,41 @@ spring:
         format_sql: true
     open-in-view: false
 
-    eureka:
-      client:
-        service-url:
-          defaultZone: http://localhost:19090/eureka/
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: area-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "com.linkeleven.area-service"
+
+  data:
+    elasticsearch:
+      host: localhost:9200
+      username: ${ELASTIC_USERNAME}
+      password: ${ELASTIC_PASSWORD}
+      repositories:
+        enabled: true
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
 
 server:
   port: 19095
+
+place:
+  naver:
+    client-id: ${CLIENT_ID}
+    client-secret: ${CLIENT_SECRET}
+    url: ${PLACE_URL}

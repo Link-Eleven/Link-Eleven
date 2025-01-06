@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,8 @@ import com.linkeleven.msa.coupon.application.dto.CouponSearchResponseDto;
 import com.linkeleven.msa.coupon.application.service.CouponService;
 import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
 import com.linkeleven.msa.coupon.libs.dto.SuccessResponseDto;
-import com.linkeleven.msa.coupon.presentation.request.CreateCouponRequestDto;
+import com.linkeleven.msa.coupon.presentation.request.CouponCreateRequestDto;
+import com.linkeleven.msa.coupon.presentation.request.CouponUpdateRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +37,7 @@ public class CouponController {
 		//todo: 게이트웨이 연결시 required 제거하기
 		@RequestHeader(value = "X-User-Id", required = false) Long userId,
 		@RequestHeader(value = "X-Role", required = false) String role,
-		@RequestBody CreateCouponRequestDto request) {
+		@RequestBody CouponCreateRequestDto request) {
 		CouponResponseDto coupon = couponService.createCoupon(userId, role, request);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 생성 완료", coupon));
 	}
@@ -49,6 +51,17 @@ public class CouponController {
 	) {
 		CouponResponseDto coupon = couponService.getCouponById(userId, role, couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 조회 완료", coupon));
+	}
+
+	// 쿠폰 수정
+	@PutMapping("/{couponId}")
+	public ResponseEntity<SuccessResponseDto<CouponResponseDto>> updateCoupon(
+		@PathVariable Long couponId,
+		@RequestHeader(value = "X-User-Id", required = false) Long userId,
+		@RequestHeader(value = "X-Role", required = false) String role,
+		@RequestBody CouponUpdateRequestDto request) {
+		CouponResponseDto coupon = couponService.updateCoupon(couponId, userId, role, request);
+		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 수정 완료", coupon));
 	}
 
 	// 쿠폰 삭제 - feignClient 요청

@@ -2,6 +2,7 @@ package com.linkeleven.msa.coupon.application.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,8 @@ import com.linkeleven.msa.coupon.domain.repository.CouponRepository;
 import com.linkeleven.msa.coupon.domain.repository.IssuedCouponRepository;
 import com.linkeleven.msa.coupon.libs.exception.CustomException;
 import com.linkeleven.msa.coupon.libs.exception.ErrorCode;
-import com.linkeleven.msa.coupon.presentation.request.CreateCouponRequestDto;
+import com.linkeleven.msa.coupon.presentation.request.CouponCreateRequestDto;
+import com.linkeleven.msa.coupon.presentation.request.CouponUpdateRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,21 +49,25 @@ public class CouponService {
 
 	// 쿠폰 생성
 	@Transactional
-	public CouponResponseDto createCoupon(Long userId, String role, CreateCouponRequestDto request) {
-		// 유효한 요청인지 확인
-		validateCouponRequest(request, role);
-
+	public CouponResponseDto createCoupon(Long userId, String role, CouponCreateRequestDto request) {
 		// 쿠폰 생성
 		Coupon coupon = Coupon.of(request.getFeedId(), request.getValidFrom(), request.getValidTo());
 		coupon = couponRepository.save(coupon);
 
 		// 쿠폰 정책 생성
-		List<CouponPolicy> policies = List.of(
-			CouponPolicy.of(coupon.getCouponId(), 40, 5), // 40% 쿠폰 5장
-			CouponPolicy.of(coupon.getCouponId(), 30, 20), // 30% 쿠폰 20장
-			CouponPolicy.of(coupon.getCouponId(), 20, 75) // 20% 쿠폰 75장
-		);
+		Coupon SavedCoupon = coupon;
+		List<CouponPolicy> policies = request.getPolicies().stream()
+			.map(policyRequest -> {
+				return CouponPolicy.of(
+					SavedCoupon.getCouponId(),
+					policyRequest.getDiscountRate(),
+					policyRequest.getQuantity()
+				);
+			})
+			.collect(Collectors.toList());
+
 		couponPolicyRepository.saveAll(policies);
+
 		return CouponResponseDto.from(coupon);
 	}
 
@@ -109,7 +115,7 @@ public class CouponService {
 
 	}
 
-	private void validateCouponRequest(CreateCouponRequestDto request, String role) throws CustomException {
+	private void validateCouponRequest(CouponCreateRequestDto request, String role) throws CustomException {
 		// feed id 확인 (중복 생성 방지)
 		boolean exists = couponRepository.existsByFeedId(request.getFeedId());
 		if (exists) {
@@ -126,5 +132,20 @@ public class CouponService {
 			throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
 		}
 
+	}
+
+	public CouponResponseDto updateCoupon(Long couponId, Long userId, String role, CouponUpdateRequestDto request) {
+		if (!"USER".equals(role)) {
+			throw new CustomException(ErrorCode.FORBIDDEN);
+		}
+		Coupon coupon = couponRepository.findById(couponId)
+			.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
+		if (!coupon.getCreatedBy().equals(userId)) {
+			throw new CustomException(ErrorCode.FORBIDDEN);
+		}
+		coupon.update(request.getValidFrom(), request.getValidTo());
+		coupon = couponRepository.save(coupon);
+
+		return CouponResponseDto.from(coupon);
 	}
 }

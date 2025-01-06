@@ -30,7 +30,7 @@ public class IssueCouponController {
 		@RequestHeader(value = "X-User-Id", required = false) Long userId,
 		@RequestHeader(value = "X-Role", required = false) String role,
 		@PathVariable Long couponId) {
-		IssuedCouponDto issuedCoupon = couponIssuingService.issueCoupon(userId, couponId);
+		IssuedCouponDto issuedCoupon = couponIssuingService.issueCoupon(userId, role, couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 발급 완료", issuedCoupon));
 	}
 

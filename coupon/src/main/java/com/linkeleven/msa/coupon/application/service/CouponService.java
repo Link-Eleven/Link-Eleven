@@ -67,7 +67,7 @@ public class CouponService {
 
 	// 쿠폰 ID로 쿠폰 조회
 	@Transactional(readOnly = true)
-	public CouponResponseDto getCouponById(Long couponId) {
+	public CouponResponseDto getCouponById(Long userId, String role, Long couponId) {
 		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
 		return CouponResponseDto.from(coupon);

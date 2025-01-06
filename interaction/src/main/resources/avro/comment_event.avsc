@@ -1,0 +1,27 @@
+{
+  "type": "record",
+  "name": "CommentEvent",
+  "namespace": "com.linkeleven.msa.interaction",
+  "fields": [
+    {
+      "name": "eventType",
+      "type": "string"
+    },
+    {
+      "name": "feedId",
+      "type": "long"
+    },
+    {
+      "name": "content",
+      "type": "string"
+    },
+    {
+      "name": "userId",
+      "type": "long"
+    },
+    {
+      "name": "commentCreatedAt",
+      "type": "string"
+    }
+  ]
+}

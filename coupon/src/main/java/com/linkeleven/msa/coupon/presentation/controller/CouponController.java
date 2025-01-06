@@ -47,7 +47,7 @@ public class CouponController {
 		@RequestHeader(value = "X-User-Id", required = false) Long userId,
 		@RequestHeader(value = "X-Role", required = false) String role
 	) {
-		CouponResponseDto coupon = couponService.getCouponById(couponId);
+		CouponResponseDto coupon = couponService.getCouponById(userId, role, couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 조회 완료", coupon));
 	}
 

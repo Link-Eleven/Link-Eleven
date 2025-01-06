@@ -23,7 +23,10 @@ public class CouponIssuingService {
 	private final IssuedCouponRepository issuedCouponRepository;
 
 	@Transactional
-	public IssuedCouponDto issueCoupon(Long userId, Long couponId) {
+	public IssuedCouponDto issueCoupon(Long userId, String role, Long couponId) {
+		if (!"COMPANY".equals(role)) {
+			throw new CustomException(ErrorCode.FORBIDDEN);
+		}
 		// 유저가 이미 해당 쿠폰을 발급받았는지 확인
 		if (issuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
 			throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);

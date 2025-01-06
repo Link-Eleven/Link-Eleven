@@ -22,4 +22,5 @@ public interface CouponPolicyRepository extends JpaRepository<CouponPolicy, Long
 	// 파라미터인 쿠폰 상태 제외 후 조회
 	List<CouponPolicy> findByCouponIdAndStatusNot(Long couponId, CouponPolicyStatus status);
 
+	void deleteByCouponId(Long couponId);
 }

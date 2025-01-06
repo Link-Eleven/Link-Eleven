@@ -19,8 +19,7 @@ import com.linkeleven.msa.coupon.application.dto.CouponSearchResponseDto;
 import com.linkeleven.msa.coupon.application.service.CouponService;
 import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
 import com.linkeleven.msa.coupon.libs.dto.SuccessResponseDto;
-import com.linkeleven.msa.coupon.presentation.request.CouponCreateRequestDto;
-import com.linkeleven.msa.coupon.presentation.request.CouponUpdateRequestDto;
+import com.linkeleven.msa.coupon.presentation.request.CouponRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +36,7 @@ public class CouponController {
 		//todo: 게이트웨이 연결시 required 제거하기
 		@RequestHeader(value = "X-User-Id", required = false) Long userId,
 		@RequestHeader(value = "X-Role", required = false) String role,
-		@RequestBody CouponCreateRequestDto request) {
+		@RequestBody CouponRequestDto request) {
 		CouponResponseDto coupon = couponService.createCoupon(userId, role, request);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 생성 완료", coupon));
 	}
@@ -59,7 +58,7 @@ public class CouponController {
 		@PathVariable Long couponId,
 		@RequestHeader(value = "X-User-Id", required = false) Long userId,
 		@RequestHeader(value = "X-Role", required = false) String role,
-		@RequestBody CouponUpdateRequestDto request) {
+		@RequestBody CouponRequestDto request) {
 		CouponResponseDto coupon = couponService.updateCoupon(couponId, userId, role, request);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 수정 완료", coupon));
 	}

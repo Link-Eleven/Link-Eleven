@@ -22,8 +22,7 @@ import com.linkeleven.msa.coupon.domain.repository.CouponRepository;
 import com.linkeleven.msa.coupon.domain.repository.IssuedCouponRepository;
 import com.linkeleven.msa.coupon.libs.exception.CustomException;
 import com.linkeleven.msa.coupon.libs.exception.ErrorCode;
-import com.linkeleven.msa.coupon.presentation.request.CouponCreateRequestDto;
-import com.linkeleven.msa.coupon.presentation.request.CouponUpdateRequestDto;
+import com.linkeleven.msa.coupon.presentation.request.CouponRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,7 +48,7 @@ public class CouponService {
 
 	// 쿠폰 생성
 	@Transactional
-	public CouponResponseDto createCoupon(Long userId, String role, CouponCreateRequestDto request) {
+	public CouponResponseDto createCoupon(Long userId, String role, CouponRequestDto request) {
 
 		validateCouponRequest(request, role);
 		// 쿠폰 생성
@@ -104,7 +103,7 @@ public class CouponService {
 
 		List<CouponPolicy> policies = couponPolicyRepository.findByCouponIdAndStatusNot(coupon.getCouponId(),
 			CouponPolicyStatus.DELETED);
-		// 발급된 쿠폰 젅부 소프트 삭제 처리
+		// 발급된 쿠폰 소프트 삭제 처리
 		List<IssuedCoupon> issuedCoupons = issuedCouponRepository.findByCouponIdAndStatusNot(coupon.getCouponId(),
 			IssuedCouponStatus.DELETED);
 		issuedCoupons.forEach(issuedCoupon -> issuedCoupon.softDelete(userId));
@@ -112,10 +111,9 @@ public class CouponService {
 		// 쿠폰 및 쿠폰 정책 상태 변경 (soft delete)
 		coupon.softDelete(userId);
 		policies.forEach(policy -> policy.softDelete(userId));
-
 	}
 
-	private void validateCouponRequest(CouponCreateRequestDto request, String role) throws CustomException {
+	private void validateCouponRequest(CouponRequestDto request, String role) throws CustomException {
 		// feed id 확인 (중복 생성 방지)
 		boolean exists = couponRepository.existsByFeedId(request.getFeedId());
 		if (exists) {
@@ -134,18 +132,32 @@ public class CouponService {
 
 	}
 
-	public CouponResponseDto updateCoupon(Long couponId, Long userId, String role, CouponUpdateRequestDto request) {
-		if (!"USER".equals(role)) {
-			throw new CustomException(ErrorCode.FORBIDDEN);
-		}
-		Coupon coupon = couponRepository.findById(couponId)
+	@Transactional
+	public CouponResponseDto updateCoupon(Long couponId, Long userId, String role, CouponRequestDto request) {
+		// 쿠폰 존재 여부 확인
+		Coupon existingCoupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
-		if (!coupon.getCreatedBy().equals(userId)) {
-			throw new CustomException(ErrorCode.FORBIDDEN);
-		}
-		coupon.update(request.getValidFrom(), request.getValidTo());
-		coupon = couponRepository.save(coupon);
 
-		return CouponResponseDto.from(coupon);
+		// 권한 및 요청 검증
+		validateCouponRequest(request, role);
+
+		// 기존 쿠폰 유효 기간 업데이트
+		existingCoupon.update(request.getValidFrom(), request.getValidTo());
+		couponRepository.save(existingCoupon); // 변경된 쿠폰 저장
+
+		couponPolicyRepository.deleteByCouponId(couponId);
+
+		// 새로 전달된 정책으로 쿠폰 정책 업데이트
+		List<CouponPolicy> updatedPolicies = request.getPolicies().stream()
+			.map(policyRequest -> CouponPolicy.of(
+				existingCoupon.getCouponId(),
+				policyRequest.getDiscountRate(),
+				policyRequest.getQuantity()
+			))
+			.collect(Collectors.toList());
+
+		couponPolicyRepository.saveAll(updatedPolicies);
+		return CouponResponseDto.from(existingCoupon);
 	}
+
 }

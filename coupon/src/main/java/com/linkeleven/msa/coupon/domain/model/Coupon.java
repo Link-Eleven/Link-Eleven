@@ -31,10 +31,10 @@ public class Coupon extends BaseTime {
 	@Column(nullable = false)
 	private Long feedId;
 
-	@Column(nullable = false, updatable = false)
+	@Column(nullable = false)
 	private LocalDateTime validFrom;
 
-	@Column(nullable = false, updatable = false)
+	@Column(nullable = false)
 	private LocalDateTime validTo;
 
 	@OneToMany(mappedBy = "couponId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -47,6 +47,11 @@ public class Coupon extends BaseTime {
 			.validFrom(validFrom)
 			.validTo(validTo)
 			.build();
+	}
+
+	public void update(LocalDateTime validFrom, LocalDateTime validTo) {
+		this.validFrom = validFrom;
+		this.validTo = validTo;
 	}
 
 	public void softDelete(Long userId) {

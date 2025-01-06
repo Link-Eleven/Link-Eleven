@@ -83,11 +83,25 @@ avro {
 	fieldVisibility = "PRIVATE"
 	stringType.set("String")
 }
-
-//
-//tasks.withType(Test) {
-//	enabled = false
+generateAvroJava {
+	source("src/main/resources/avro/")
+	include("**/*.avsc")
+	outputDir = file("build/generated/avro-java")
+}
+//sourceSets {
+//	main {
+//		java {
+//			srcDirs += "build/generated-main-avro-java"
+//		}
+//	}
 //}
+tasks.named('compileJava') {
+	dependsOn('generateAvroJava')
+}
+
+tasks.withType(Test) {
+	enabled = false
+}
 
 
 tasks.named('test') {

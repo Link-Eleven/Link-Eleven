@@ -37,29 +37,31 @@ public class FeedController {
 
 	@PostMapping
 	public ResponseEntity<SuccessResponseDto<FeedCreateResponseDto>> createFeed(
-		@RequestHeader("Authorization") String token,
+		@RequestHeader("X-User-Id") Long userId,
 		@RequestPart FeedCreateRequestDto feedCreateRequestDto,
 		@RequestParam(value = "file", required = false) List<MultipartFile> files) throws IOException {
 
-		FeedCreateResponseDto response = feedService.createFeed(feedCreateRequestDto, files, token);
+		FeedCreateResponseDto response = feedService.createFeed(feedCreateRequestDto, files, userId);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 생성 성공", response));
 	}
 
 	@PutMapping("/{feedId}")
 	public ResponseEntity<SuccessResponseDto<FeedUpdateResponseDto>> updateFeed(
 		@PathVariable Long feedId,
-		@RequestHeader("Authorization") String token,
+		@RequestHeader("X-User-Id") Long userId,
+		@RequestHeader("X-Role") String userRole,
 		@RequestPart FeedUpdateRequestDto feedUpdateRequestDto,
 		@RequestParam(value = "file", required = false) List<MultipartFile> files) throws IOException {
 
-		FeedUpdateResponseDto response = feedService.updateFeed(feedId, feedUpdateRequestDto, files, token);
+		FeedUpdateResponseDto response = feedService.updateFeed(feedId, feedUpdateRequestDto, files, userId, userRole);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
 	}
 
 	@DeleteMapping("/{feedId}")
 	public ResponseEntity<SuccessResponseDto<Void>> deleteFeed(@PathVariable Long feedId,
-		@RequestHeader("Authorization") String token) {
-		feedService.deleteFeed(feedId, token);
+		@RequestHeader("X-User-Id") Long userId,
+		@RequestHeader("X-Role") String userRole) {
+		feedService.deleteFeed(feedId, userId, userRole);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 삭제 완료"));
 	}
 

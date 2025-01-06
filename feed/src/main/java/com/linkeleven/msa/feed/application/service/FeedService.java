@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +13,11 @@ import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
+import com.linkeleven.msa.feed.application.dto.external.UserInfoResponseDto;
 import com.linkeleven.msa.feed.domain.model.Feed;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
+import com.linkeleven.msa.feed.infrastructure.client.AuthClient;
 import com.linkeleven.msa.feed.infrastructure.client.InteractionClient;
-import com.linkeleven.msa.feed.infrastructure.config.TokenVerifier;
 import com.linkeleven.msa.feed.libs.exception.CustomException;
 import com.linkeleven.msa.feed.libs.exception.ErrorCode;
 import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;
@@ -31,14 +31,16 @@ public class FeedService {
 
 	private final FeedRepository feedRepository;
 	private final FileService fileService;
-	private final TokenVerifier tokenVerifier;
 	private final InteractionClient interactionClient;
+	private final AuthClient authClient;
 
 	@Transactional
 	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files,
-		String token) {
+		Long userId) {
 
-		Long userId = tokenVerifier.getUserIdFromToken(token);
+		// 유저 정보 가져오기 및 검증
+		// UserInfoResponseDto userInfo = authClient.getUsername(userId);
+		// validateUser(userId, userInfo);
 
 		Feed feed = Feed.of(
 			userId,
@@ -57,10 +59,11 @@ public class FeedService {
 
 	@Transactional
 	public FeedUpdateResponseDto updateFeed(Long feedId, FeedUpdateRequestDto feedUpdateRequestDto,
-		List<MultipartFile> files, String token) {
+		List<MultipartFile> files, Long userId, String userRole) {
 
-		Long userId = tokenVerifier.getUserIdFromToken(token);
-		String userRole = tokenVerifier.getRoleFromToken(token);
+		// 유저 정보 가져오기 및 검증
+		// UserInfoResponseDto userInfo = authClient.getUsername(userId);
+		// validateUser(userId, userInfo);
 
 		Feed feed = findByIdAndDeletedAt(feedId);
 
@@ -82,10 +85,11 @@ public class FeedService {
 	}
 
 	@Transactional
-	public void deleteFeed(Long feedId, String token) {
+	public void deleteFeed(Long feedId, Long userId, String userRole) {
 
-		Long userId = tokenVerifier.getUserIdFromToken(token);
-		String userRole = tokenVerifier.getRoleFromToken(token);
+		// 유저 정보 가져오기 및 검증
+		// UserInfoResponseDto userInfo = authClient.getUsername(userId);
+		// validateUser(userId, userInfo);
 
 		Feed feed = findByIdAndDeletedAt(feedId);
 
@@ -115,7 +119,7 @@ public class FeedService {
 	}
 
 	@Transactional
-	@Cacheable(value = "popularFeeds", key = "#limit", cacheManager = "cacheManager", unless = "#result == null || #result.isEmpty()")
+	// @Cacheable(value = "popularFeeds", key = "#limit", cacheManager = "cacheManager", unless = "#result == null || #result.isEmpty()")
 	public List<FeedTopResponseDto> getTopFeed(int limit) {
 		Pageable pageable = Pageable.unpaged();
 		List<Feed> feeds = feedRepository.findTopFeeds(pageable);
@@ -149,6 +153,12 @@ public class FeedService {
 	private Feed findByIdAndDeletedAt(Long feedId) {
 		return feedRepository.findByIdAndDeletedAt(feedId)
 			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
+	}
+
+	private void validateUser(Long headerUserId, UserInfoResponseDto userInfo) {
+		if (userInfo == null || userInfo.getUserId() == null || !headerUserId.equals(userInfo.getUserId())) {
+			throw new CustomException(ErrorCode.INVALID_USER);
+		}
 	}
 
 	public boolean checkFeedExists(Long feedId) {

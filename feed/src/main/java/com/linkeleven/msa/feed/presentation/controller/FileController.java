@@ -15,7 +15,6 @@
 //
 // import lombok.RequiredArgsConstructor;
 
-
 // 이미지 s3 저장 및 연동 -> 정상 작동하는지 테스트를 위한 컨트롤러 -> 게시글에 이미지 기능 반영에 의해 불필요(제거 예정)
 // @RestController
 // @RequestMapping("/api/files")

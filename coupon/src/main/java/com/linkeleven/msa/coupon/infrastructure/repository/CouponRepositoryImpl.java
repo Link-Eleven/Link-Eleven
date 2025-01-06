@@ -20,9 +20,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class CouponRepositoryImpl implements CouponRepositoryCustom {
@@ -36,9 +34,6 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 	@Override
 	public Page<CouponSearchResponseDto> findCouponsByFilter(Long userId, CouponPolicyStatus status, Long feedId,
 		String validFrom, String validTo, Pageable pageable) {
-
-		log.debug("Search parameters - userId: {}, status: {}, feedId: {}, validFrom: {}, validTo: {}",
-			userId, status, feedId, validFrom, validTo);
 
 		BooleanExpression createdByCondition = userId != null ? coupon.createdBy.eq(userId) : null;
 

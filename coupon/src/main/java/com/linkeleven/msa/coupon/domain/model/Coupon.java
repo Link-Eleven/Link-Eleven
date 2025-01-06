@@ -48,4 +48,9 @@ public class Coupon extends BaseTime {
 			.validTo(validTo)
 			.build();
 	}
+
+	public void softDelete(Long userId) {
+		this.setDeletedBy(userId);
+		this.setDeletedAt(LocalDateTime.now());
+	}
 }

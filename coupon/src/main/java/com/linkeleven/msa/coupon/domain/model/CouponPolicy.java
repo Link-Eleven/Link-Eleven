@@ -1,5 +1,7 @@
 package com.linkeleven.msa.coupon.domain.model;
 
+import java.time.LocalDateTime;
+
 import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
 import com.linkeleven.msa.coupon.libs.exception.CustomException;
 import com.linkeleven.msa.coupon.libs.exception.ErrorCode;
@@ -60,5 +62,11 @@ public class CouponPolicy extends BaseTime {
 		} else {
 			throw new CustomException(ErrorCode.NO_AVAILABLE_COUPON);
 		}
+	}
+
+	public void softDelete(Long userId) {
+		this.status = CouponPolicyStatus.DELETED;
+		this.setDeletedBy(userId);
+		this.setDeletedAt(LocalDateTime.now());
 	}
 }

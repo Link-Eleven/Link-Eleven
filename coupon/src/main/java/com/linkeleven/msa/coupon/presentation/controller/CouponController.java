@@ -3,6 +3,7 @@ package com.linkeleven.msa.coupon.presentation.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +49,17 @@ public class CouponController {
 	) {
 		CouponResponseDto coupon = couponService.getCouponById(couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 조회 완료", coupon));
+	}
+
+	// 쿠폰 삭제 - feignClient 요청
+	@DeleteMapping("/{feedId}")
+	public ResponseEntity<SuccessResponseDto<String>> deleteCoupon(
+		@PathVariable Long feedId,
+		@RequestHeader(value = "X-User-Id", required = false) Long userId,
+		@RequestHeader(value = "X-Role", required = false) String role
+	) {
+		couponService.deleteCoupon(userId, role, feedId);
+		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 삭제 완료", ""));
 	}
 
 	// Master: 쿠폰 검색 API

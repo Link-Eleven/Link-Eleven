@@ -14,9 +14,12 @@ import com.linkeleven.msa.coupon.application.dto.CouponSearchResponseDto;
 import com.linkeleven.msa.coupon.application.dto.CouponWithStatsDto;
 import com.linkeleven.msa.coupon.domain.model.Coupon;
 import com.linkeleven.msa.coupon.domain.model.CouponPolicy;
+import com.linkeleven.msa.coupon.domain.model.IssuedCoupon;
 import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
+import com.linkeleven.msa.coupon.domain.model.enums.IssuedCouponStatus;
 import com.linkeleven.msa.coupon.domain.repository.CouponPolicyRepository;
 import com.linkeleven.msa.coupon.domain.repository.CouponRepository;
+import com.linkeleven.msa.coupon.domain.repository.IssuedCouponRepository;
 import com.linkeleven.msa.coupon.libs.exception.CustomException;
 import com.linkeleven.msa.coupon.libs.exception.ErrorCode;
 import com.linkeleven.msa.coupon.presentation.request.CreateCouponRequestDto;
@@ -29,6 +32,7 @@ public class CouponService {
 
 	private final CouponRepository couponRepository;
 	private final CouponPolicyRepository couponPolicyRepository;
+	private final IssuedCouponRepository issuedCouponRepository;
 
 	@Scheduled(cron = "0 0 0 * * *")  // 매일 자정에 실행
 	@Transactional
@@ -76,6 +80,27 @@ public class CouponService {
 		String validTo,
 		Pageable pageable) {
 		return couponRepository.findCouponsByFilter(status, feedId, validFrom, validTo, pageable);
+	}
+
+	@Transactional
+	public void deleteCoupon(Long userId, String role, Long feedId) {
+		if ("USER".equals(role)) {
+			throw new CustomException(ErrorCode.FORBIDDEN);
+		}
+		Coupon coupon = couponRepository.findByFeedId(feedId)
+			.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
+
+		List<CouponPolicy> policies = couponPolicyRepository.findByCouponIdAndStatusNot(coupon.getCouponId(),
+			CouponPolicyStatus.DELETED);
+		// 발급된 쿠폰 젅부 소프트 삭제 처리
+		List<IssuedCoupon> issuedCoupons = issuedCouponRepository.findByCouponIdAndStatusNot(coupon.getCouponId(),
+			IssuedCouponStatus.DELETED);
+		issuedCoupons.forEach(issuedCoupon -> issuedCoupon.softDelete(userId));
+
+		// 쿠폰 및 쿠폰 정책 상태 변경 (soft delete)
+		coupon.softDelete(userId);
+		policies.forEach(policy -> policy.softDelete(userId));
+
 	}
 
 	private void validateCouponRequest(CreateCouponRequestDto request, String role) throws CustomException {

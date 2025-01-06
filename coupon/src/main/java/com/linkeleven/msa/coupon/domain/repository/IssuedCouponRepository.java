@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.linkeleven.msa.coupon.domain.model.IssuedCoupon;
+import com.linkeleven.msa.coupon.domain.model.enums.IssuedCouponStatus;
 
 public interface IssuedCouponRepository extends JpaRepository<IssuedCoupon, Long> {
 	boolean existsByUserIdAndCouponId(Long userId, Long couponId);
@@ -19,4 +20,7 @@ public interface IssuedCouponRepository extends JpaRepository<IssuedCoupon, Long
 		"WHERE ic.userId = :userId " +
 		"AND ic.status = 'ISSUED' ")
 	List<IssuedCoupon> findActiveIssuedCouponsByUserId(@Param("userId") Long userId);
+
+	// 파라미터 상태 제외 후 조회
+	List<IssuedCoupon> findByCouponIdAndStatusNot(Long couponId, IssuedCouponStatus issuedCouponStatus);
 }

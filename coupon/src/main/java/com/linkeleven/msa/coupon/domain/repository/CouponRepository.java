@@ -15,4 +15,6 @@ public interface CouponRepository extends JpaRepository<Coupon, Long>, CouponRep
 
 	@Query("SELECT c FROM Coupon c JOIN c.policies cp WHERE c.validTo < :currentTime AND cp.status <> 'INACTIVE'")
 	List<Coupon> findCouponsByValidToBeforeAndCouponPolicyStatusNot(LocalDateTime currentTime);
+	// feedId로 쿠폰 조회
+	Optional<Coupon> findByFeedId(Long feedId);
 }

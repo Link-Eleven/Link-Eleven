@@ -1,7 +1,6 @@
-package com.linkeleven.msa.gateway;
+package com.linkeleven.msa.gateway.filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.http.HttpStatus;
@@ -24,14 +23,12 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     this.jwtProvider = jwtProvider;
   }
 
-  @Value("${service.jwt.secret-key}")
-  private String secretKey;
-
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
     String path = exchange.getRequest().getURI().getPath();
-    if (path.startsWith("/api/auth/")) {
-      return chain.filter(exchange);
+
+    if (path.equals("/api/auth/signin")||path.equals("/api/auth/signup")) {;
+      return chain.filter(exchange);  // /signIn 경로는 필터를 적용하지 않음
     }
 
     String token = extractToken(exchange);
@@ -40,7 +37,13 @@ public class JwtAuthenticationFilter implements GlobalFilter {
       exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
       return exchange.getResponse().setComplete();
     }
-
+    Claims claims = jwtProvider.parseToken(token);
+    exchange = exchange.mutate()
+        .request(exchange.getRequest().mutate()
+            .header("X-User-Id", claims.get("user_id").toString())  // 원하는 값으로 설정
+            .header("X-Role", claims.get("role").toString())     // 원하는 값으로 설정
+            .build())  // 새로운 요청 객체를 생성
+        .build();  // 변경된 요청 객체를 exchange에 반영
     return chain.filter(exchange);
   }
 
@@ -57,11 +60,6 @@ public class JwtAuthenticationFilter implements GlobalFilter {
       Claims claims = jwtProvider.parseToken(token);
       Claims validatedClaims = jwtProvider.validateClaims(claims);
 
-      exchange.getRequest().mutate()
-          .header("X-User-Id", validatedClaims.get("user_id", String.class))
-          .header("X-Role", validatedClaims.get("role", String.class))
-          .build();
-
       return true; // 토큰이 유효하면 true 반환
     } catch (CustomException e) {
       log.error("Authentication failed: {}", e.getMessage());
@@ -70,19 +68,16 @@ public class JwtAuthenticationFilter implements GlobalFilter {
   }
 
 
-  private Claims checkValidateAuthService(Claims body) {
-    String userId = body.get("user_id",String.class);
-    String role = body.get("role",String.class);
+/*  private void validateUserRoleUserService(Claims claims) {
+    String role = claims.get("role").toString();
+    long userId = Long.parseLong(claims.get("user_id").toString());
 
-    if(userId!=null){
-      //if(auth check)  false -> 에러 반환
-      return body;
+    if(role.equals("MASTER")||role.equals("COMPANY")) {
+      UserRoleResponseDto userRoleResponseDto=userClient.getUserRole(userId);
+      if(!userRoleResponseDto.getRole().equals(role)) {
+        throw new CustomException(ErrorCode.ROLE_NOT_EQUALS);
+      }
     }
-    if(role!=null){
-      //if(auth check) 권한 같은지 확인 후 반환
-      return body;
-    }
-    return body;
-  }
+  }*/
 
 }

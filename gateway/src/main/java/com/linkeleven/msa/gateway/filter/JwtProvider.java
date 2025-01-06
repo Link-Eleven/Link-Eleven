@@ -1,4 +1,4 @@
-package com.linkeleven.msa.gateway;
+package com.linkeleven.msa.gateway.filter;
 
 import javax.crypto.SecretKey;
 

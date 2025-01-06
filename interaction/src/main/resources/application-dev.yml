@@ -1,3 +1,4 @@
+---
 spring:
   application:
     name: interaction
@@ -17,11 +18,6 @@ spring:
         show_sql: true
         format_sql: true
     open-in-view: false
-
-    eureka:
-      client:
-        service-url:
-          defaultZone: http://localhost:19090/eureka/
 
   kafka:
     bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
@@ -43,6 +39,11 @@ spring:
       try:
         topic:
           enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
 
 server:
   port: 19094

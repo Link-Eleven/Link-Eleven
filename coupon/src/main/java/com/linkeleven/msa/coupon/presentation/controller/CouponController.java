@@ -72,7 +72,7 @@ public class CouponController {
 		@RequestParam(required = false) String validFrom,
 		@RequestParam(required = false) String validTo,
 		Pageable pageable) {
-		Page<CouponSearchResponseDto> couponList = couponService.searchCoupons(userId, role, status, feedId, validFrom,
+		Page<CouponSearchResponseDto> couponList = couponService.searchCoupons(role, status, feedId, validFrom,
 			validTo,
 			pageable);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 조회 완료", couponList));

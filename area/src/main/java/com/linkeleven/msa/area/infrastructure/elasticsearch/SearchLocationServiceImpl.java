@@ -51,7 +51,7 @@ public class SearchLocationServiceImpl implements SearchLocationService {
 			.withQuery(boolQuery.build()._toQuery())
 			.build();
 
-		System.out.println("Generated Query: " + query.getQuery());
+		log.info("Generated Query: " + query.getQuery());
 
 		SearchHits<SearchLocation> searchHits = elasticsearchOperations.search(query, SearchLocation.class);
 

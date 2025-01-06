@@ -1,7 +1,5 @@
 package com.linkeleven.msa.feed.application.service;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,9 +15,7 @@ import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.domain.model.Feed;
-import com.linkeleven.msa.feed.domain.model.File;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
-import com.linkeleven.msa.feed.domain.repository.FileRepository;
 import com.linkeleven.msa.feed.infrastructure.client.InteractionClient;
 import com.linkeleven.msa.feed.infrastructure.config.TokenVerifier;
 import com.linkeleven.msa.feed.libs.exception.CustomException;
@@ -158,7 +154,5 @@ public class FeedService {
 	public boolean checkFeedExists(Long feedId) {
 		return feedRepository.existsById(feedId);
 	}
-
-
 
 }

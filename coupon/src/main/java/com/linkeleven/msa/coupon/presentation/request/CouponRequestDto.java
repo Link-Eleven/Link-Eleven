@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CouponCreateRequestDto {
+public class CouponRequestDto {
 	private Long feedId;
 	private LocalDateTime validFrom;
 	private LocalDateTime validTo;

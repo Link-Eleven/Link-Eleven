@@ -50,6 +50,8 @@ public class CouponService {
 	// 쿠폰 생성
 	@Transactional
 	public CouponResponseDto createCoupon(Long userId, String role, CouponCreateRequestDto request) {
+
+		validateCouponRequest(request, role);
 		// 쿠폰 생성
 		Coupon coupon = Coupon.of(request.getFeedId(), request.getValidFrom(), request.getValidTo());
 		coupon = couponRepository.save(coupon);
@@ -57,13 +59,11 @@ public class CouponService {
 		// 쿠폰 정책 생성
 		Coupon SavedCoupon = coupon;
 		List<CouponPolicy> policies = request.getPolicies().stream()
-			.map(policyRequest -> {
-				return CouponPolicy.of(
-					SavedCoupon.getCouponId(),
-					policyRequest.getDiscountRate(),
-					policyRequest.getQuantity()
-				);
-			})
+			.map(policyRequest -> CouponPolicy.of(
+				SavedCoupon.getCouponId(),
+				policyRequest.getDiscountRate(),
+				policyRequest.getQuantity()
+			))
 			.collect(Collectors.toList());
 
 		couponPolicyRepository.saveAll(policies);

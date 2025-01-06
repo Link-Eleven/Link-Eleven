@@ -67,8 +67,7 @@ public class FeedService {
 		Long userId = tokenVerifier.getUserIdFromToken(token);
 		String userRole = tokenVerifier.getRoleFromToken(token);
 
-		Feed feed = feedRepository.findByIdAndDeletedAt(feedId)
-			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
+		Feed feed = findByIdAndDeletedAt(feedId);
 
 		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER")) {
 			throw new CustomException(ErrorCode.NO_UPDATE_PERMISSION);
@@ -93,8 +92,7 @@ public class FeedService {
 		Long userId = tokenVerifier.getUserIdFromToken(token);
 		String userRole = tokenVerifier.getRoleFromToken(token);
 
-		Feed feed = feedRepository.findById(feedId)
-			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
+		Feed feed = findByIdAndDeletedAt(feedId);
 
 		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER")) {
 			throw new CustomException(ErrorCode.NO_DELETE_PERMISSION);
@@ -115,8 +113,7 @@ public class FeedService {
 
 		feedRepository.incrementViews(feedId);
 
-		Feed feed = feedRepository.findByIdAndDeletedAt(feedId)
-			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
+		Feed feed = findByIdAndDeletedAt(feedId);
 		return FeedReadResponseDto.from(feed);
 	}
 
@@ -150,6 +147,11 @@ public class FeedService {
 
 		String formattedScore = String.format("%.2f", popularityScore);
 		return Double.parseDouble(formattedScore);
+	}
+
+	private Feed findByIdAndDeletedAt(Long feedId) {
+		return feedRepository.findByIdAndDeletedAt(feedId)
+			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
 	}
 
 	public boolean checkFeedExists(Long feedId) {

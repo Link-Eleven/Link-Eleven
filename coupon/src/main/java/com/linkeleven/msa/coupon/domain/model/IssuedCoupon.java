@@ -34,19 +34,22 @@ public class IssuedCoupon extends BaseTime {
 	@Column(nullable = false)
 	private Long couponId;
 
+	@Column(nullable = false)
+	private int discountRate;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private IssuedCouponStatus status;
 
-	public static IssuedCoupon of(Long userId, Long couponId) {
+	public static IssuedCoupon of(Long userId, Long couponId, int discountRate) {
 		return IssuedCoupon.builder()
 			.userId(userId)
 			.couponId(couponId)
+			.discountRate(discountRate)
 			.status(IssuedCouponStatus.ISSUED)
 			.build();
 	}
 
-	// 상태 변경을 위한 메서드 추가
 	public void updateStatus(IssuedCouponStatus newStatus) {
 		this.status = newStatus;
 	}

@@ -43,11 +43,13 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 				coupon.validTo,
 				queryFactory.select(issuedCoupon.count())
 					.from(issuedCoupon)
-					.where(issuedCoupon.couponId.eq(coupon.couponId)),
+					.where(issuedCoupon.couponId.eq(coupon.couponId)
+						.and(issuedCoupon.status.ne(IssuedCouponStatus.DELETED)))
+				,
 				queryFactory.select(issuedCoupon.count())
 					.from(issuedCoupon)
-					.where(
-						issuedCoupon.couponId.eq(coupon.couponId).and(issuedCoupon.status.eq(IssuedCouponStatus.USED)))
+					.where(issuedCoupon.couponId.eq(coupon.couponId)
+						.and(issuedCoupon.status.eq(IssuedCouponStatus.USED)))
 			))
 			.from(coupon)
 			.join(coupon.policies, couponPolicy)
@@ -55,7 +57,8 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 				policyStatusEq(status),
 				feedIdEq(feedId),
 				validFromGoe(validFrom),
-				validToLoe(validTo)
+				validToLoe(validTo),
+				couponPolicy.status.ne(CouponPolicyStatus.DELETED)
 			)
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -74,7 +77,8 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 				policyStatusEq(status),
 				feedIdEq(feedId),
 				validFromGoe(validFrom),
-				validToLoe(validTo)
+				validToLoe(validTo),
+				couponPolicy.status.ne(CouponPolicyStatus.DELETED)
 			)
 			.fetchCount();
 

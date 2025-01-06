@@ -78,7 +78,7 @@ public class Feed extends BaseTime {
 		this.category = Optional.ofNullable(category).orElse(this.category);
 	}
 
-	public void updatePopularityScore (double popularityScore) {
+	public void updatePopularityScore(double popularityScore) {
 		this.popularityScore = popularityScore;
 	}
 

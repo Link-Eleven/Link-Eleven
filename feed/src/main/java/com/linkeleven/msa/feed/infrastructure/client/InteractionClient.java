@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.linkeleven.msa.feed.application.dto.external.CommentCountResponseDto;
 import com.linkeleven.msa.feed.application.dto.external.LikeCountResponseDto;
 
-@FeignClient(name = "interaction", url = "http://localhost:19094") // interaction-service와 feed-service 간의 통신을 위한 URL -> 추후 수정 예정
+@FeignClient(name = "interaction", url = "http://localhost:19094")
+// interaction-service와 feed-service 간의 통신을 위한 URL -> 추후 수정 예정
 public interface InteractionClient {
 
 	@GetMapping("/external/feeds/{feedId}/comments")

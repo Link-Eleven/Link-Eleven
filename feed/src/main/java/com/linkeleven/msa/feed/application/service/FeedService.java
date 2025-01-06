@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
-import com.linkeleven.msa.feed.application.dto.FeedResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.domain.model.Feed;
@@ -143,7 +142,6 @@ public class FeedService {
 			})
 			.collect(Collectors.toList());
 	}
-
 
 	private double calculatePopularityScore(int views, long commentCount, long likeCount) {
 		double popularityScore = views * 0.2 + commentCount * 0.5 + likeCount * 0.3;

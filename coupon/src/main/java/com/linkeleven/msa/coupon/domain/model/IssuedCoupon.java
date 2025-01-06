@@ -1,5 +1,7 @@
 package com.linkeleven.msa.coupon.domain.model;
 
+import java.time.LocalDateTime;
+
 import com.linkeleven.msa.coupon.domain.model.enums.IssuedCouponStatus;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
@@ -47,5 +49,11 @@ public class IssuedCoupon extends BaseTime {
 	// 상태 변경을 위한 메서드 추가
 	public void updateStatus(IssuedCouponStatus newStatus) {
 		this.status = newStatus;
+	}
+
+	public void softDelete(Long userId) {
+		this.setDeletedBy(userId);
+		this.setDeletedAt(LocalDateTime.now());
+		this.status = IssuedCouponStatus.DELETED;
 	}
 }

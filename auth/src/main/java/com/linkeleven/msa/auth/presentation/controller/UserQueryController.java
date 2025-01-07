@@ -1,6 +1,5 @@
 package com.linkeleven.msa.auth.presentation.controller;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,6 @@ import com.linkeleven.msa.auth.application.dto.UserQueryResponseDto;
 import com.linkeleven.msa.auth.application.service.UserQueryService;
 import com.linkeleven.msa.auth.libs.dto.SuccessResponseDto;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -26,10 +24,8 @@ public class UserQueryController {
 	@GetMapping
 	public ResponseEntity<SuccessResponseDto<PageResponseDto<UserQueryResponseDto>>> getUsers(
 		@RequestParam( required = false) String username,
-		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "10") int size
+		Pageable pageable
 	) {
-		Pageable pageable = PageRequest.of(page, size);
 		Slice<UserQueryResponseDto> slice = userQueryService.getUsersByUsername(username, pageable);
 
 		PageResponseDto<UserQueryResponseDto> responseDto = PageResponseDto.from(slice);

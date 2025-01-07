@@ -1,5 +1,7 @@
 package com.linkeleven.msa.auth.infrastructure.repository;
 
+import static com.linkeleven.msa.auth.domain.model.QUser.*;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +11,6 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import com.linkeleven.msa.auth.application.dto.UserQueryResponseDto;
-import com.linkeleven.msa.auth.domain.model.QUser;
 import com.linkeleven.msa.auth.domain.model.User;
 import com.linkeleven.msa.auth.domain.repository.UserRepository;
 import com.linkeleven.msa.auth.domain.repository.UserRepositoryCustom;
@@ -45,17 +46,18 @@ public class UserRepositoryImpl implements UserRepository , UserRepositoryCustom
 	public Slice<UserQueryResponseDto> findUserByUsername(String username, Pageable pageable) {
 		List<UserQueryResponseDto> users = queryFactory
 			.select(Projections.constructor(UserQueryResponseDto.class,
-				QUser.user.userId,
-				QUser.user.username,
-				QUser.user.role.stringValue(),
-				QUser.user.isAnonymous,
-				QUser.user.isCouponIssued
+				user.userId,
+				user.username,
+				user.role.stringValue(),
+				user.isAnonymous,
+				user.isCouponIssued
 			))
-			.from(QUser.user)
+			.from(user)
 			.where(
 				username == null || username.isBlank()
-					? null // username이 비어 있으면 조건 없이 모든 사용자
-					: QUser.user.username.containsIgnoreCase(username) // username 포함 조건
+					? user.deletedBy.isNull() // 삭제되지 않은 사용자만 조회
+					: user.username.containsIgnoreCase(username)
+					.and(user.deletedBy.isNull())
 			)
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize() + 1)

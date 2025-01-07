@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.linkeleven.msa.auth.application.dto.UserDeleteResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserMyInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateAnonymousResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateCouponIssuedResponseDto;
@@ -79,14 +78,12 @@ public class UserController {
 	}
 
 	@DeleteMapping("/{userId}")
-	public ResponseEntity<SuccessResponseDto<UserDeleteResponseDto>> deleteUser(
+	public ResponseEntity<SuccessResponseDto<Void>> deleteUser(
 		@RequestHeader("X-User-Id")String headerId,
 		@RequestHeader("X-Role")String role,
 		@PathVariable Long userId
 	){
-		return ResponseEntity.ok(SuccessResponseDto.success(
-			"유저가 삭제되었습니다.",
-			userService.deleteUser(headerId,role,userId)
-		));
+		userService.deleteUser(headerId,role,userId);
+		return ResponseEntity.ok(SuccessResponseDto.success("유저가 삭제되었습니다."));
 	}
  }

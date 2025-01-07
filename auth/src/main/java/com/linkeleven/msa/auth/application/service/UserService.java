@@ -2,7 +2,6 @@ package com.linkeleven.msa.auth.application.service;
 
 import org.springframework.stereotype.Service;
 
-import com.linkeleven.msa.auth.application.dto.UserDeleteResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserMyInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserRoleResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateAnonymousResponseDto;
@@ -87,11 +86,9 @@ public class UserService {
 	}
 
 	@Transactional
-	public UserDeleteResponseDto deleteUser(String headerId,String role, Long userId) {
+	public 	void deleteUser(String headerId,String role, Long userId) {
 		User user=validateSameUser(Long.valueOf(headerId),userId,role);
 		user.deleteUser(user.getUserId());
-
-		return UserDeleteResponseDto.from(user.getUserId());
 	}
 
 	private User validateUserById(Long userId) {
@@ -136,7 +133,7 @@ public class UserService {
 	//2개의 boolean값이 다른경우 true 같은경우 false
 	private Boolean isBooleanValuesDifferent(Boolean original,Boolean change){
 		if(original){
-			if(!change){
+			if(!original.equals(change)){
 				return true;
 			}
 			else return false;

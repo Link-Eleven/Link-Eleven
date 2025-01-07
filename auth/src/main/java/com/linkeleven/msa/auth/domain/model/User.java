@@ -49,7 +49,7 @@ public class User extends BaseTime {
 			.password(password)
 			.role(role)
 			.isAnonymous(isAnonymous)
-			.isCouponIssued(true)
+			.isCouponIssued(false)
 			.build();
 	}
 

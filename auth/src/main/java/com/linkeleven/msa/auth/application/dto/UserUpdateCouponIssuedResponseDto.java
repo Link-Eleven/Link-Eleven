@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserUpdateCouponIssuedResponseDto {
 	private Long userId;
-	private boolean isCouponIssued;
+	private Boolean isCouponIssued;
 
 	public static UserUpdateCouponIssuedResponseDto of(Long userId, boolean isCouponIssued) {
 		return UserUpdateCouponIssuedResponseDto.builder()

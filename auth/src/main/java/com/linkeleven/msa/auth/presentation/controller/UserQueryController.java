@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.linkeleven.msa.auth.application.dto.PageResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserQueryResponseDto;
 import com.linkeleven.msa.auth.application.service.UserQueryService;
 import com.linkeleven.msa.auth.libs.dto.SuccessResponseDto;
@@ -22,15 +21,14 @@ public class UserQueryController {
 	private final UserQueryService userQueryService;
 
 	@GetMapping
-	public ResponseEntity<SuccessResponseDto<PageResponseDto<UserQueryResponseDto>>> getUsers(
+	public ResponseEntity<SuccessResponseDto<Slice<UserQueryResponseDto>>> getUsers(
 		@RequestParam( required = false) String username,
 		Pageable pageable
 	) {
 		Slice<UserQueryResponseDto> slice = userQueryService.getUsersByUsername(username, pageable);
 
-		PageResponseDto<UserQueryResponseDto> responseDto = PageResponseDto.from(slice);
 
 		return ResponseEntity.ok()
-			.body(SuccessResponseDto.success("조회 성공", responseDto));
+			.body(SuccessResponseDto.success("조회 성공", slice));
 	}
 }

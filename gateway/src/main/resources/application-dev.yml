@@ -9,12 +9,12 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/api/auth/** ,/api/follows/**,/api/users/**
+            - Path=/api/auth/**
 
         - id: feed-service
           uri: lb://feed-service
           predicates:
-            - Path=/api/feeds/**
+            - Path=/api/feed/**
 
         - id: area-service
           uri: lb://area-service
@@ -24,17 +24,22 @@ spring:
         - id: coupon-service
           uri: lb://coupon-service
           predicates:
-            - Path=/api/coupons/**
+            - Path=/api/coupon/**
 
         - id: interaction-service
           uri: lb://interaction-service
           predicates:
-            - Path=/api/interaction/**, /api/comments/**, /api/likes/**
+            - Path=/api/interaction/**
 
         - id: notification-service
           uri: lb://notification-service
           predicates:
             - Path=/api/notification/**
+
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**
 
         - id: recommendation-service
           uri: lb://recommendation-service

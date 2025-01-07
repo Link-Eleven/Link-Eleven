@@ -23,5 +23,20 @@ spring:
         service-url:
           defaultZone: http://localhost:19090/eureka/
 
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
+    properties:
+      schema.registry.url: http://localhost:28081
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    consumer:
+      group-id: my-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        specific.avro.reader: true
+
 server:
   port: 19094

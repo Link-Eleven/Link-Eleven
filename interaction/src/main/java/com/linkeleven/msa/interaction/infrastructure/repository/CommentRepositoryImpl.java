@@ -62,6 +62,20 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 		return new SliceImpl<>(responseDtoList, PageRequest.of(0, pageSize), hasNext);
 	}
 
+	@Override
+	public Long countByFeedId(Long feedId) {
+		Long count = queryFactory.select(comment.count())
+			.from(comment)
+			.where(
+				comment.feedId.eq(feedId),
+				isNotDeleted()
+				// isNotReported(),
+			)
+			.fetchOne();
+
+		return count == null ? 0L : count;
+	}
+
 	private BooleanExpression cursorCondition(Long cursorId, String sortBy, Long cursorLikeCount, LocalDateTime cursorCreatedAt) {
 		return "like".equalsIgnoreCase(sortBy) ?
 			cursorLikeCondition(cursorId, cursorLikeCount) :

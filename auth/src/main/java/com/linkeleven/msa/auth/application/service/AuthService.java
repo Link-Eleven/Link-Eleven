@@ -32,7 +32,7 @@ public class AuthService {
 			signUpRequestDto.getUsername(),
 			password,
 			signUpRequestDto.getRole(),
-			signUpRequestDto.isAnonymous()
+			signUpRequestDto.getIsAnonymous()
 		);
 		userRepository.save(user);
 
@@ -60,6 +60,9 @@ public class AuthService {
 	private User validateLoginUser(SignInRequestDto signInRequestDto) {
 		User user=userRepository.findByUsername(signInRequestDto.getUsername())
 			.orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
+		if(user.getDeletedBy()!=null){
+			throw new CustomException(ErrorCode.USER_NOT_FOUND);
+		}
 		if (!passwordEncoder.matches(signInRequestDto.getPassword(), user.getPassword())) {
 			throw new CustomException(ErrorCode.INVALID_PASSWORD);
 		}

@@ -8,7 +8,7 @@ import lombok.Getter;
 public class SignUpRequestDto {
 	private String username;
 	private String password;
-	private boolean isAnonymous;
+	private Boolean isAnonymous;
 	private UserRole role;
 
 }

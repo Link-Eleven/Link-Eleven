@@ -1,5 +1,7 @@
 package com.linkeleven.msa.auth.domain.model;
 
+import java.time.LocalDateTime;
+
 import com.linkeleven.msa.auth.domain.common.UserRole;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
@@ -37,19 +39,32 @@ public class User extends BaseTime {
 	private UserRole role;
 
 	@Column(name="is_anonymous",nullable = false)
-	private boolean isAnonymous;
+	private Boolean isAnonymous;
 
 	@Column(name="is_coupon_issued")
-	private boolean isCouponIssued;
-	public static User createUser(String username, String password, UserRole role, boolean isAnonymous) {
+	private Boolean isCouponIssued;
+	public static User createUser(String username, String password, UserRole role, Boolean isAnonymous) {
 		return User.builder()
 			.username(username)
 			.password(password)
 			.role(role)
 			.isAnonymous(isAnonymous)
-			.isCouponIssued(true)
+			.isCouponIssued(false)
 			.build();
 	}
 
+	public void updateAnonymous(Boolean isAnonymous) {
+		this.isAnonymous = isAnonymous;
+	}
+	public void updateCouponIssued(Boolean isCouponIssued) {
+		this.isCouponIssued = isCouponIssued;
+	}
+	public void updateUsername(String username) {
+		this.username = username;
+	}
 
+	public void deleteUser(Long userId) {
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(userId);
+	}
 }

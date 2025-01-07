@@ -9,13 +9,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthTokenResponseDto {
-	private String accessToken;
+public class UserDeleteResponseDto {
+	private Long userId;
 
-	public static AuthTokenResponseDto from(String accessToken){
-		return AuthTokenResponseDto.builder()
-			.accessToken(accessToken)
+	public static UserDeleteResponseDto from(Long userId) {
+		return UserDeleteResponseDto.builder()
+			.userId(userId)
 			.build();
 	}
-
 }

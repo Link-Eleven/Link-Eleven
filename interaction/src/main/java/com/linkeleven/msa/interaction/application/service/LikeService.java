@@ -21,6 +21,7 @@ public class LikeService {
 
 	private final LikeRepository likeRepository;
 	private final ValidationService validationService;
+	private final OutboxService outboxService;
 	private final FeedClient feedClient;
 
 	public void createLike(Long userId, Long targetId, ContentType contentType) {
@@ -31,6 +32,9 @@ public class LikeService {
 		Target target = Target.of(contentType, targetId);
 		Like like = Like.of(target, userId);
 		likeRepository.save(like);
+
+		outboxService.saveLikeCreatedEvent(targetId, contentType.name(), userId,
+			like.getCreatedAt().toString(),"LIKE_CREATED");
 	}
 	public void cancelLike(Long userId, Long targetId, ContentType contentType) {
 		Like like = getLike(userId, targetId);

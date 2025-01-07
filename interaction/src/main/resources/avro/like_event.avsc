@@ -20,10 +20,6 @@
       "type": "long"
     },
     {
-      "name": "username",
-      "type": "string"
-    },
-    {
       "name": "likeTime",
       "type": "string"
     }

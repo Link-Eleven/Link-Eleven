@@ -121,7 +121,10 @@ public class FeedService {
 	public List<FeedTopResponseDto> getTopFeed(int limit) {
 
 		Pageable pageable = Pageable.unpaged();
-		List<Feed> feeds = feedRepository.findTopFeeds(pageable);
+		List<Feed> feeds = feedRepository.findTopFeeds(pageable)
+			.stream()
+			.filter(feed -> feed.getDeletedAt() == null)
+			.toList();
 
 		feeds.forEach(feed -> {
 			long commentCount = interactionClient.getCommentCount(feed.getFeedId()).getCount();

@@ -57,7 +57,7 @@ public class Feed extends BaseTime {
 	@Column(name = "popularity_score", nullable = false)
 	private double popularityScore = 0.0;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "feed_id")
 	@Builder.Default
 	private List<File> files = new ArrayList<>();
@@ -85,5 +85,6 @@ public class Feed extends BaseTime {
 	public void delete(Long userId) {
 		this.setDeletedAt(LocalDateTime.now());
 		this.setDeletedBy(userId);
+		this.files.forEach(file -> file.delete(userId));
 	}
 }

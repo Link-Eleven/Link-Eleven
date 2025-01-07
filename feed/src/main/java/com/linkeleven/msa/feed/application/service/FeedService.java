@@ -98,11 +98,8 @@ public class FeedService {
 			throw new CustomException(ErrorCode.NO_DELETE_PERMISSION);
 		}
 
-		if (!feed.getFiles().isEmpty()) {
-			fileService.deleteFiles(feed);
-		}
-
 		feed.delete(userId);
+		fileService.deleteFiles(feed, userId);
 
 	}
 

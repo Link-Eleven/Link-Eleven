@@ -60,11 +60,11 @@ public class FileService {
 		}).collect(Collectors.toList());
 	}
 
-	public void deleteFiles(Feed feed) {
+	public void deleteFiles(Feed feed, Long userId) {
 		List<File> files = feed.getFiles();
 		files.forEach(file -> {
 			deleteImage(file.getS3Url());
-			fileRepository.delete(file);
+			file.delete(userId);
 		});
 		feed.getFiles().clear();
 	}

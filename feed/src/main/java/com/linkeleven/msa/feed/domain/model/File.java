@@ -1,5 +1,7 @@
 package com.linkeleven.msa.feed.domain.model;
 
+import java.time.LocalDateTime;
+
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "p_file")
-public class File {
+public class File extends BaseTime {
 
 	@Id
 	@Tsid
@@ -37,5 +39,10 @@ public class File {
 			.fileName(fileName)
 			.fileSize(fileSize)
 			.build();
+	}
+
+	public void delete(Long userId) {
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(userId);
 	}
 }

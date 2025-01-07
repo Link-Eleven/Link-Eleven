@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,8 +120,9 @@ public class FeedService {
 	}
 
 	@Transactional
-	// @Cacheable(value = "popularFeeds", key = "#limit", cacheManager = "cacheManager", unless = "#result == null || #result.isEmpty()")
+	@Cacheable(value = "popularFeeds", key = "#limit", cacheManager = "cacheManager", unless = "#result == null || #result.isEmpty()")
 	public List<FeedTopResponseDto> getTopFeed(int limit) {
+
 		Pageable pageable = Pageable.unpaged();
 		List<Feed> feeds = feedRepository.findTopFeeds(pageable);
 

@@ -24,6 +24,23 @@ spring:
         format_sql: true
     open-in-view: false
 
+  data:
+    redis:
+      port: 6379
+      host: localhost
+      username: default
+      password: systempass
+
+  cache:
+    type: redis
+    cache-names: popularFeeds
+
+logging:
+  level:
+    org:
+      springframework:
+        cache: DEBUG
+
 eureka:
   client:
     service-url:

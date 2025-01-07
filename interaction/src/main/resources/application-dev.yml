@@ -1,7 +1,7 @@
 ---
 spring:
   application:
-    name: interaction
+    name: interaction-service
 
   datasource:
     url: ${INTERACTION_DB_URL}

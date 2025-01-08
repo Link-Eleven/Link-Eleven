@@ -30,14 +30,10 @@ public class CouponController {
 	private final CouponService couponService;
 
 	// 쿠폰 생성 API
-	// todo: 권한 확인 추가
 	@PostMapping
 	public ResponseEntity<SuccessResponseDto<CouponResponseDto>> createCoupon(
-		//todo: 게이트웨이 연결시 required 제거하기
-		@RequestHeader(value = "X-User-Id", required = false) Long userId,
-		@RequestHeader(value = "X-Role", required = false) String role,
 		@RequestBody CouponRequestDto request) {
-		CouponResponseDto coupon = couponService.createCoupon(userId, role, request);
+		CouponResponseDto coupon = couponService.createCoupon(request);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 생성 완료", coupon));
 	}
 

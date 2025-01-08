@@ -8,8 +8,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+
 public class CouponRequestDto {
 	private Long feedId;
+	private Long userId;
 	private LocalDateTime validFrom;
 	private LocalDateTime validTo;
 	private List<CouponPolicyRequestDto> policies;

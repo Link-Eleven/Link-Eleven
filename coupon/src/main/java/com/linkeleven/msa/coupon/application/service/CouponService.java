@@ -20,6 +20,7 @@ import com.linkeleven.msa.coupon.domain.model.enums.IssuedCouponStatus;
 import com.linkeleven.msa.coupon.domain.repository.CouponPolicyRepository;
 import com.linkeleven.msa.coupon.domain.repository.CouponRepository;
 import com.linkeleven.msa.coupon.domain.repository.IssuedCouponRepository;
+import com.linkeleven.msa.coupon.infrastructure.client.FeedServiceClient;
 import com.linkeleven.msa.coupon.libs.exception.CustomException;
 import com.linkeleven.msa.coupon.libs.exception.ErrorCode;
 import com.linkeleven.msa.coupon.presentation.request.CouponRequestDto;
@@ -34,24 +35,34 @@ public class CouponService {
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final IssuedCouponRepository issuedCouponRepository;
 	private final CouponRedisService couponRedisService;
+	private final FeedServiceClient feedServiceClient;
 
 	@Scheduled(cron = "0 0 0 * * *")  // 매일 자정에 실행
 	@Transactional
 	public void updateExpiredCouponsStatus() {
 		// 유효기한 지난 쿠폰 상태변경
 		LocalDateTime currentTime = LocalDateTime.now();
-		List<Coupon> expiredCoupons = couponRepository.findCouponsByValidToBeforeAndCouponPolicyStatusNot(currentTime);
+		List<Coupon> expiredCoupons = couponRepository.findExpiredCoupons(currentTime);
 
 		for (Coupon coupon : expiredCoupons) {
 			couponPolicyRepository.updateCouponPolicyStatusToInactive(coupon.getCouponId());
 		}
 	}
 
+	@Scheduled(cron = "50 23 * * * ?")
+	public void generateCouponsForPopularPosts() {
+		// 인기 게시글 목록을 가져오기 위한 Feign Client 호출
+		List<CouponRequestDto> popularFeeds = feedServiceClient.getPopularFeeds();
+
+		// 인기 게시글 목록에 대해 쿠폰 생성
+		popularFeeds.forEach(this::createCoupon);
+	}
+
 	// 쿠폰 생성
 	@Transactional
-	public CouponResponseDto createCoupon(Long userId, String role, CouponRequestDto request) {
+	public CouponResponseDto createCoupon(CouponRequestDto request) {
 
-		validateCouponRequest(request, role);
+		validateCouponRequest(request);
 		// 쿠폰 생성
 		Coupon coupon = Coupon.of(request.getFeedId(), request.getValidFrom(), request.getValidTo());
 		Coupon savedCoupon = couponRepository.save(coupon);
@@ -116,38 +127,20 @@ public class CouponService {
 		policies.forEach(policy -> policy.softDelete(userId));
 	}
 
-	private void validateCouponRequest(CouponRequestDto request, String role) throws CustomException {
-		// feed id 확인 (중복 생성 방지)
-		boolean exists = couponRepository.existsByFeedId(request.getFeedId());
-		if (exists) {
-			throw new CustomException(ErrorCode.DUPLICATE_FEED_ID);
-		}
-		// 권한 확인
-		if (role == null || role.equals("USER")) {
-			throw new CustomException(ErrorCode.FORBIDDEN);
-		}
-		// 쿠폰 시작일 확인
-		if (!(request.getValidFrom().isAfter(LocalDateTime.now())
-			&& request.getValidTo().isAfter(LocalDateTime.now())
-			&& request.getValidFrom().isBefore(request.getValidTo()))) {
-			throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
-		}
-
-	}
-
 	@Transactional
 	public CouponResponseDto updateCoupon(Long couponId, Long userId, String role, CouponRequestDto request) {
 		// 쿠폰 존재 여부 확인
 		Coupon existingCoupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
 
-		// 권한 및 요청 검증
-		validateCouponRequest(request, role);
+		if (!"COMPANY".equals(role) && !existingCoupon.getCreatedBy().equals(userId)) {
+			throw new CustomException(ErrorCode.FORBIDDEN);
+		}
+		// 요청 검증
+		validateCouponRequest(request);
 
 		// 기존 쿠폰 유효 기간 업데이트
 		existingCoupon.update(request.getValidFrom(), request.getValidTo());
-		couponRepository.save(existingCoupon); // 변경된 쿠폰 저장
-
 		couponPolicyRepository.deleteByCouponId(couponId);
 
 		// 새로 전달된 정책으로 쿠폰 정책 업데이트
@@ -163,4 +156,17 @@ public class CouponService {
 		return CouponResponseDto.from(existingCoupon);
 	}
 
+	private void validateCouponRequest(CouponRequestDto request) throws CustomException {
+		// feed id 확인 (중복 생성 방지)
+		boolean exists = couponRepository.existsByFeedId(request.getFeedId());
+		if (exists) {
+			throw new CustomException(ErrorCode.DUPLICATE_FEED_ID);
+		}
+		// 쿠폰 시작일 확인
+		if (!(request.getValidFrom().isAfter(LocalDateTime.now())
+			&& request.getValidTo().isAfter(LocalDateTime.now())
+			&& request.getValidFrom().isBefore(request.getValidTo()))) {
+			throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
+		}
+	}
 }

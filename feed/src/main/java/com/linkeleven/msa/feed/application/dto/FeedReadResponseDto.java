@@ -1,5 +1,8 @@
 package com.linkeleven.msa.feed.application.dto;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.model.Feed;
 
@@ -21,6 +24,7 @@ public class FeedReadResponseDto {
 	private Category category;
 	private int views;
 	private double popularityScore;
+	private List<FileResponseDto> files;
 
 	public static FeedReadResponseDto from(Feed feed) {
 		return FeedReadResponseDto.builder()
@@ -32,6 +36,7 @@ public class FeedReadResponseDto {
 			.category(feed.getCategory())
 			.views(feed.getViews())
 			.popularityScore(feed.getPopularityScore())
+			.files(feed.getFiles().stream().map(FileResponseDto::from).collect(Collectors.toList()))
 			.build();
 	}
 }

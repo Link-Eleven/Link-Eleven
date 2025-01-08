@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.linkeleven.msa.feed.domain.enums.Region;
+
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -48,6 +50,10 @@ public class Feed extends BaseTime {
 	@Column(name = "category", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Category category;
+
+	@Column(name = "region", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Region region;
 
 	@Builder.Default
 	@Column(name = "views", nullable = false)

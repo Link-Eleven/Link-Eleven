@@ -110,6 +110,8 @@ public class FeedService {
 		feed.delete(userId);
 		fileService.deleteFiles(feed, userId);
 
+		couponClient.deleteCoupons(feedId);
+
 	}
 
 	@Transactional

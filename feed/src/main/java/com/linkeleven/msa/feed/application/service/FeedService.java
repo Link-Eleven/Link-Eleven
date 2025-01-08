@@ -1,5 +1,7 @@
 package com.linkeleven.msa.feed.application.service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -120,22 +122,31 @@ public class FeedService {
 	@Cacheable(value = "popularFeeds", key = "#limit", cacheManager = "cacheManager", unless = "#result == null || #result.isEmpty()")
 	public List<FeedTopResponseDto> getTopFeed(int limit) {
 
+		LocalDateTime currentDate = LocalDateTime.now();
+		LocalDateTime cutoffDate = currentDate.minusDays(7);
+
 		Pageable pageable = Pageable.unpaged();
 		List<Feed> feeds = feedRepository.findTopFeeds(pageable)
 			.stream()
-			.filter(feed -> feed.getDeletedAt() == null)
+			.filter(feed -> feed.getDeletedAt() == null && feed.getCreatedAt().isAfter(cutoffDate))
 			.toList();
 
 		feeds.forEach(feed -> {
+			long daysSincePosted = ChronoUnit.DAYS.between(feed.getCreatedAt(), currentDate);
+			int weight = (daysSincePosted <= 7) ? (8 - (int)daysSincePosted) : 1;
 			long commentCount = interactionClient.getCommentCount(feed.getFeedId()).getCount();
 			long likeCount = interactionClient.getLikeCount(feed.getFeedId()).getCount();
-			double popularityScore = calculatePopularityScore(feed.getViews(), commentCount, likeCount);
+			double popularityScore = calculatePopularityScore(feed.getViews(), commentCount, likeCount, weight);
 			feed.updatePopularityScore(popularityScore);
 			feedRepository.save(feed);
 		});
 
-		return feeds.stream()
+		List<Feed> top100Feeds = feeds.stream()
 			.sorted(Comparator.comparingDouble(Feed::getPopularityScore).reversed())
+			.limit(100)
+			.toList();
+
+		return top100Feeds.stream()
 			.limit(limit)
 			.map(feed -> {
 				long commentCount = interactionClient.getCommentCount(feed.getFeedId()).getCount();
@@ -145,8 +156,8 @@ public class FeedService {
 			.collect(Collectors.toList());
 	}
 
-	private double calculatePopularityScore(int views, long commentCount, long likeCount) {
-		double popularityScore = views * 0.2 + commentCount * 0.5 + likeCount * 0.3;
+	private double calculatePopularityScore(int views, long commentCount, long likeCount, int weight) {
+		double popularityScore = (views * 0.2 + commentCount * 0.5 + likeCount * 0.3) * weight;
 
 		String formattedScore = String.format("%.2f", popularityScore);
 		return Double.parseDouble(formattedScore);

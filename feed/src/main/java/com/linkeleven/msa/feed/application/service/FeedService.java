@@ -57,7 +57,8 @@ public class FeedService {
 			feedCreateRequestDto.getLocationId(),
 			feedCreateRequestDto.getTitle(),
 			feedCreateRequestDto.getContent(),
-			feedCreateRequestDto.getCategory()
+			feedCreateRequestDto.getCategory(),
+			feedCreateRequestDto.getRegion()
 		);
 
 		feed.getFiles().addAll(fileService.uploadFiles(files));
@@ -110,7 +111,8 @@ public class FeedService {
 		feed.delete(userId);
 		fileService.deleteFiles(feed, userId);
 
-		couponClient.deleteCoupons(feedId);
+		// 쿠폰 삭제 요청
+		// couponClient.deleteCoupons(feedId);
 
 	}
 
@@ -155,7 +157,7 @@ public class FeedService {
 			.limit(100)
 			.toList();
 
-		List<FeedTopResponseDto> topFeedDtos = top100Feeds.stream()
+		return top100Feeds.stream()
 			.limit(limit)
 			.map(feed -> {
 				long commentCount = interactionClient.getCommentCount(feed.getFeedId()).getCount();
@@ -163,10 +165,20 @@ public class FeedService {
 				return FeedTopResponseDto.of(feed, commentCount, likeCount);
 			})
 			.collect(Collectors.toList());
-
-		couponClient.createCoupons(topFeedDtos);
-
-		return topFeedDtos;
+		
+		// 쿠폰 생성 요청시 변경 예정
+		// List<FeedTopResponseDto> topFeedDtos = top100Feeds.stream()
+		// 	.limit(limit)
+		// 	.map(feed -> {
+		// 		long commentCount = interactionClient.getCommentCount(feed.getFeedId()).getCount();
+		// 		long likeCount = interactionClient.getLikeCount(feed.getFeedId()).getCount();
+		// 		return FeedTopResponseDto.of(feed, commentCount, likeCount);
+		// 	})
+		// 	.collect(Collectors.toList());
+		//
+		// couponClient.createCoupons(topFeedDtos);
+		//
+		// return topFeedDtos;
 	}
 
 	@Transactional(readOnly = true)

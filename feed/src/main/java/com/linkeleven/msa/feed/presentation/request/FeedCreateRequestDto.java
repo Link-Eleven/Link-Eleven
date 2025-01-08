@@ -18,5 +18,7 @@ public class FeedCreateRequestDto {
 	private String title;
 	private String content;
 	private Category category;
-	private Region region;
+	// private Region region;
+	private String region;
+	public Region getRegionEnum() { return region != null ? Region.fromFullName(region) : null; }
 }

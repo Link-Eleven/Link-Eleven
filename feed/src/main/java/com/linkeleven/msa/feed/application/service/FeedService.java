@@ -58,7 +58,7 @@ public class FeedService {
 			feedCreateRequestDto.getTitle(),
 			feedCreateRequestDto.getContent(),
 			feedCreateRequestDto.getCategory(),
-			feedCreateRequestDto.getRegion()
+			feedCreateRequestDto.getRegionEnum()
 		);
 
 		feed.getFiles().addAll(fileService.uploadFiles(files));

@@ -1,3 +1,5 @@
 spring:
+  application:
+    name: area-service
   profiles:
     active: dev

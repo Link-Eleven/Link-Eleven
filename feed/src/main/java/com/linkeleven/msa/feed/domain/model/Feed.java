@@ -68,7 +68,8 @@ public class Feed extends BaseTime {
 	@Builder.Default
 	private List<File> files = new ArrayList<>();
 
-	public static Feed of(Long userId, Long locationId, String title, String content, Category category, Region region) {
+	public static Feed of(Long userId, Long locationId, String title, String content, Category category,
+		Region region) {
 		return Feed.builder()
 			.userId(userId)
 			.locationId(locationId)

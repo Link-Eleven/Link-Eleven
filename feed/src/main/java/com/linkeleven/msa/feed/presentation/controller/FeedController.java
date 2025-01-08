@@ -25,7 +25,6 @@ import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.service.FeedService;
-import com.linkeleven.msa.feed.domain.enums.Region;
 import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.libs.dto.SuccessResponseDto;
 import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;

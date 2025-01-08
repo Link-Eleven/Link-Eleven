@@ -12,10 +12,12 @@ import org.springframework.stereotype.Repository;
 import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.domain.enums.Region;
 import com.linkeleven.msa.feed.domain.model.Category;
-import com.linkeleven.msa.feed.domain.model.Feed;
 import com.linkeleven.msa.feed.domain.repository.FeedRepositoryCustom;
 import com.linkeleven.msa.feed.presentation.request.FeedSearchRequestDto;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -29,34 +31,48 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 	@Override
 	public Slice<FeedSearchResponseDto> searchFeeds(FeedSearchRequestDto searchRequestDto, Pageable pageable) {
 
-		List<Feed> results = queryFactory.selectFrom(feed)
-			.where(
-				feed.deletedAt.isNull(),
-				titleContains(searchRequestDto.getTitle()),
-				contentContains(searchRequestDto.getContent()),
-				regionEq(searchRequestDto.getRegionEnum()),
-				categoryEq(searchRequestDto.getCategory())
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(feed.deletedAt.isNull());
+
+		if (searchRequestDto.getTitle() != null && !searchRequestDto.getTitle().isEmpty()) {
+			builder.and(titleContains(searchRequestDto.getTitle()));
+		}
+
+		if (searchRequestDto.getContent() != null && !searchRequestDto.getContent().isEmpty()) {
+			builder.and(contentContains(searchRequestDto.getContent()));
+		}
+
+		if (searchRequestDto.getRegionEnum() != null) {
+			builder.and(regionEq(searchRequestDto.getRegionEnum()));
+		}
+
+		if (searchRequestDto.getCategory() != null) {
+			builder.and(categoryEq(searchRequestDto.getCategory()));
+		}
+
+		JPQLQuery<FeedSearchResponseDto> query = queryFactory.select(
+				Projections.constructor(FeedSearchResponseDto.class,
+					feed.feedId,
+					feed.title,
+					feed.content,
+					feed.category,
+					feed.region
+				)
 			)
+			.from(feed)
+			.where(builder)
+			.orderBy(feed.createdAt.desc());
+
+		List<FeedSearchResponseDto> dtoResults = query
 			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
+			.limit(pageable.getPageSize() + 1)
 			.fetch();
 
-		long total = queryFactory.selectFrom(feed)
-			.where(
-				feed.deletedAt.isNull(),
-				titleContains(searchRequestDto.getTitle()),
-				contentContains(searchRequestDto.getContent()),
-				regionEq(searchRequestDto.getRegionEnum()),
-				categoryEq(searchRequestDto.getCategory())
-			)
-			.fetch()
-			.size();
-
-		List<FeedSearchResponseDto> dtoResults = results.stream()
-			.map(FeedSearchResponseDto::from)
-			.toList();
-
 		boolean hasNext = dtoResults.size() > pageable.getPageSize();
+
+		if (hasNext) {
+			dtoResults.remove(dtoResults.size() - 1);
+		}
 
 		return new SliceImpl<>(dtoResults, pageable, hasNext);
 	}

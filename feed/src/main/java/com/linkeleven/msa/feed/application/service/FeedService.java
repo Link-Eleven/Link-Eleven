@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -19,7 +20,6 @@ import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.dto.external.UserInfoResponseDto;
-import com.linkeleven.msa.feed.domain.enums.Region;
 import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.model.Feed;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
@@ -142,15 +142,21 @@ public class FeedService {
 			.filter(feed -> feed.getDeletedAt() == null && feed.getCreatedAt().isAfter(cutoffDate))
 			.toList();
 
+		// Batch 요청으로 댓글 및 좋아요 수를 한 번에 가져오기
+		List<Long> feedIds = feeds.stream().map(Feed::getFeedId).toList();
+		Map<Long, Long> commentCounts = interactionClient.getCommentCounts(feedIds);
+		Map<Long, Long> likeCounts = interactionClient.getLikeCounts(feedIds);
+
 		feeds.forEach(feed -> {
 			long daysSincePosted = ChronoUnit.DAYS.between(feed.getCreatedAt(), currentDate);
 			int weight = (daysSincePosted <= 7) ? (8 - (int)daysSincePosted) : 1;
-			long commentCount = interactionClient.getCommentCount(feed.getFeedId()).getCount();
-			long likeCount = interactionClient.getLikeCount(feed.getFeedId()).getCount();
+			long commentCount = commentCounts.getOrDefault(feed.getFeedId(), 0L);
+			long likeCount = likeCounts.getOrDefault(feed.getFeedId(), 0L);
 			double popularityScore = calculatePopularityScore(feed.getViews(), commentCount, likeCount, weight);
 			feed.updatePopularityScore(popularityScore);
-			feedRepository.save(feed);
 		});
+
+		feedRepository.saveAll(feeds);
 
 		List<Feed> top100Feeds = feeds.stream()
 			.sorted(Comparator.comparingDouble(Feed::getPopularityScore).reversed())
@@ -160,12 +166,12 @@ public class FeedService {
 		return top100Feeds.stream()
 			.limit(limit)
 			.map(feed -> {
-				long commentCount = interactionClient.getCommentCount(feed.getFeedId()).getCount();
-				long likeCount = interactionClient.getLikeCount(feed.getFeedId()).getCount();
+				long commentCount = commentCounts.getOrDefault(feed.getFeedId(), 0L);
+				long likeCount = likeCounts.getOrDefault(feed.getFeedId(), 0L);
 				return FeedTopResponseDto.of(feed, commentCount, likeCount);
 			})
 			.collect(Collectors.toList());
-		
+
 		// 쿠폰 생성 요청시 변경 예정
 		// List<FeedTopResponseDto> topFeedDtos = top100Feeds.stream()
 		// 	.limit(limit)

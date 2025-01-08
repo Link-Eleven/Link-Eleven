@@ -19,7 +19,6 @@ public enum ErrorCode {
 	ADDRESS_LENGTH_EXCEEDED(400, "주소는 최대 100자까지 가능합니다."),
 	REGION_CANNOT_BE_NULL_OR_EMPTY(400, "지역 정보 입력은 필수입니다."),
 	REGION_LENGTH_EXCEEDED(400, "지역 정보는 최대 50자까지 가능합니다."),
-	NOT_FOUND_AREA(400, "찾으시는 지역 정보가 없습니다."),
 	ILLEGAL_MATCH_LOCATION(400, "잘못된 장소 매칭"),
 	ILLEGAL_MATCH_CATEGORY(400, "잘못된 카테고리 매칭"),
 
@@ -32,7 +31,8 @@ public enum ErrorCode {
 
 	/*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
 	ACCESS_DENIED(404, "접근 권한이 없습니다."),
-
+	NOT_FOUND_AREA(400, "찾으시는 지역 정보가 없습니다."),
+	NOT_FOUND_ES_LOCATION(400, "엘라스틱 서치에 해당 장소 데이터가 없습니다."),
 	/*  408 REQUEST_TIMEOUT : 요청에 대한 응답 시간 초과  */
 	TIMEOUT_ERROR(408, "응답시간을 초과하였습니다."),
 

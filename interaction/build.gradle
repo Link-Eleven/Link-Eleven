@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.1'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.github.davidmc24.gradle.plugin.avro' version '1.9.1'
+//	id 'com.github.davidmc24.gradle.plugin.avro' version '1.9.1'
 }
 
 group = 'com.link-eleven.msa'
@@ -67,6 +67,7 @@ dependencies {
 
 	// avro schema
 	implementation 'org.apache.avro:avro:1.12.0'
+	implementation 'org.apache.avro:avro-tools:1.12.0'
 	implementation 'io.confluent:kafka-avro-serializer:7.8.0'
 
 	implementation 'org.springframework.retry:spring-retry'
@@ -78,23 +79,43 @@ dependencyManagement {
 	}
 }
 
-avro {
-	outputCharacterEncoding = "UTF-8"
-	fieldVisibility = "PRIVATE"
-	stringType.set("String")
-}
-generateAvroJava {
-	source("src/main/resources/avro/")
-	include("**/*.avsc")
-	outputDir = file("build/generated/avro-java")
-}
-//sourceSets {
-//	main {
-//		java {
-//			srcDirs += "build/generated-main-avro-java"
-//		}
-//	}
+//avro {
+//	outputCharacterEncoding = "UTF-8"
+//	fieldVisibility = "PRIVATE"
+//	stringType.set("String")
 //}
+//generateAvroJava {
+//	source("src/main/resources/avro/")
+//	include("**/*.avsc")
+//	outputDir = file("build/generated/avro-java")
+//} deprecated 된 플러그인 코드
+
+sourceSets {
+	main {
+		java {
+			srcDirs += "build/generated-main-avro-java"
+		}
+	}
+}
+
+tasks.register("generateAvroJava", JavaExec) {
+	group = "build"
+	description = "Compiles Avro schemas into Java classes"
+
+	// mainClass 설정
+	mainClass.set("org.apache.avro.tool.Main")
+
+	// classpath를 runtimeClasspath로 설정
+	classpath = configurations.runtimeClasspath
+
+	// 명령어 인수 설정
+	args = [
+			"compile", "schema",
+			"src/main/resources/avro/*.avsc",  // 스키마 경로
+			"build/generated/avro-java"        // 출력 디렉토리
+	]
+}
+
 tasks.named('compileJava') {
 	dependsOn('generateAvroJava')
 }

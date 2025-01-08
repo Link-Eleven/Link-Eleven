@@ -22,7 +22,7 @@ public class OutboxProcessorService {
 	private final KafkaProducerService kafkaProducerService;
 	private final OutboxStatusChangeService outboxStatusChangeService;
 
-	@Scheduled(fixedDelay = 7000)
+	@Scheduled(fixedDelay = 10000)
 	public void sendPendingEvent() {
 		List<OutBox> pendingEventList = outboxRepository.findByEventStatus(EventStatus.PENDING);
 

@@ -2,6 +2,7 @@ package com.linkeleven.msa.interaction.application.service;
 
 import org.springframework.stereotype.Service;
 
+import com.linkeleven.msa.interaction.application.service.messaging.OutboxService;
 import com.linkeleven.msa.interaction.domain.model.entity.Like;
 import com.linkeleven.msa.interaction.domain.model.enums.ContentType;
 import com.linkeleven.msa.interaction.domain.model.vo.Target;
@@ -33,9 +34,12 @@ public class LikeService {
 		Like like = Like.of(target, userId);
 		likeRepository.save(like);
 
-		outboxService.saveLikeCreatedEvent(targetId, contentType.name(), userId,
-			like.getCreatedAt().toString(),"LIKE_CREATED");
+		String lowerCaseContentType = contentType.name().toLowerCase();
+
+		outboxService.saveLikeCreatedEvent(targetId, lowerCaseContentType, userId,
+			like.getCreatedAt().toString(),"like_created");
 	}
+
 	public void cancelLike(Long userId, Long targetId, ContentType contentType) {
 		Like like = getLike(userId, targetId);
 		validateTarget(targetId, contentType);

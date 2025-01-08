@@ -32,6 +32,7 @@ public enum ErrorCode {
 	EXPIRED_COUPON(410, "쿠폰이 만료되었습니다."),
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
+	LOCK_ACQUISITION_FAILURE(500, "쿠폰 발급 처리 중 오류가 발생했습니다"),
 	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다.");
 
 

@@ -11,7 +11,7 @@ import com.linkeleven.msa.coupon.domain.model.CouponPolicy;
 import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
 
 public interface CouponPolicyRepository extends JpaRepository<CouponPolicy, Long> {
-	@Query("SELECT p FROM CouponPolicy p WHERE p.couponId = :couponId AND p.issuedCount < p.quantity AND p.status = 'ACTIVE' ORDER BY p.createdAt ASC")
+	@Query("SELECT p FROM CouponPolicy p WHERE p.couponId = :couponId AND p.issuedCount < p.quantity AND p.status = 'ACTIVE' ORDER BY p.discountRate DESC")
 	List<CouponPolicy> findAvailablePolicies(@Param("couponId") Long couponId);
 
 	// 스케쥴러: 유효기한 지난 쿠폰 비활성화

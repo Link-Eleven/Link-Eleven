@@ -2,6 +2,7 @@ package com.linkeleven.msa.interaction.application.service.messaging;
 
 import org.springframework.stereotype.Service;
 
+import com.linkeleven.msa.interaction.CommentEvent;
 import com.linkeleven.msa.interaction.LikeEvent;
 import com.linkeleven.msa.interaction.domain.model.entity.OutBox;
 import com.linkeleven.msa.interaction.domain.model.enums.EventStatus;
@@ -31,6 +32,25 @@ public class OutboxService {
 
 		AvroSerializer<LikeEvent> avroSerializer = new AvroSerializer<>();
 		byte[] serializedPayload = avroSerializer.serialize(likeEvent);
+		OutBox outbox = OutBox.create(topic, serializedPayload, EventStatus.PENDING);
+		outboxRepository.save(outbox);
+	}
+
+	@Transactional
+	public void saveCommentCreatedEvent(Long feedId, String content, Long userId,
+		String username, String commentCreatedAt) {
+		String topic = "comment_created";
+		CommentEvent commentEvent = CommentEvent.newBuilder()
+			.setEventType(topic)
+			.setFeedId(feedId)
+			.setContent(content)
+			.setUserId(userId)
+			.setUsername(username)
+			.setCommentCreatedAt(commentCreatedAt)
+			.build();
+
+		AvroSerializer<CommentEvent> avroSerializer = new AvroSerializer<>();
+		byte[] serializedPayload = avroSerializer.serialize(commentEvent);
 		OutBox outbox = OutBox.create(topic, serializedPayload, EventStatus.PENDING);
 		outboxRepository.save(outbox);
 	}

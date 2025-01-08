@@ -33,6 +33,7 @@ public class CouponService {
 	private final CouponRepository couponRepository;
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final IssuedCouponRepository issuedCouponRepository;
+	private final CouponRedisService couponRedisService;
 
 	@Scheduled(cron = "0 0 0 * * *")  // 매일 자정에 실행
 	@Transactional
@@ -53,13 +54,11 @@ public class CouponService {
 		validateCouponRequest(request, role);
 		// 쿠폰 생성
 		Coupon coupon = Coupon.of(request.getFeedId(), request.getValidFrom(), request.getValidTo());
-		coupon = couponRepository.save(coupon);
+		Coupon savedCoupon = couponRepository.save(coupon);
 
-		// 쿠폰 정책 생성
-		Coupon SavedCoupon = coupon;
 		List<CouponPolicy> policies = request.getPolicies().stream()
 			.map(policyRequest -> CouponPolicy.of(
-				SavedCoupon.getCouponId(),
+				savedCoupon.getCouponId(),
 				policyRequest.getDiscountRate(),
 				policyRequest.getQuantity()
 			))
@@ -67,6 +66,10 @@ public class CouponService {
 
 		couponPolicyRepository.saveAll(policies);
 
+		// Redis에 정책별 쿠폰 저장
+		policies.forEach(policy ->
+			couponRedisService.addCouponsToRedis(coupon.getCouponId(), policy.getPolicyId(), policy.getQuantity())
+		);
 		return CouponResponseDto.from(coupon);
 	}
 

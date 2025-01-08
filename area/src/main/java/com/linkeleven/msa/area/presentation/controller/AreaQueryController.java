@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.area.application.dto.AreaSearchResponseDto;
+import com.linkeleven.msa.area.application.dto.LocationSearchDetailResponseDto;
 import com.linkeleven.msa.area.application.dto.LocationSearchResponseDto;
 import com.linkeleven.msa.area.application.service.AreaQueryService;
 import com.linkeleven.msa.area.libs.dto.SuccessResponseDto;
@@ -53,6 +54,19 @@ public class AreaQueryController {
 				SuccessResponseDto.success(
 					"주소 정보 조회 성공",
 					areaQueryService.searchAreaByKeyword(keyword, pageable)
+				)
+			);
+	}
+
+	@GetMapping("/locations/{locationId}")
+	public ResponseEntity<SuccessResponseDto<LocationSearchDetailResponseDto>> searchDetailLocation(
+		@PathVariable Long locationId
+	){
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(
+				SuccessResponseDto.success(
+					"장소 조회 성공",
+					areaQueryService.searchDetailLocation(locationId)
 				)
 			);
 	}

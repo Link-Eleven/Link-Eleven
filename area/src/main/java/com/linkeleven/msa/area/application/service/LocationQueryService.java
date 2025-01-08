@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.linkeleven.msa.area.application.dto.LocationSearchDetailResponseDto;
 import com.linkeleven.msa.area.application.dto.LocationSearchResponseDto;
 import com.linkeleven.msa.area.domain.common.CategoryType;
-import com.linkeleven.msa.area.infrastructure.elasticsearch.SearchLocationServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class LocationQueryService {
 	// elastic service
 
-	private final SearchLocationServiceImpl searchLocationService;
+	private final SearchLocationService searchLocationService;
 
 	public List<LocationSearchResponseDto> searchLocationByKeyword(String keyword, CategoryType type, Long areaId){
 

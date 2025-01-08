@@ -29,14 +29,15 @@ public class CouponIssuingService {
 	@Transactional
 	public IssuedCouponDto issueCoupon(Long userId, String role, Long couponId) {
 		// 유저가 이미 해당 쿠폰을 발급받았는지 확인
-		// if (issuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
-		// 	throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);
-		// }
+		if (issuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
+			throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);
+		}
 
 		List<CouponPolicy> availablePolicies = couponPolicyRepository.findAvailablePolicies(couponId);
 		if (availablePolicies.isEmpty()) {
 			throw new CustomException(ErrorCode.NO_AVAILABLE_POLICY);
 		}
+
 		List<Long> policyIds = availablePolicies.stream()
 			.map(CouponPolicy::getPolicyId)
 			.collect(Collectors.toList());
@@ -44,7 +45,7 @@ public class CouponIssuingService {
 		String couponCode = couponRedisService.issueCouponFromRedis(couponId, policyIds);
 
 		if (couponCode == null) {
-			throw new RuntimeException("해당 쿠폰은 모두 소진되었습니다.");
+			throw new CustomException(ErrorCode.COUPON_SOLD_OUT);
 		}
 
 		// 발급된 쿠폰 코드에서 policyId 추출

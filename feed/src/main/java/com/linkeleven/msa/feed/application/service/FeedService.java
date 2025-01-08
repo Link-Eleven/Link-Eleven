@@ -24,6 +24,7 @@ import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.model.Feed;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
 import com.linkeleven.msa.feed.infrastructure.client.AuthClient;
+import com.linkeleven.msa.feed.infrastructure.client.CouponClient;
 import com.linkeleven.msa.feed.infrastructure.client.InteractionClient;
 import com.linkeleven.msa.feed.libs.exception.CustomException;
 import com.linkeleven.msa.feed.libs.exception.ErrorCode;
@@ -41,6 +42,7 @@ public class FeedService {
 	private final FileService fileService;
 	private final InteractionClient interactionClient;
 	private final AuthClient authClient;
+	private final CouponClient couponClient;
 
 	@Transactional
 	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files,
@@ -151,7 +153,7 @@ public class FeedService {
 			.limit(100)
 			.toList();
 
-		return top100Feeds.stream()
+		List<FeedTopResponseDto> topFeedDtos = top100Feeds.stream()
 			.limit(limit)
 			.map(feed -> {
 				long commentCount = interactionClient.getCommentCount(feed.getFeedId()).getCount();
@@ -159,6 +161,10 @@ public class FeedService {
 				return FeedTopResponseDto.of(feed, commentCount, likeCount);
 			})
 			.collect(Collectors.toList());
+
+		couponClient.createCoupons(topFeedDtos);
+
+		return topFeedDtos;
 	}
 
 	@Transactional(readOnly = true)

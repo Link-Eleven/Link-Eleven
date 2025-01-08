@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.CommentUpdateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.external.UserInfoResponseDto;
+import com.linkeleven.msa.interaction.application.service.messaging.OutboxService;
 import com.linkeleven.msa.interaction.domain.model.entity.Comment;
 import com.linkeleven.msa.interaction.domain.model.vo.ContentDetails;
 import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class CommentService {
 
 	private final CommentRepository commentRepository;
+	private final OutboxService outboxService;
 	private final FeedClient feedClient;
 	private final AuthClient authClient;
 
@@ -36,6 +38,14 @@ public class CommentService {
 		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId, userInfo.getUsername());
 		Comment comment = Comment.of(contentDetails, feedId);
 		commentRepository.save(comment);
+
+		outboxService.saveCommentCreatedEvent(
+			feedId, comment.getContentDetails().getContent(),
+			comment.getContentDetails().getUserId(),
+			comment.getContentDetails().getUsername(),
+			comment.getCreatedAt().toString()
+		);
+
 		return CommentCreateResponseDto.of(
 			comment.getId(),
 			comment.getContentDetails().getUserId(),

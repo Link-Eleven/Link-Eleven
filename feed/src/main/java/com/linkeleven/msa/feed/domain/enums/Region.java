@@ -27,4 +27,13 @@ public enum Region {
 
 	private final String fullName;
 
+	public static Region fromFullName(String fullName) {
+		for (Region region : Region.values()) {
+			if (region.getFullName().equals(fullName)) {
+				return region;
+			}
+		}
+		throw new IllegalArgumentException("Unknown region name: " + fullName);
+	}
+
 }

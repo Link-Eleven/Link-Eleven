@@ -87,7 +87,7 @@ public class FeedController {
 	public Slice<FeedSearchResponseDto> searchFeeds(
 		@RequestParam(required = false) String title,
 		@RequestParam(required = false) String content,
-		@RequestParam(required = false) Region region,
+		@RequestParam(required = false) String region,
 		@RequestParam(required = false) Category category,
 		@PageableDefault(size = 10) Pageable pageable) {
 		return feedService.searchFeeds(title, content, region, category, pageable);

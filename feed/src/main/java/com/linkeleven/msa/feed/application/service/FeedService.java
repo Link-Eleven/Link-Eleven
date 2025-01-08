@@ -182,7 +182,7 @@ public class FeedService {
 	}
 
 	@Transactional(readOnly = true)
-	public Slice<FeedSearchResponseDto> searchFeeds(String title, String content, Region region, Category category,
+	public Slice<FeedSearchResponseDto> searchFeeds(String title, String content, String region, Category category,
 		Pageable pageable) {
 
 		FeedSearchRequestDto searchRequestDto = FeedSearchRequestDto.builder()

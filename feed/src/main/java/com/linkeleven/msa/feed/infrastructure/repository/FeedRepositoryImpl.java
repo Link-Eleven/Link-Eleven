@@ -34,7 +34,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 				feed.deletedAt.isNull(),
 				titleContains(searchRequestDto.getTitle()),
 				contentContains(searchRequestDto.getContent()),
-				regionEq(searchRequestDto.getRegion()),
+				regionEq(searchRequestDto.getRegionEnum()),
 				categoryEq(searchRequestDto.getCategory())
 			)
 			.offset(pageable.getOffset())
@@ -46,7 +46,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 				feed.deletedAt.isNull(),
 				titleContains(searchRequestDto.getTitle()),
 				contentContains(searchRequestDto.getContent()),
-				// regionEq(searchRequestDto.getRegion()),
+				regionEq(searchRequestDto.getRegionEnum()),
 				categoryEq(searchRequestDto.getCategory())
 			)
 			.fetch()

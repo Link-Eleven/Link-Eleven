@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.area.application.dto.AreaSearchResponseDto;
+import com.linkeleven.msa.area.application.dto.LocationSearchDetailResponseDto;
 import com.linkeleven.msa.area.application.dto.LocationSearchResponseDto;
 import com.linkeleven.msa.area.application.dto.message.PlaceMessageDto;
 import com.linkeleven.msa.area.application.service.message.PlaceProduceService;
@@ -80,5 +81,10 @@ public class AreaQueryService {
 		int pageSize = Math.min(pageable.getPageSize(), 10);
 		pageable = PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
 		return areaRepository.findAllAreaInKeyword(keyword, pageable);
+	}
+
+	public LocationSearchDetailResponseDto searchDetailLocation(Long locationId){
+
+		return locationQueryService.searchDetailLocation(locationId);
 	}
 }

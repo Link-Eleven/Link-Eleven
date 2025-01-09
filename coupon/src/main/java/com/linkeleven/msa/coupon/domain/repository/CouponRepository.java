@@ -21,4 +21,5 @@ public interface CouponRepository extends JpaRepository<Coupon, Long>, CouponRep
 	// feedId로 쿠폰 조회
 	Optional<Coupon> findByFeedId(Long feedId);
 
+	Optional<Coupon> findByCouponIdAndCreatedBy(Long couponId, Long createdBy);
 }

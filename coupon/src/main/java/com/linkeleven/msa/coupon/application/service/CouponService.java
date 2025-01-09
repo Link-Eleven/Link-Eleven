@@ -87,9 +87,16 @@ public class CouponService {
 	// 쿠폰 ID로 쿠폰 조회
 	@Transactional(readOnly = true)
 	public CouponResponseDto getCouponById(Long userId, String role, Long couponId) {
-		Coupon coupon = couponRepository.findById(couponId)
-			.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
-		return CouponResponseDto.from(coupon);
+		if ("MASTER".equals(role)) {
+			Coupon coupon = couponRepository.findById(couponId)
+				.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
+			return CouponResponseDto.from(coupon);
+		} else if ("COMPANY".equals(role)) {
+			Coupon coupon = couponRepository.findByCouponIdAndCreatedBy(couponId, userId)
+				.orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN)); // 권한이 없기 때문에 조회 안됨.
+			return CouponResponseDto.from(coupon);
+		}
+		throw new CustomException(ErrorCode.FORBIDDEN);
 	}
 
 	// 모든 쿠폰 조회

@@ -32,7 +32,7 @@ public enum ErrorCode {
 	/*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
 	ACCESS_DENIED(404, "접근 권한이 없습니다."),
 	NOT_FOUND_AREA(400, "찾으시는 지역 정보가 없습니다."),
-	NOT_FOUND_ES_LOCATION(400, "엘라스틱 서치에 해당 장소 데이터가 없습니다."),
+	NOT_FOUND_ES_LOCATION(400, "Read DB에 해당 장소 데이터가 없습니다."),
 	/*  408 REQUEST_TIMEOUT : 요청에 대한 응답 시간 초과  */
 	TIMEOUT_ERROR(408, "응답시간을 초과하였습니다."),
 

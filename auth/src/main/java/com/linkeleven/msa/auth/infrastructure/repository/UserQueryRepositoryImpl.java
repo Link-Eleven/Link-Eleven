@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.linkeleven.msa.auth.application.dto.UserQueryResponseDto;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -31,12 +32,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 				user.isCouponIssued
 			))
 			.from(user)
-			.where(
-				username == null || username.isBlank()
-					? user.deletedBy.isNull() // 삭제되지 않은 사용자만 조회
-					: user.username.containsIgnoreCase(username)
-					.and(user.deletedBy.isNull())
-			)
+			.where(searchCondition(username))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
@@ -47,5 +43,15 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 		}
 
 		return new SliceImpl<>(users, pageable, hasNext);
+	}
+	private BooleanExpression searchCondition(String username) {
+
+		BooleanExpression isNotDeleted = user.deletedBy.isNull();
+
+		if (username == null || username.isBlank()) {
+			return isNotDeleted;
+		}
+
+		return user.username.containsIgnoreCase(username).and(isNotDeleted);
 	}
 }

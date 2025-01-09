@@ -1,5 +1,6 @@
 package com.linkeleven.msa.coupon.application.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,13 @@ public class CouponIssuingService {
 	@DistributedLock(key = "coupon_issue")
 	@Transactional
 	public IssuedCouponDto issueCoupon(Long userId, String role, Long couponId) {
+		// 현재 시간이 자정 00시 이전인 경우 쿠폰 발급을 막음
+		LocalDateTime currentTime = LocalDateTime.now();
+		LocalDateTime midnight = currentTime.toLocalDate().atStartOfDay().plusDays(1); // 자정 00시
+
+		if (currentTime.isBefore(midnight)) {
+			throw new CustomException(ErrorCode.COUPON_CANNOT_BE_ISSUED_YET);
+		}
 		// 유저가 이미 해당 쿠폰을 발급받았는지 확인
 		if (issuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
 			throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);

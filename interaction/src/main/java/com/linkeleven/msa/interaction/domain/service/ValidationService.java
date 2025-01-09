@@ -15,7 +15,7 @@ public class ValidationService {
 	private final ReplyRepository replyRepository;
 
 	public boolean existsComment(Long targetId, Long targetAuthorId) {
-		return commentRepository.existsByIdAndContentDetails_userId(targetId, targetAuthorId);
+		return commentRepository.existsByIdAndContentDetailsUserId(targetId, targetAuthorId);
 	}
 
 	public boolean existsReply(Long targetId, Long targetAuthorId) {

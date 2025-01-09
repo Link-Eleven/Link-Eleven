@@ -108,16 +108,20 @@ public class CouponService {
 	// 쿠폰 ID로 쿠폰 조회
 	@Transactional(readOnly = true)
 	public CouponResponseDto getCouponById(Long userId, String role, Long couponId) {
+		Coupon coupon;
+
 		if ("MASTER".equals(role)) {
-			Coupon coupon = couponRepository.findById(couponId)
+			// "MASTER"일 경우, 쿠폰 ID로 조회
+			coupon = couponRepository.findById(couponId)
 				.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
-			return CouponResponseDto.from(coupon);
 		} else if ("COMPANY".equals(role)) {
-			Coupon coupon = couponRepository.findByCouponIdAndCreatedBy(couponId, userId)
+			// "COMPANY"일 경우, 유저ID와 쿠폰ID로 조회
+			coupon = couponRepository.findByCouponIdAndCreatedBy(couponId, userId)
 				.orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN));
-			return CouponResponseDto.from(coupon);
+		} else {
+			throw new CustomException(ErrorCode.FORBIDDEN);
 		}
-		throw new CustomException(ErrorCode.FORBIDDEN);
+		return CouponResponseDto.from(coupon);
 	}
 
 	// 모든 쿠폰 조회

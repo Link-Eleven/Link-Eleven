@@ -20,12 +20,13 @@ public class OutboxService {
 
 	private final OutboxRepository outboxRepository;
 
-	public void saveCommentCreatedEvent(Long feedId, String content, Long userId,
+	public void saveCommentCreatedEvent(Long feedId, Long feedAuthorId, String content, Long userId,
 		String username, String commentCreatedAt) {
 		String topic = "comment_created";
 		CommentEvent commentEvent = CommentEvent.newBuilder()
 			.setEventType(topic)
 			.setFeedId(feedId)
+			.setFeedAuthorId(feedAuthorId)
 			.setContent(content)
 			.setUserId(userId)
 			.setUsername(username)
@@ -38,12 +39,13 @@ public class OutboxService {
 		outboxRepository.save(outbox);
 	}
 
-	public void saveReplyCreatedEvent(Long commentId, String content, Long userId,
+	public void saveReplyCreatedEvent(Long commentId, Long commentAuthorId, String content, Long userId,
 		String username, String replyCreatedAt) {
 		String topic = "reply_created";
 		ReplyEvent replyEvent = ReplyEvent.newBuilder()
 			.setEventType(topic)
 			.setCommentId(commentId)
+			.setCommentAuthorId(commentAuthorId)
 			.setContent(content)
 			.setUserId(userId)
 			.setUsername(username)
@@ -56,12 +58,13 @@ public class OutboxService {
 		outboxRepository.save(outbox);
 	}
 
-	public void saveLikeCreatedEvent(Long targetId, String contentType, Long userId,
+	public void saveLikeCreatedEvent(Long targetId, Long targetAuthorId, String contentType, Long userId,
 		String likeTime, String eventType) {
 		String topic = generateTopicName(contentType, eventType);
 		LikeEvent likeEvent = LikeEvent.newBuilder()
 			.setEventType(topic)
 			.setTargetId(targetId)
+			.setTargetAuthorId(targetAuthorId)
 			.setContentType(contentType)
 			.setUserId(userId)
 			.setLikeTime(likeTime)

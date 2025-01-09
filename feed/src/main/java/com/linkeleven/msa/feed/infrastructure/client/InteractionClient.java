@@ -7,8 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "interaction", url = "http://localhost:19094")
-// interaction-service와 feed-service 간의 통신을 위한 URL -> 추후 수정 예정
+@FeignClient(name = "interaction")
 public interface InteractionClient {
 
 	// @GetMapping("/external/feeds/{feedId}/comments")
@@ -17,7 +16,6 @@ public interface InteractionClient {
 	// @GetMapping("/external/feeds/{feedId}/likes")
 	// LikeCountResponseDto getLikeCount(@PathVariable Long feedId);
 
-	// Batch 요청을 위한 API 추가
 	@GetMapping("/external/feeds/comments")
 	Map<Long, Integer> getCommentCounts(@RequestParam("feedIds") List<Long> feedIds);
 

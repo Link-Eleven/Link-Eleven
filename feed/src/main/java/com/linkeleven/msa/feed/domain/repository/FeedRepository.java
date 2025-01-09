@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -32,5 +31,5 @@ public interface FeedRepository extends JpaRepository<Feed, Long>, FeedRepositor
 	@Query("SELECT f FROM Feed f WHERE f.deletedAt IS NULL AND f.createdAt >= :cutoffDate ORDER BY f.popularityScore DESC")
 	List<Feed> findTopFeeds(@Param("cutoffDate") LocalDateTime cutoffDate);
 
-	boolean existsByIdAndUserId(Long feedId, Long userId);
+	boolean existsByFeedIdAndUserId(Long feedId, Long userId);
 }

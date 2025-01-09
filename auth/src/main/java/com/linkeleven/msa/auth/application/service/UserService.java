@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository userRepository;
-	private final KafkaService kafkaService;
+	private final CommentProduceService commentProduceService;
 
 	public UserRoleResponseDto getUserRole(Long userId) {
 		User user=validateUserById(userId);
@@ -159,7 +159,7 @@ public class UserService {
 			new TransactionSynchronizationAdapter() {
 				@Override
 				public void afterCommit() {
-					kafkaService.sendMessage("username-change", dto);
+					commentProduceService.sendMessage("username-change", dto);
 				}
 			}
 		);

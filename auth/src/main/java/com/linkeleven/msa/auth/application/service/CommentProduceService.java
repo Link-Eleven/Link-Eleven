@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class KafkaService {
+public class CommentProduceService {
 	private final KafkaTemplate<String, Object> kafkaTemplate;
 
 	public void sendMessage(String topic,KafkaUpdateUsernameDto kafkaDto) {

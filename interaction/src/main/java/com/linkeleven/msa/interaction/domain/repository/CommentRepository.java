@@ -9,4 +9,5 @@ import com.linkeleven.msa.interaction.domain.model.entity.Comment;
 public interface CommentRepository extends JpaRepository<Comment, Long> , CommentRepositoryCustom {
 	boolean existsByIdAndDeletedAtIsNull(Long commentId);
 
+	boolean existsByIdAndContentDetails_userId(Long targetId, Long targetAuthorId);
 }

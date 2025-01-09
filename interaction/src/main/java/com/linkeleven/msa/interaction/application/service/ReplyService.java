@@ -43,7 +43,9 @@ public class ReplyService {
 		replyRepository.save(reply);
 
 		outboxService.saveReplyCreatedEvent(
-			commentId, reply.getContentDetails().getContent(),
+			commentId,
+			requestDto.getAuthorId(),
+			reply.getContentDetails().getContent(),
 			reply.getContentDetails().getUserId(),
 			reply.getContentDetails().getUsername(),
 			reply.getCreatedAt().toString()

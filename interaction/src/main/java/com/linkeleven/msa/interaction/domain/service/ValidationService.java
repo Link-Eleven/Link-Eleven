@@ -14,12 +14,12 @@ public class ValidationService {
 	private final CommentRepository commentRepository;
 	private final ReplyRepository replyRepository;
 
-	public boolean existsComment(Long targetId) {
-		return commentRepository.existsById(targetId);
+	public boolean existsComment(Long targetId, Long targetAuthorId) {
+		return commentRepository.existsByIdAndContentDetails_userId(targetId, targetAuthorId);
 	}
 
-	public boolean existsReply(Long targetId) {
-		return replyRepository.existsById(targetId);
+	public boolean existsReply(Long targetId, Long targetAuthorId) {
+		return replyRepository.existsByIdAndContentDetails_userId(targetId, targetAuthorId);
 	}
 
 	public boolean existsCommentNotDeleted(Long commentId) {

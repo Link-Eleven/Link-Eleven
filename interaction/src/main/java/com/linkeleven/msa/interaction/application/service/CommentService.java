@@ -34,13 +34,15 @@ public class CommentService {
 	public CommentCreateResponseDto createComment(Long userId, Long feedId, CommentCreateRequestDto requestDto) {
 		checkLogIn(userId);
 		UserInfoResponseDto userInfo = getUsername(userId);
-		checkFeedExists(feedId);
+		checkFeedExists(feedId, requestDto.getAuthorId());
 		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId, userInfo.getUsername());
 		Comment comment = Comment.of(contentDetails, feedId);
 		commentRepository.save(comment);
 
 		outboxService.saveCommentCreatedEvent(
-			feedId, comment.getContentDetails().getContent(),
+			feedId,
+			requestDto.getAuthorId(),
+			comment.getContentDetails().getContent(),
 			comment.getContentDetails().getUserId(),
 			comment.getContentDetails().getUsername(),
 			comment.getCreatedAt().toString()
@@ -106,8 +108,8 @@ public class CommentService {
 		return localDateTime != null;
 	}
 
-	private void checkFeedExists(Long feedId) {
-		if (!feedClient.checkFeedExists(feedId)) {
+	private void checkFeedExists(Long feedId, Long userId) {
+		if (!feedClient.checkFeedExists(feedId, userId)) {
 			throw new CustomException(ErrorCode.FEED_NOT_FOUND);
 		}
 	}

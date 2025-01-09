@@ -12,9 +12,7 @@ import com.linkeleven.msa.interaction.domain.model.entity.Reply;
 import com.linkeleven.msa.interaction.domain.model.vo.ContentDetails;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
 import com.linkeleven.msa.interaction.domain.service.ValidationService;
-
 import com.linkeleven.msa.interaction.infrastructure.client.AuthClient;
-
 import com.linkeleven.msa.interaction.libs.exception.CustomException;
 import com.linkeleven.msa.interaction.libs.exception.ErrorCode;
 import com.linkeleven.msa.interaction.presentation.dto.ReplyCreateRequestDto;
@@ -25,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ReplyService {
 
 	private final ReplyRepository replyRepository;
@@ -33,7 +30,7 @@ public class ReplyService {
 	private final ValidationService validationService;
 	private final AuthClient authClient;
 
-
+	@Transactional
 	public ReplyCreateResponseDto createReply(Long userId, Long commentId, ReplyCreateRequestDto requestDto) {
 		checkLogIn(userId);
 		UserInfoResponseDto userInfo = getUsername(userId);
@@ -59,6 +56,7 @@ public class ReplyService {
 			reply.getContentDetails().getContent());
 	}
 
+	@Transactional
 	public ReplyUpdateResponseDto updateReply(Long userId, Long replyId, Long commentId, ReplyUpdateRequestDto requestDto) {
 		Reply reply = getReply(replyId);
 		checkValidateReply(commentId, userId ,reply);
@@ -72,6 +70,7 @@ public class ReplyService {
 			reply.getContentDetails().getContent());
 	}
 
+	@Transactional
 	public void deleteReply(Long userId, Long commentId, Long replyId) {
 		Reply reply = getReply(replyId);
 		checkValidateReply(commentId, userId, reply);

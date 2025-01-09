@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CommentService {
 
 	private final CommentRepository commentRepository;
@@ -31,6 +30,7 @@ public class CommentService {
 	private final FeedClient feedClient;
 	private final AuthClient authClient;
 
+	@Transactional
 	public CommentCreateResponseDto createComment(Long userId, Long feedId, CommentCreateRequestDto requestDto) {
 		checkLogIn(userId);
 		UserInfoResponseDto userInfo = getUsername(userId);
@@ -55,6 +55,7 @@ public class CommentService {
 			comment.getContentDetails().getContent());
 	}
 
+	@Transactional
 	public CommentUpdateResponseDto updateComment(Long userId, Long feedId, Long commentId, CommentUpdateRequestDto requestDto) {
 		Comment comment = getComment(commentId);
 		checkValidateComment(userId, feedId, comment);
@@ -68,6 +69,7 @@ public class CommentService {
 			comment.getContentDetails().getContent());
 	}
 
+	@Transactional
 	public void deleteComment(Long userId, Long feedId, Long commentId) {
 		Comment comment = getComment(commentId);
 		checkValidateComment(userId, feedId, comment);

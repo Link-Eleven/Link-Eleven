@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class LikeService {
 
 	private final LikeRepository likeRepository;
@@ -26,6 +25,7 @@ public class LikeService {
 	private final OutboxService outboxService;
 	private final FeedClient feedClient;
 
+	@Transactional
 	public void createLike(Long userId, Long targetId, ContentType contentType, LikeRequestDto requestDto) {
 		checkLogIn(userId);
 		checkAlreadyLike(userId, targetId);
@@ -42,6 +42,7 @@ public class LikeService {
 			like.getCreatedAt().toString(),"like_created");
 	}
 
+	@Transactional
 	public void cancelLike(Long userId, Long targetId, ContentType contentType, LikeRequestDto requestDto) {
 		Like like = getLike(userId, targetId);
 		validateTarget(targetId, requestDto.getTargetAuthorId(), contentType);

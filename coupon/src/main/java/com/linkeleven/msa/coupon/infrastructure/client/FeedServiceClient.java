@@ -9,6 +9,6 @@ import com.linkeleven.msa.coupon.application.dto.PopularFeedResponseDto;
 
 @FeignClient(name = "feed-service")
 public interface FeedServiceClient {
-	@GetMapping("/external/popular-feeds")
+	@GetMapping("/external/feeds/popular")
 	List<PopularFeedResponseDto> getPopularFeeds();
 }

@@ -11,7 +11,7 @@ public enum ErrorCode {
 
 	/*  400 BAD_REQUEST : 잘못된 요청  */
 	ILLEGAL_ARGUMENT_ERROR(400, "잘못된 파라미터 전달"),
-	INVALID_DATE_RANGE(400, "유효 기간이 잘못되었습니다. 유효 시작 시간은 현재 시간보다 이후여야 하며, 유효 만료 시간은 현재 시간보다 이후이면서 시작 시간보다 이전이어야 합니다."),
+	COUPON_CANNOT_BE_ISSUED_YET(400, "현재는 쿠폰 발급을 할 수 없습니다."),
 	/*  401 UNAUTHORIZED : 인증 안됨  */
 	UNAUTHORIZED(401, "인증되지 않았습니다."),
 
@@ -24,7 +24,6 @@ public enum ErrorCode {
 	NO_AVAILABLE_POLICY(404, "유효한 쿠폰 정책이 없습니다."),
 	NO_AVAILABLE_COUPON(404, "유효한 쿠폰이 없습니다."),
 	COUPON_ALREADY_ISSUED(404, "이미 쿠폰이 발급되었습니다."),
-
 	/*  408 REQUEST_TIMEOUT : 요청에 대한 응답 시간 초과  */
 	TIMEOUT_ERROR(408, "응답시간을 초과하였습니다."),
 
@@ -34,7 +33,6 @@ public enum ErrorCode {
 	EXPIRED_COUPON(410, "쿠폰이 만료되었습니다."),
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
-	LOCK_ACQUISITION_FAILURE(500, "쿠폰 발급 처리 중 오류가 발생했습니다"),
 	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다.");
 
 

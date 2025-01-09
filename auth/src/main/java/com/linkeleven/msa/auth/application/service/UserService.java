@@ -1,7 +1,11 @@
 package com.linkeleven.msa.auth.application.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.linkeleven.msa.auth.application.dto.KafkaUpdateUsernameDto;
+import com.linkeleven.msa.auth.application.dto.UserInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserMyInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserRoleResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateAnonymousResponseDto;
@@ -23,12 +27,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository userRepository;
+	private final CommentProduceService commentProduceService;
 
 	public UserRoleResponseDto getUserRole(Long userId) {
 		User user=validateUserById(userId);
 		return UserRoleResponseDto.from(user.getRole().toString());
 	}
-
+	public UserInfoResponseDto getUsername(Long userId) {
+		User user=validateUserById(userId);
+		return UserInfoResponseDto.from(user.getUsername());
+	}
 	public UserMyInfoResponseDto getUserMyInfo(String userId) {
 		User user=validateUserById(Long.parseLong(userId));
 		return UserMyInfoResponseDto.from(user);
@@ -81,8 +89,10 @@ public class UserService {
 		User user=validateSameUser(Long.valueOf(headerId),userId,role);
 
 		user.updateUsername(userUpdateUsernameRequestDto.getUsername());
-		return UserUpdateUsernameResponseDto.of(user.getUserId(),user.getUsername());
 
+		kafkaAfterCommit("username-change",KafkaUpdateUsernameDto.of(user.getUserId(), user.getUsername()));
+
+		return UserUpdateUsernameResponseDto.of(user.getUserId(),user.getUsername());
 	}
 
 	@Transactional
@@ -143,4 +153,16 @@ public class UserService {
 			}else return false;
 		}
 	}
+
+	private void kafkaAfterCommit(String topic, KafkaUpdateUsernameDto dto) {
+		TransactionSynchronizationManager.registerSynchronization(
+			new TransactionSynchronizationAdapter() {
+				@Override
+				public void afterCommit() {
+					commentProduceService.sendMessage("username-change", dto);
+				}
+			}
+		);
+	}
+
 }

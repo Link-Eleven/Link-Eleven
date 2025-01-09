@@ -28,6 +28,9 @@ ext {
 }
 
 dependencies {
+	//kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+
 	// H2 Database 의존성 추가
 	testImplementation 'com.h2database:h2'
 

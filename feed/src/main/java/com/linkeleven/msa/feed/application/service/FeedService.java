@@ -219,8 +219,8 @@ public class FeedService {
 		}
 	}
 
-	public boolean checkFeedExists(Long feedId) {
-		return feedRepository.existsById(feedId);
+	public boolean checkFeedExists(Long feedId, Long userId) {
+		return feedRepository.existsByIdAndUserId(feedId, userId);
 	}
 
 }

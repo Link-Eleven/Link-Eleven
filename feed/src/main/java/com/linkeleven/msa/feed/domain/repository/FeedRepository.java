@@ -31,4 +31,5 @@ public interface FeedRepository extends JpaRepository<Feed, Long>, FeedRepositor
 	@Query("SELECT f FROM Feed f ORDER BY f.popularityScore DESC")
 	List<Feed> findTopFeeds(Pageable pageable);
 
+	boolean existsByIdAndUserId(Long feedId, Long userId);
 }

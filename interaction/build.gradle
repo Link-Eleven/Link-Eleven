@@ -61,16 +61,18 @@ dependencies {
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 
-	// kafka
+	// kafka & Related Dependency
 	implementation 'org.springframework.kafka:spring-kafka'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	implementation 'io.confluent:kafka-avro-serializer:7.8.0'
+	implementation 'org.springframework.retry:spring-retry'
 
 	// avro schema
-	implementation 'org.apache.avro:avro:1.12.0'
-	implementation 'org.apache.avro:avro-tools:1.12.0'
-	implementation 'io.confluent:kafka-avro-serializer:7.8.0'
+	configurations {
+		avroTools
+	}
+	avroTools 'org.apache.avro:avro-tools:1.12.0'
 
-	implementation 'org.springframework.retry:spring-retry'
 }
 
 dependencyManagement {
@@ -93,7 +95,8 @@ dependencyManagement {
 sourceSets {
 	main {
 		java {
-			srcDirs += "build/generated-main-avro-java"
+			srcDirs += "build/generated/avro-java"
+//			srcDirs += "build/generated-main-avro-java"
 		}
 	}
 }
@@ -106,12 +109,13 @@ tasks.register("generateAvroJava", JavaExec) {
 	mainClass.set("org.apache.avro.tool.Main")
 
 	// classpath를 runtimeClasspath로 설정
-	classpath = configurations.runtimeClasspath
+//	classpath = configurations.runtimeClasspath
+	classpath = configurations.avroTools
 
 	// 명령어 인수 설정
 	args = [
-			"compile", "schema",
-			"src/main/resources/avro/*.avsc",  // 스키마 경로
+			"compile", "-string", "schema",
+			"src/main/resources/avro",  // 스키마 경로
 			"build/generated/avro-java"        // 출력 디렉토리
 	]
 }

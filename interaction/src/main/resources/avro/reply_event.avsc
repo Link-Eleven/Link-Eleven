@@ -12,6 +12,10 @@
       "type": "long"
     },
     {
+      "name": "commentAuthorId",
+      "type": "long"
+    },
+    {
       "name": "content",
       "type": "string"
     },

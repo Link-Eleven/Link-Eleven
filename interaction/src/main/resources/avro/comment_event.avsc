@@ -12,6 +12,10 @@
       "type": "long"
     },
     {
+      "name": "feedAuthorId",
+      "type": "long"
+    },
+    {
       "name": "content",
       "type": "string"
     },

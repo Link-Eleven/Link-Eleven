@@ -12,6 +12,10 @@
       "type": "long"
     },
     {
+      "name": "targetAuthorId",
+      "type": "long"
+    },
+    {
       "name": "contentType",
       "type": "string"
     },

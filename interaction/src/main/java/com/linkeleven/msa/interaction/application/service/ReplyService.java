@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.linkeleven.msa.interaction.application.dto.ReplyCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyUpdateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.external.UserInfoResponseDto;
+import com.linkeleven.msa.interaction.application.service.messaging.OutboxService;
 import com.linkeleven.msa.interaction.domain.model.entity.Reply;
 import com.linkeleven.msa.interaction.domain.model.vo.ContentDetails;
 import com.linkeleven.msa.interaction.domain.repository.ReplyRepository;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ReplyService {
 
 	private final ReplyRepository replyRepository;
+	private final OutboxService outboxService;
 	private final ValidationService validationService;
 	private final AuthClient authClient;
 
@@ -39,6 +41,14 @@ public class ReplyService {
 		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId, userInfo.getUsername());
 		Reply reply = Reply.of(contentDetails, commentId);
 		replyRepository.save(reply);
+
+		outboxService.saveReplyCreatedEvent(
+			commentId, reply.getContentDetails().getContent(),
+			reply.getContentDetails().getUserId(),
+			reply.getContentDetails().getUsername(),
+			reply.getCreatedAt().toString()
+		);
+
 		return ReplyCreateResponseDto.of(
 			reply.getId(),
 			reply.getCommentId(),

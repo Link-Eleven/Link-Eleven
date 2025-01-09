@@ -19,9 +19,9 @@ public interface InteractionClient {
 
 	// Batch 요청을 위한 API 추가
 	@GetMapping("/external/feeds/comments")
-	Map<Long, Long> getCommentCounts(@RequestParam("feedIds") List<Long> feedIds);
+	Map<Long, Integer> getCommentCounts(@RequestParam("feedIds") List<Long> feedIds);
 
 	@GetMapping("/external/feeds/likes")
-	Map<Long, Long> getLikeCounts(@RequestParam("feedIds") List<Long> feedIds);
+	Map<Long, Integer> getLikeCounts(@RequestParam("feedIds") List<Long> feedIds);
 
 }

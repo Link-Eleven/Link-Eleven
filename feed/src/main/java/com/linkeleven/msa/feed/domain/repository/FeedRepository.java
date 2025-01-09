@@ -1,5 +1,6 @@
 package com.linkeleven.msa.feed.domain.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +29,8 @@ public interface FeedRepository extends JpaRepository<Feed, Long>, FeedRepositor
 	@Transactional
 	void incrementViews(@Param("feedId") Long feedId);
 
-	@Query("SELECT f FROM Feed f ORDER BY f.popularityScore DESC")
-	List<Feed> findTopFeeds(Pageable pageable);
+	@Query("SELECT f FROM Feed f WHERE f.deletedAt IS NULL AND f.createdAt >= :cutoffDate ORDER BY f.popularityScore DESC")
+	List<Feed> findTopFeeds(@Param("cutoffDate") LocalDateTime cutoffDate);
 
 	boolean existsByIdAndUserId(Long feedId, Long userId);
 }

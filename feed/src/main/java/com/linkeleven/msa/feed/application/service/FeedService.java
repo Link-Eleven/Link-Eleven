@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +43,7 @@ public class FeedService {
 	private final InteractionClient interactionClient;
 	private final AuthClient authClient;
 	private final CouponClient couponClient;
+	private final RedisTemplate<String, List<Feed>> redisTemplate;
 
 	@Transactional
 	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files,
@@ -130,64 +131,70 @@ public class FeedService {
 	}
 
 	@Transactional
-	//어노테이션 말고 직접 캐시 스케줄러로 넣어줄 것
-	@Cacheable(value = "popularFeeds", key = "#limit", cacheManager = "cacheManager", unless = "#result == null || #result.isEmpty()")
-	public List<FeedTopResponseDto> getTopFeed(int limit) {
-		
-		//------------------------------------------------------------- 캐시 스켈줄러로 계산하고 저장 
-		// localdatetime 에서 23:30 기준으로 24시 잡고 weight 계산
-		LocalDateTime currentDate = LocalDateTime.now();
-		LocalDateTime cutoffDate = currentDate.minusDays(7);
+	public void updateTopFeed() {
 
-		Pageable pageable = Pageable.unpaged();
-		List<Feed> feeds = feedRepository.findTopFeeds(pageable)  // 쿼리문으로 처리 일주일 데이터 가져오기
-			.stream()
-			.filter(feed -> feed.getDeletedAt() == null && feed.getCreatedAt().isAfter(cutoffDate))
-			.toList();
+		// 현재 날짜 기준으로 23:30을 설정 (24시 기준으로 계산)
+		LocalDateTime adjustedCurrentDate = LocalDateTime.now().withHour(23).withMinute(30).withSecond(0).withNano(0);
 
-		// Batch 요청으로 댓글 및 좋아요 수를 한 번에 가져오기
+		// 일주일 전 날짜를 계산
+		LocalDateTime cutoffDate = adjustedCurrentDate.minusDays(7);
+
+		// 인기 게시글 조회
+		List<Feed> feeds = feedRepository.findTopFeeds(cutoffDate);
+
+		// feed Id 별 댓글 및 좋아요 수 조회
 		List<Long> feedIds = feeds.stream().map(Feed::getFeedId).toList();
-		Map<Long, Long> commentCounts = interactionClient.getCommentCounts(feedIds); // map or dto(피드아이디 댓글 갯수) map 추천
-		Map<Long, Long> likeCounts = interactionClient.getLikeCounts(feedIds); // 1 long feedId 2 long size = integer (피드아이디 좋아요 수)
+		Map<Long, Integer> commentCounts = interactionClient.getCommentCounts(
+			feedIds); // map or dto(피드아이디 댓글 갯수) map 추천
+		Map<Long, Integer> likeCounts = interactionClient.getLikeCounts(
+			feedIds); // 1 long feedId 2 long size = integer (피드아이디 좋아요 수)
 
+		// 각 피드의 인기도 점수 계산
 		feeds.forEach(feed -> {
-			long daysSincePosted = ChronoUnit.DAYS.between(feed.getCreatedAt(), currentDate);
+			long daysSincePosted = ChronoUnit.DAYS.between(feed.getCreatedAt(), adjustedCurrentDate);
 			int weight = (daysSincePosted <= 7) ? (8 - (int)daysSincePosted) : 1;
-			long commentCount = commentCounts.getOrDefault(feed.getFeedId(), 0L); // map 조회로 변경 예정
-			long likeCount = likeCounts.getOrDefault(feed.getFeedId(), 0L); // map 조회로 변경 예정
+			int commentCount = commentCounts.getOrDefault(feed.getFeedId(), 0);// map 조회로 변경 예정
+			int likeCount = likeCounts.getOrDefault(feed.getFeedId(), 0); // map 조회로 변경 예정
 			double popularityScore = calculatePopularityScore(feed.getViews(), commentCount, likeCount, weight);
 			feed.updatePopularityScore(popularityScore);
 		});
 
-		feedRepository.saveAll(feeds); // 제외
-
+		// 상위 100개의 게시글을 인기 순으로 정렬하여 캐시에 저장
 		List<Feed> top100Feeds = feeds.stream()
 			.sorted(Comparator.comparingDouble(Feed::getPopularityScore).reversed())
 			.limit(100)
 			.toList();
-		//-----------------------------
-		return top100Feeds.stream() // 조회시 캐시 가져와서 조회
-			.limit(limit)
-			.map(feed -> {
-				long commentCount = commentCounts.getOrDefault(feed.getFeedId(), 0L);
-				long likeCount = likeCounts.getOrDefault(feed.getFeedId(), 0L);
-				return FeedTopResponseDto.of(feed, commentCount, likeCount);
-			})
-			.collect(Collectors.toList());
 
-		// 쿠폰 생성 요청시 변경 예정
-		// List<FeedTopResponseDto> topFeedDtos = top100Feeds.stream()
-		// 	.limit(limit)
-		// 	.map(feed -> {
-		// 		long commentCount = interactionClient.getCommentCount(feed.getFeedId()).getCount();
-		// 		long likeCount = interactionClient.getLikeCount(feed.getFeedId()).getCount();
-		// 		return FeedTopResponseDto.of(feed, commentCount, likeCount);
-		// 	})
-		// 	.collect(Collectors.toList());
-		//
-		// couponClient.createCoupons(topFeedDtos);
-		//
-		// return topFeedDtos;
+		//Redis에 저장
+		redisTemplate.opsForValue().set("popularFeeds", top100Feeds);
+		//-----------------------------
+
+		// 요청이 들어오면 top 3를(userId / feedId)포함해서 캐시에서 꺼내서 보내기
+
+	}
+
+	@Transactional
+	public List<FeedTopResponseDto> getTopFeed(int limit) {
+		// 캐시에서 인기 게시글 조회
+		List<Feed> top100Feeds = redisTemplate.opsForValue().get("popularFeeds");
+		if (top100Feeds == null || top100Feeds.isEmpty()) {
+			throw new CustomException(ErrorCode.CACHE_NOT_FOUND);
+		}
+
+		Map<Long, Integer> commentCounts = interactionClient.getCommentCounts(
+			top100Feeds.stream().map(Feed::getFeedId).toList()
+		);
+		Map<Long, Integer> likeCounts = interactionClient.getLikeCounts(
+			top100Feeds.stream().map(Feed::getFeedId).toList()
+		);
+
+		// 상위 limit 개수만 조회하여 응답 DTO로 변환
+		return top100Feeds.stream()
+			.limit(limit)
+			.map(feed -> FeedTopResponseDto.of(feed,
+				commentCounts.getOrDefault(feed.getFeedId(), 0),
+				likeCounts.getOrDefault(feed.getFeedId(), 0)))
+			.collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)

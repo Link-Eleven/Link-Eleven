@@ -20,7 +20,7 @@ public class CacheScheduler {
 
 		cacheManager.getCache("popularFeeds").clear();
 
-		feedService.getTopFeed(100);
+		feedService.updateTopFeed();
 
 	}
 }

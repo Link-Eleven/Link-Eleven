@@ -26,9 +26,8 @@ public class IssueCouponController {
 	// 쿠폰 발급 API
 	@PostMapping("/{couponId}/issue")
 	public ResponseEntity<SuccessResponseDto<IssuedCouponDto>> issueCoupon(
-		// todo: 게이트웨이 연결시 required 제거하기
-		@RequestHeader(value = "X-User-Id", required = false) Long userId,
-		@RequestHeader(value = "X-Role", required = false) String role,
+		@RequestHeader(value = "X-User-Id") Long userId,
+		@RequestHeader(value = "X-Role") String role,
 		@PathVariable Long couponId) {
 		IssuedCouponDto issuedCoupon = couponIssuingService.issueCoupon(userId, role, couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 발급 완료", issuedCoupon));
@@ -37,8 +36,8 @@ public class IssueCouponController {
 	// 쿠폰 사용 API
 	@PostMapping("/{couponId}/use")
 	public ResponseEntity<SuccessResponseDto<IssuedCouponDto>> useCoupon(
-		@RequestHeader(value = "X-User-Id", required = false) Long userId,
-		@RequestHeader(value = "X-Role", required = false) String role,
+		@RequestHeader(value = "X-User-Id") Long userId,
+		@RequestHeader(value = "X-Role") String role,
 		@PathVariable Long couponId) {
 		IssuedCouponDto usedCoupon = couponIssuingService.useCoupon(userId, couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 사용 완료", usedCoupon));
@@ -47,8 +46,8 @@ public class IssueCouponController {
 	// 유저: 발급받은 쿠폰 목록 조회 API
 	@GetMapping
 	public ResponseEntity<SuccessResponseDto<List<IssuedCouponDto>>> getIssuedCoupons(
-		@RequestHeader(value = "X-User-Id", required = false) Long userId,
-		@RequestHeader(value = "X-Role", required = false) String role
+		@RequestHeader(value = "X-User-Id") Long userId,
+		@RequestHeader(value = "X-Role") String role
 	) {
 		List<IssuedCouponDto> issuedCoupons = couponIssuingService.getIssuedCouponsByUserId(userId);
 		return ResponseEntity.ok(SuccessResponseDto.success("발급 쿠폰 조회 완료", issuedCoupons));

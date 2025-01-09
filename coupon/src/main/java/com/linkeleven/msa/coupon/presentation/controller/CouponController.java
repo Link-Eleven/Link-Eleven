@@ -41,8 +41,8 @@ public class CouponController {
 	@GetMapping("/{couponId}")
 	public ResponseEntity<SuccessResponseDto<CouponResponseDto>> getCouponById(
 		@PathVariable Long couponId,
-		@RequestHeader(value = "X-User-Id", required = false) Long userId,
-		@RequestHeader(value = "X-Role", required = false) String role
+		@RequestHeader(value = "X-User-Id") Long userId,
+		@RequestHeader(value = "X-Role") String role
 	) {
 		CouponResponseDto coupon = couponService.getCouponById(userId, role, couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 조회 완료", coupon));
@@ -52,8 +52,8 @@ public class CouponController {
 	@PutMapping("/{couponId}")
 	public ResponseEntity<SuccessResponseDto<CouponResponseDto>> updateCoupon(
 		@PathVariable Long couponId,
-		@RequestHeader(value = "X-User-Id", required = false) Long userId,
-		@RequestHeader(value = "X-Role", required = false) String role,
+		@RequestHeader(value = "X-User-Id") Long userId,
+		@RequestHeader(value = "X-Role") String role,
 		@RequestBody CouponRequestDto request) {
 		CouponResponseDto coupon = couponService.updateCoupon(couponId, userId, role, request);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 수정 완료", coupon));
@@ -63,8 +63,8 @@ public class CouponController {
 	@DeleteMapping("/{feedId}")
 	public ResponseEntity<SuccessResponseDto<String>> deleteCoupon(
 		@PathVariable Long feedId,
-		@RequestHeader(value = "X-User-Id", required = false) Long userId,
-		@RequestHeader(value = "X-Role", required = false) String role
+		@RequestHeader(value = "X-User-Id") Long userId,
+		@RequestHeader(value = "X-Role") String role
 	) {
 		couponService.deleteCoupon(userId, role, feedId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 삭제 완료", ""));

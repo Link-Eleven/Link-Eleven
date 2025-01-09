@@ -123,47 +123,50 @@ public class FeedService {
 			throw new CustomException(ErrorCode.FEED_NOT_FOUND);
 		}
 
-		feedRepository.incrementViews(feedId);
+		feedRepository.incrementViews(feedId); 
 
 		Feed feed = findByIdAndDeletedAt(feedId);
 		return FeedReadResponseDto.from(feed);
 	}
 
 	@Transactional
+	//어노테이션 말고 직접 캐시 스케줄러로 넣어줄 것
 	@Cacheable(value = "popularFeeds", key = "#limit", cacheManager = "cacheManager", unless = "#result == null || #result.isEmpty()")
 	public List<FeedTopResponseDto> getTopFeed(int limit) {
-
+		
+		//------------------------------------------------------------- 캐시 스켈줄러로 계산하고 저장 
+		// localdatetime 에서 23:30 기준으로 24시 잡고 weight 계산
 		LocalDateTime currentDate = LocalDateTime.now();
 		LocalDateTime cutoffDate = currentDate.minusDays(7);
 
 		Pageable pageable = Pageable.unpaged();
-		List<Feed> feeds = feedRepository.findTopFeeds(pageable)
+		List<Feed> feeds = feedRepository.findTopFeeds(pageable)  // 쿼리문으로 처리 일주일 데이터 가져오기
 			.stream()
 			.filter(feed -> feed.getDeletedAt() == null && feed.getCreatedAt().isAfter(cutoffDate))
 			.toList();
 
 		// Batch 요청으로 댓글 및 좋아요 수를 한 번에 가져오기
 		List<Long> feedIds = feeds.stream().map(Feed::getFeedId).toList();
-		Map<Long, Long> commentCounts = interactionClient.getCommentCounts(feedIds);
-		Map<Long, Long> likeCounts = interactionClient.getLikeCounts(feedIds);
+		Map<Long, Long> commentCounts = interactionClient.getCommentCounts(feedIds); // map or dto(피드아이디 댓글 갯수) map 추천
+		Map<Long, Long> likeCounts = interactionClient.getLikeCounts(feedIds); // 1 long feedId 2 long size = integer (피드아이디 좋아요 수)
 
 		feeds.forEach(feed -> {
 			long daysSincePosted = ChronoUnit.DAYS.between(feed.getCreatedAt(), currentDate);
 			int weight = (daysSincePosted <= 7) ? (8 - (int)daysSincePosted) : 1;
-			long commentCount = commentCounts.getOrDefault(feed.getFeedId(), 0L);
-			long likeCount = likeCounts.getOrDefault(feed.getFeedId(), 0L);
+			long commentCount = commentCounts.getOrDefault(feed.getFeedId(), 0L); // map 조회로 변경 예정
+			long likeCount = likeCounts.getOrDefault(feed.getFeedId(), 0L); // map 조회로 변경 예정
 			double popularityScore = calculatePopularityScore(feed.getViews(), commentCount, likeCount, weight);
 			feed.updatePopularityScore(popularityScore);
 		});
 
-		feedRepository.saveAll(feeds);
+		feedRepository.saveAll(feeds); // 제외
 
 		List<Feed> top100Feeds = feeds.stream()
 			.sorted(Comparator.comparingDouble(Feed::getPopularityScore).reversed())
 			.limit(100)
 			.toList();
-
-		return top100Feeds.stream()
+		//-----------------------------
+		return top100Feeds.stream() // 조회시 캐시 가져와서 조회
 			.limit(limit)
 			.map(feed -> {
 				long commentCount = commentCounts.getOrDefault(feed.getFeedId(), 0L);
@@ -202,7 +205,7 @@ public class FeedService {
 	}
 
 	private double calculatePopularityScore(int views, long commentCount, long likeCount, int weight) {
-		double popularityScore = (views * 0.2 + commentCount * 0.5 + likeCount * 0.3) * weight;
+		double popularityScore = (views * 0.2 + commentCount * 0.5 + likeCount * 0.3) * weight; // 
 
 		String formattedScore = String.format("%.2f", popularityScore);
 		return Double.parseDouble(formattedScore);

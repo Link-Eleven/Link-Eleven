@@ -65,10 +65,13 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 
 		List<FeedSearchResponseDto> dtoResults = query
 			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
+			.limit(pageable.getPageSize() + 1)
 			.fetch();
 
-		boolean hasNext = dtoResults.size() > pageable.getPageSize() + 1;
+		boolean hasNext = dtoResults.size() > pageable.getPageSize();
+		if (hasNext) {
+			dtoResults.remove(dtoResults.size() -1);
+		}
 
 		return new SliceImpl<>(dtoResults, pageable, hasNext);
 	}

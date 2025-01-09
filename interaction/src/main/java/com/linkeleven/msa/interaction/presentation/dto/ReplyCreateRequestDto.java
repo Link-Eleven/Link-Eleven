@@ -10,4 +10,6 @@ public class ReplyCreateRequestDto {
 	@ValidateContent
 	private String Content;
 
+	private Long authorId;
+
 }

@@ -80,7 +80,8 @@ public class FeedService {
 
 		Feed feed = findByIdAndDeletedAt(feedId);
 
-		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER")) {
+
+		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER") ) {
 			throw new CustomException(ErrorCode.NO_UPDATE_PERMISSION);
 		}
 

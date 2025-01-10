@@ -17,13 +17,11 @@ public class JpaAuditorAware implements AuditorAware<Long> {
 	@Override
 	public Optional<Long> getCurrentAuditor() {
 		String userIdStr = request.getHeader("X-User-Id");
-		if (userIdStr != null) {
-			try {
-				return Optional.of(Long.parseLong(userIdStr));
-			} catch (NumberFormatException e) {
-				return Optional.empty();
-			}
+
+		if(userIdStr != null) {
+			return Optional.of(Long.parseLong(userIdStr));
 		}
+
 		return Optional.empty();
 	}
 }

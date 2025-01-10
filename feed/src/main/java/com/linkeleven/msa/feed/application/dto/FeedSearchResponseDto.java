@@ -4,11 +4,15 @@ import com.linkeleven.msa.feed.domain.enums.Region;
 import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.model.Feed;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FeedSearchResponseDto {
 	private Long feedId;
 	private String title;

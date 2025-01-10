@@ -49,30 +49,29 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 		if (searchRequestDto.getCategory() != null) {
 			builder.and(categoryEq(searchRequestDto.getCategory()));
 		}
-
-		JPQLQuery<FeedSearchResponseDto> query = queryFactory.select(
-				Projections.constructor(FeedSearchResponseDto.class,
-					feed.feedId,
-					feed.title,
-					feed.content,
-					feed.category,
-					feed.region
-				)
+		List<FeedSearchResponseDto> feedList = queryFactory.query()
+			.select(
+			Projections.constructor(FeedSearchResponseDto.class,
+				feed.feedId,
+				feed.title,
+				feed.content,
+				feed.category,
+				feed.region
 			)
-			.from(feed)
-			.where(builder)
-			.orderBy(feed.createdAt.desc());
-
-		List<FeedSearchResponseDto> dtoResults = query
-			.limit(pageable.getPageSize() + 1)
+		)
+		.from(feed)
+		.where(builder)
+		.orderBy(feed.createdAt.desc())
+		.limit(pageable.getPageSize() + 1)
 			.fetch();
 
-		boolean hasNext = dtoResults.size() > pageable.getPageSize();
+
+		boolean hasNext = feedList.size() > pageable.getPageSize();
 		if (hasNext) {
-			dtoResults.remove(dtoResults.size() - 1);
+			feedList.remove(feedList.size() - 1);
 		}
 
-		return new SliceImpl<>(dtoResults, pageable, hasNext);
+		return new SliceImpl<>(feedList, pageable, hasNext);
 	}
 
 	private BooleanExpression titleContains(String title) {

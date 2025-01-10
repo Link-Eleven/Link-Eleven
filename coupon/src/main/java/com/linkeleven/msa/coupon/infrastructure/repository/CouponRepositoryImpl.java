@@ -46,10 +46,8 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 				coupon.validTo,
 				queryFactory.select(issuedCoupon.count())
 					.from(issuedCoupon)
-					.where(issuedCoupon.couponId.eq(coupon.couponId)),
-				queryFactory.select(issuedCoupon.count())
-					.from(issuedCoupon)
-					.where(issuedCoupon.couponId.eq(coupon.couponId))))
+					.where(issuedCoupon.couponId.eq(coupon.couponId))
+			))
 			.from(coupon)
 			.join(coupon.policies, couponPolicy)
 			.where(
@@ -68,7 +66,8 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 				coupon.validTo)
 			.fetch();
 
-		long total = queryFactory.selectFrom(coupon)
+		Long total = queryFactory.select(coupon.count())
+			.from(coupon)
 			.join(coupon.policies, couponPolicy)
 			.where(
 				createdByCondition,
@@ -76,7 +75,9 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 				feedIdEq(feedId),
 				validFromGoe(validFrom),
 				validToLoe(validTo))
-			.fetchCount();
+			.fetchOne();
+
+		total = total != null ? total : 0L;
 
 		return new PageImpl<>(content, pageable, total);
 	}

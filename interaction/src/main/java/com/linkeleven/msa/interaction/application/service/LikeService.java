@@ -2,12 +2,14 @@ package com.linkeleven.msa.interaction.application.service;
 
 import org.springframework.stereotype.Service;
 
+import com.linkeleven.msa.interaction.application.dto.external.UserInfoResponseDto;
 import com.linkeleven.msa.interaction.application.service.messaging.OutboxService;
 import com.linkeleven.msa.interaction.domain.model.entity.Like;
 import com.linkeleven.msa.interaction.domain.model.enums.ContentType;
 import com.linkeleven.msa.interaction.domain.model.vo.Target;
 import com.linkeleven.msa.interaction.domain.repository.LikeRepository;
 import com.linkeleven.msa.interaction.domain.service.ValidationService;
+import com.linkeleven.msa.interaction.infrastructure.client.AuthClient;
 import com.linkeleven.msa.interaction.infrastructure.client.FeedClient;
 import com.linkeleven.msa.interaction.libs.exception.CustomException;
 import com.linkeleven.msa.interaction.libs.exception.ErrorCode;
@@ -24,10 +26,12 @@ public class LikeService {
 	private final ValidationService validationService;
 	private final OutboxService outboxService;
 	private final FeedClient feedClient;
+	private final AuthClient authClient;
 
 	@Transactional
 	public void createLike(Long userId, Long targetId, ContentType contentType, LikeRequestDto requestDto) {
 		checkLogIn(userId);
+		UserInfoResponseDto userInfo = getUsername(userId);
 		checkAlreadyLike(userId, targetId);
 		validateTarget(targetId, requestDto.getTargetAuthorId(), contentType);
 
@@ -38,7 +42,7 @@ public class LikeService {
 		String lowerCaseContentType = contentType.name().toLowerCase();
 
 		outboxService.saveLikeCreatedEvent(targetId, requestDto.getTargetAuthorId(),
-			lowerCaseContentType, userId,
+			lowerCaseContentType, userId, userInfo.getUsername(),
 			like.getCreatedAt().toString(),"like_created");
 	}
 
@@ -94,4 +98,9 @@ public class LikeService {
 			throw new CustomException(ErrorCode.INVALID_USERID);
 		}
 	}
+
+	private UserInfoResponseDto getUsername(Long userId) {
+		return authClient.getUsername(userId);
+	}
+
 }

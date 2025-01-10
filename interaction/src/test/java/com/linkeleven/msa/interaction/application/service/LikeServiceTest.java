@@ -9,14 +9,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.linkeleven.msa.interaction.application.dto.external.UserInfoResponseDto;
 import com.linkeleven.msa.interaction.domain.model.enums.ContentType;
 import com.linkeleven.msa.interaction.domain.repository.LikeRepository;
 import com.linkeleven.msa.interaction.domain.service.ValidationService;
+import com.linkeleven.msa.interaction.infrastructure.client.AuthClient;
 import com.linkeleven.msa.interaction.infrastructure.client.FeedClient;
 import com.linkeleven.msa.interaction.presentation.dto.LikeRequestDto;
 
@@ -36,6 +39,9 @@ class LikeServiceTest {
 	@MockitoBean
 	private FeedClient feedClient;
 
+	@MockitoBean
+	private AuthClient authClient;
+
 	private Long userId;
 	private Long targetFeedId;
 	private Long targetCommentId;
@@ -50,6 +56,9 @@ class LikeServiceTest {
 		Long targetAuthorId = 9L;
 
 		when(feedClient.checkFeedExists(100L, 9L)).thenReturn(true);
+
+		UserInfoResponseDto userInfo = new UserInfoResponseDto("username");
+		Mockito.when(authClient.getUsername(1L)).thenReturn(userInfo);
 		when(validationService.existsComment(targetCommentId, 9L)).thenReturn(true);
 		when(validationService.existsReply(targetReplyId, 9L)).thenReturn(true);
 	}

@@ -59,7 +59,7 @@ public class OutboxService {
 	}
 
 	public void saveLikeCreatedEvent(Long targetId, Long targetAuthorId, String contentType, Long userId,
-		String likeTime, String eventType) {
+		String username, String likeTime, String eventType) {
 		String topic = generateTopicName(contentType, eventType);
 		LikeEvent likeEvent = LikeEvent.newBuilder()
 			.setEventType(topic)
@@ -67,6 +67,7 @@ public class OutboxService {
 			.setTargetAuthorId(targetAuthorId)
 			.setContentType(contentType)
 			.setUserId(userId)
+			.setUsername(username)
 			.setLikeTime(likeTime)
 			.build();
 

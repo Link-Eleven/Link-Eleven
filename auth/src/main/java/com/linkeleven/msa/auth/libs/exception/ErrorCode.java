@@ -34,6 +34,7 @@ public enum ErrorCode {
 	/*  409 CONFLICT : Resource 중복  */
 	USERNAME_ALREADY_EXISTS(409, "이미 존재하는 사용자 이름입니다."),
 	ALREADY_FOLLOWING(409,"이미 팔로잉한 유저입니다."),
+	ALREADY_UNFOLLOWING(409,"이미 팔로잉을 삭제한 유저입니다."),
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
 	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다.");

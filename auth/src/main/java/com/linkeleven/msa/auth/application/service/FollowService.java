@@ -40,6 +40,17 @@ public class FollowService {
 		followRepository.save(Follow.createFollow(user, followingUser));
 		return FollowingUsernameResponseDto.from(followingUser.getUsername());
 	}
+	@Transactional
+	public void deleteFollowing(Long userId, Long followingId) {
+		Follow follow = deletefollow(userId, followingId);
+		follow.deleteUser(userId);
+	}
+
+	@Transactional
+	public void deleteFollower(Long followerId, Long userId) {
+		Follow follow = deletefollow(followerId, userId);
+		follow.deleteUser(userId);
+	}
 
 	private boolean validateFollowing(User user, User following) {
 		return followRepository.existsByFollowerAndFollowing(user, following);
@@ -65,4 +76,19 @@ public class FollowService {
 		}
 	}
 
+	private Follow deletefollow(Long followerId, Long followingId) {
+		validateFollowingSelf(followerId,followingId);
+
+		User follwer = validateUserById(followerId);
+		User following = validateUserById(followingId);
+
+		if (!validateFollowing(follwer, following)) {
+			new CustomException(ErrorCode.NOT_FOLLOWING_USER);
+		}
+		Follow follow = validateFollowByUser(follwer, following);
+		if (follow.getDeletedAt() != null) {
+			new CustomException(ErrorCode.ALREADY_UNFOLLOWING);
+		}
+		return follow;
+	}
 }

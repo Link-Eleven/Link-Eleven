@@ -9,6 +9,7 @@ public enum ErrorCode {
 
 	/*  400 BAD_REQUEST : 잘못된 요청  */
 	ILLEGAL_ARGUMENT_ERROR(400, "잘못된 파라미터 전달"),
+	CANNOT_FOLLOWING_SELF(400,"유저 본인을 팔로잉 할 수 없습니다."),
 
 
 	/*  401 UNAUTHORIZED : 인증 안됨  */

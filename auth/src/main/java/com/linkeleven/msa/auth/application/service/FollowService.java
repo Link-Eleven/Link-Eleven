@@ -22,6 +22,8 @@ public class FollowService {
 
 	@Transactional
 	public FollowingUsernameResponseDto createFollow(FollowingUsernameRequestDto requestDto, String userId) {
+		validateFollowingSelf(Long.valueOf(userId),requestDto.getUserId());
+
 		User user = validateUserById(Long.valueOf(userId));
 		User followingUser = validateUserById(requestDto.getUserId());
 
@@ -55,6 +57,12 @@ public class FollowService {
 			throw new CustomException(ErrorCode.USER_NOT_FOUND);
 		}
 		return user;
+	}
+
+	private void validateFollowingSelf(Long followerId,Long followingId) {
+		if(followerId.equals(followingId)) {
+			new CustomException(ErrorCode.CANNOT_FOLLOWING_SELF);
+		}
 	}
 
 }

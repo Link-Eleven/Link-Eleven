@@ -15,10 +15,15 @@ spring:
         format_sql: true
     open-in-view: false
 
-    eureka:
-      client:
-        service-url:
-          defaultZone: ${SERVER_URL}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${SERVER_URL}
 
 server:
   port: ${NOTIFICATION_PORT}

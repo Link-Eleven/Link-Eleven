@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.linkeleven.msa.interaction.application.service.LikeService;
 import com.linkeleven.msa.interaction.domain.model.enums.ContentType;
 import com.linkeleven.msa.interaction.libs.dto.SuccessResponseDto;
+import com.linkeleven.msa.interaction.presentation.dto.LikeRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,9 +27,10 @@ public class LikeController {
 	@PostMapping("/feeds/{feedId}")
 	public ResponseEntity<SuccessResponseDto<Void>> createFeedLike(
 		@RequestHeader("X-User-Id") Long userId,
-		@PathVariable Long feedId
+		@PathVariable Long feedId,
+		@RequestBody LikeRequestDto requestDto
 	) {
-		likeService.createLike(userId, feedId, ContentType.FEED);
+		likeService.createLike(userId, feedId, ContentType.FEED, requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(SuccessResponseDto.success("게시글 좋아요."));
 	}
@@ -35,9 +38,10 @@ public class LikeController {
 	@DeleteMapping("/feeds/{feedId}")
 	public ResponseEntity<SuccessResponseDto<Void>> deleteFeedLike(
 		@RequestHeader("X-User-Id") Long userId,
-		@PathVariable Long feedId
+		@PathVariable Long feedId,
+		@RequestBody LikeRequestDto requestDto
 	) {
-		likeService.cancelLike(userId, feedId, ContentType.FEED);
+		likeService.cancelLike(userId, feedId, ContentType.FEED, requestDto);
 		return ResponseEntity.ok()
 			.body(SuccessResponseDto.success("게시글 좋아요 취소."));
 	}
@@ -45,9 +49,10 @@ public class LikeController {
 	@PostMapping("/comments/{commentId}")
 	public ResponseEntity<SuccessResponseDto<Void>> createCommentLike(
 		@RequestHeader("X-User-Id") Long userId,
-		@PathVariable Long commentId
+		@PathVariable Long commentId,
+		@RequestBody LikeRequestDto requestDto
 	) {
-		likeService.createLike(userId, commentId, ContentType.COMMENT);
+		likeService.createLike(userId, commentId, ContentType.COMMENT, requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(SuccessResponseDto.success("댓글 좋아요."));
 	}
@@ -55,9 +60,10 @@ public class LikeController {
 	@DeleteMapping("/comments/{commentId}")
 	public ResponseEntity<SuccessResponseDto<Void>> deleteCommentLike(
 		@RequestHeader("X-User-Id") Long userId,
-		@PathVariable Long commentId
+		@PathVariable Long commentId,
+		@RequestBody LikeRequestDto requestDto
 	) {
-		likeService.cancelLike(userId, commentId, ContentType.COMMENT);
+		likeService.cancelLike(userId, commentId, ContentType.COMMENT, requestDto);
 		return ResponseEntity.ok()
 			.body(SuccessResponseDto.success("댓글 좋아요 취소."));
 	}
@@ -65,9 +71,10 @@ public class LikeController {
 	@PostMapping("/replies/{replyId}")
 	public ResponseEntity<SuccessResponseDto<Void>> createReplyLike(
 		@RequestHeader("X-User-Id") Long userId,
-		@PathVariable Long replyId
+		@PathVariable Long replyId,
+		@RequestBody LikeRequestDto requestDto
 	) {
-		likeService.createLike(userId, replyId, ContentType.REPLY);
+		likeService.createLike(userId, replyId, ContentType.REPLY, requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(SuccessResponseDto.success("대댓글 좋아요."));
 	}
@@ -75,9 +82,10 @@ public class LikeController {
 	@DeleteMapping("/replies/{replyId}")
 	public ResponseEntity<SuccessResponseDto<Void>> deleteReplyLike(
 		@RequestHeader("X-User-Id") Long userId,
-		@PathVariable Long replyId
+		@PathVariable Long replyId,
+		@RequestBody LikeRequestDto requestDto
 	) {
-		likeService.cancelLike(userId, replyId, ContentType.REPLY);
+		likeService.cancelLike(userId, replyId, ContentType.REPLY, requestDto);
 		return ResponseEntity.ok()
 			.body(SuccessResponseDto.success("대댓글 좋아요 취소."));
 	}

@@ -1,6 +1,7 @@
+---
 spring:
   application:
-    name: interaction
+    name: interaction-service
 
   datasource:
     url: ${INTERACTION_DB_URL}
@@ -18,15 +19,12 @@ spring:
         format_sql: true
     open-in-view: false
 
-    eureka:
-      client:
-        service-url:
-          defaultZone: http://localhost:19090/eureka/
-
   kafka:
     bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
     properties:
       schema.registry.url: http://localhost:28081
+      retry:
+        enable: true
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
@@ -37,6 +35,15 @@ spring:
       value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
       properties:
         specific.avro.reader: true
+    listener:
+      try:
+        topic:
+          enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
 
 server:
   port: 19094

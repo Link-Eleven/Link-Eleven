@@ -51,6 +51,8 @@ public enum ErrorCode {
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
 	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다."),
+	INTERNAL_SERVER_ERROR_TO_SERIALIZE(500, "내부 서버 에러. 직렬화 실패"),
+	INTERNAL_SERVER_ERROR_TO_DESERIALIZE(500, "내부 서버 에러. 역직렬화 실패"),
 	INTERRUPTED_ERROR(500, " Interrupted 에러 발생."),
 
 	/*  502 BAD_GATEWAY  연결 실패   */

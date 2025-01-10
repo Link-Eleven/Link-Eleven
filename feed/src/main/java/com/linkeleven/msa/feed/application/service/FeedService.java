@@ -19,6 +19,7 @@ import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
+import com.linkeleven.msa.feed.application.dto.external.PopularFeedResponseDto;
 import com.linkeleven.msa.feed.application.dto.external.UserInfoResponseDto;
 import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.model.Feed;
@@ -113,7 +114,7 @@ public class FeedService {
 		fileService.deleteFiles(feed, userId);
 
 		// 쿠폰 삭제 요청
-		// couponClient.deleteCoupons(feedId);
+		// couponClient.deleteCoupons(feedId, userId, userRole);
 
 	}
 
@@ -182,6 +183,12 @@ public class FeedService {
 		// 상위 limit 개수만 조회하여 응답 DTO로 변환
 		return top100Feeds.stream()
 			.limit(limit)
+			.collect(Collectors.toList());
+	}
+
+	public List<PopularFeedResponseDto> getPopularFeedForCoupon(int limit) {
+		return getTopFeed(limit).stream()
+			.map(feed -> new PopularFeedResponseDto(feed.getFeedId(), feed.getUserId()))
 			.collect(Collectors.toList());
 	}
 

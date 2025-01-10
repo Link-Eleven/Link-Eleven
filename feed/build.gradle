@@ -28,13 +28,18 @@ ext {
 }
 
 dependencies {
+    // QueryDsl
+    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
 
     //S3
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.770'
-//    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
     //  Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'

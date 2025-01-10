@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class FeedTopResponseDto {
 
 	private Long feedId;
+	private Long userId;
 	private String title;
 	private long commentCount;
 	private long likeCount;
@@ -22,6 +23,7 @@ public class FeedTopResponseDto {
 	public static FeedTopResponseDto of(Feed feed, long commentCount, long likeCount) {
 		return FeedTopResponseDto.builder()
 			.feedId(feed.getFeedId())
+			.userId(feed.getUserId())
 			.title(feed.getTitle())
 			.commentCount(commentCount)
 			.likeCount(likeCount)

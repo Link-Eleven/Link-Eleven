@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.interaction.application.dto.CommentQueryResponseDto;
-import com.linkeleven.msa.interaction.application.dto.PageResponseDto;
 import com.linkeleven.msa.interaction.application.service.CommentQueryService;
 import com.linkeleven.msa.interaction.libs.dto.SuccessResponseDto;
 import com.linkeleven.msa.interaction.presentation.enums.SortBy;
@@ -27,7 +26,7 @@ public class CommentQueryController {
 	private final CommentQueryService commentQueryService;
 
 	@GetMapping("/{feedId}")
-	public ResponseEntity<SuccessResponseDto<PageResponseDto<CommentQueryResponseDto>>> getCommentList(
+	public ResponseEntity<SuccessResponseDto<Slice<CommentQueryResponseDto>>> getCommentList(
 		@PathVariable Long feedId,
 		@RequestParam(required = false) Long cursorId,
 		@RequestParam(required = false) LocalDateTime cursorCreatedAt,
@@ -39,9 +38,7 @@ public class CommentQueryController {
 		Slice<CommentQueryResponseDto> slice = commentQueryService.getCommentsWithCursor(
 			feedId, cursorId, cursorCreatedAt, cursorLikeCount, pageSize, sortByEnum);
 
-		PageResponseDto<CommentQueryResponseDto> responseDto = PageResponseDto.from(slice);
-
 		return ResponseEntity.ok()
-			.body(SuccessResponseDto.success("조회 성공", responseDto));
+			.body(SuccessResponseDto.success("조회 성공", slice));
 	}
 }

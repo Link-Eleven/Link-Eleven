@@ -37,13 +37,15 @@ class CommentServiceTest {
 
 	private Long userId;
 	private Long feedId;
+	private Long feedAuthorId;
 
 	@BeforeEach
 	void setUp() {
 		userId = 1L;
 		feedId = 100L;
+		feedAuthorId = 9L;
 
-		Mockito.when(feedClient.checkFeedExists(100L)).thenReturn(true);
+		Mockito.when(feedClient.checkFeedExists(100L, 9L)).thenReturn(true);
 
 		UserInfoResponseDto userInfo = new UserInfoResponseDto("username");
 		Mockito.when(authClient.getUsername(1L)).thenReturn(userInfo);
@@ -56,6 +58,7 @@ class CommentServiceTest {
 		String content = "테스트";
 		CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
 		requestDto.setContent(content);
+		requestDto.setAuthorId(feedAuthorId);
 
 		CommentCreateResponseDto responseDto = commentService.createComment(userId, feedId, requestDto);
 
@@ -70,6 +73,7 @@ class CommentServiceTest {
 		String content = "테스트";
 		CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
 		requestDto.setContent(content);
+		requestDto.setAuthorId(feedAuthorId);
 		CommentCreateResponseDto responseDto = commentService.createComment(userId, feedId, requestDto);
 		Long commentId = responseDto.getCommentId();
 
@@ -89,6 +93,7 @@ class CommentServiceTest {
 		String content = "테스트";
 		CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
 		requestDto.setContent(content);
+		requestDto.setAuthorId(feedAuthorId);
 		CommentCreateResponseDto responseDto = commentService.createComment(userId, feedId, requestDto);
 		Long commentId = responseDto.getCommentId();
 

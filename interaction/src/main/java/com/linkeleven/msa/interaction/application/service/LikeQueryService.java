@@ -1,6 +1,11 @@
 package com.linkeleven.msa.interaction.application.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.interaction.application.dto.external.LikeCountResponseDto;
 import com.linkeleven.msa.interaction.domain.model.enums.ContentType;
@@ -14,10 +19,21 @@ public class LikeQueryService {
 
 	private final LikeRepository likeRepository;
 
-	public LikeCountResponseDto getLikeCount(Long feedId, ContentType type) {
-		Long count = likeRepository.countByTarget_TargetIdAndTarget_ContentType(feedId, type)
-			.orElseGet(() -> 0L);
+	@Transactional(readOnly = true)
+	public LikeCountResponseDto getLikeCount(List<Long> feedIdList, ContentType type) {
+		List<Object[]> resultList = likeRepository.countByTargetIdListAndTargetContentType(feedIdList, type);
+		Map<Long, Integer> likeCounts = new HashMap<>();
 
-		return new LikeCountResponseDto(count);
+		for (Long feedId : feedIdList) {
+			likeCounts.put(feedId, 0);
+		}
+
+		for (Object[] likeList : resultList) {
+			Long feedId = (Long)likeList[0];
+			Integer count = ((Long)likeList[1]).intValue();
+			likeCounts.put(feedId, count);
+		}
+
+		return new LikeCountResponseDto(likeCounts);
 	}
 }

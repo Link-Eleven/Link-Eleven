@@ -1,8 +1,9 @@
 package com.linkeleven.msa.interaction.presentation.controller.external;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.interaction.application.dto.external.CommentCountResponseDto;
@@ -12,15 +13,14 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/external/feeds/{feedId}/comments")
 public class ExtCommentController {
 
 	private final CommentQueryService commentQueryService;
 
-	@GetMapping
+	@GetMapping("/external/feeds/comments")
 	public CommentCountResponseDto getCommentCount(
-		@PathVariable Long feedId
+		@RequestParam("feedIdList") List<Long> feedIdList
 	) {
-		return commentQueryService.getCommentCount(feedId);
+		return commentQueryService.getCommentCount(feedIdList);
 	}
 }

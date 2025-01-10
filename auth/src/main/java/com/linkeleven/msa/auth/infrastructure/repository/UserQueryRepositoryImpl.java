@@ -10,6 +10,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import com.linkeleven.msa.auth.application.dto.UserQueryResponseDto;
+import com.linkeleven.msa.auth.domain.model.User;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -44,6 +45,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
 		return new SliceImpl<>(users, pageable, hasNext);
 	}
+
 	private BooleanExpression searchCondition(String username) {
 
 		BooleanExpression isNotDeleted = user.deletedBy.isNull();
@@ -53,5 +55,17 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 		}
 
 		return user.username.containsIgnoreCase(username).and(isNotDeleted);
+	}
+
+	@Override
+	public List<User> findAllUserInId(List<Long> userIdList) {
+		return queryFactory.query()
+			.select(user)
+			.from(user)
+			.where(
+				user.deletedBy.isNull(),
+				user.userId.in(userIdList)
+			)
+			.fetch();
 	}
 }

@@ -1,16 +1,24 @@
 package com.linkeleven.msa.auth.application.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.linkeleven.msa.auth.application.dto.KafkaUpdateUsernameDto;
+import com.linkeleven.msa.auth.application.dto.UserIdAndRoleResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserMyInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserRoleResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateAnonymousResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateCouponIssuedResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateUsernameResponseDto;
+import com.linkeleven.msa.auth.application.dto.UserValidateIdResponseDto;
 import com.linkeleven.msa.auth.domain.common.UserRole;
 import com.linkeleven.msa.auth.domain.model.User;
 import com.linkeleven.msa.auth.domain.repository.UserRepository;
@@ -37,6 +45,30 @@ public class UserService {
 		User user=validateUserById(userId);
 		return UserInfoResponseDto.from(user.getUsername());
 	}
+	public List<UserIdAndRoleResponseDto> getUserRoleList(List<Long> userIdList) {
+		List<UserIdAndRoleResponseDto> responseDtoList =new ArrayList<>();
+
+		List<User> userList = userRepository.findAllUserInId(userIdList);
+		// userIdList ->인기 게시글 1, 2, 3 등 작성자
+		// -> where in을 사용 매치 안되면 안나올텐데
+		// 그러면 중간에 탈퇴한 사람 있으면 우짬? -> 빼고 보내주자
+		Map<Long, User> userMap = userList.stream()
+			.collect(Collectors.toMap(User::getUserId, Function.identity()));
+
+		for (Long userId : userIdList) {
+			if(userMap.containsKey(userId)){
+				User user=userMap.get(userId);
+				responseDtoList.add(UserIdAndRoleResponseDto.of(user.getUserId(),user.getRole().toString()));
+			}
+		}
+		return responseDtoList;
+	}
+
+	public UserValidateIdResponseDto getValidateUserId(Long userId) {
+		User user=validateUserById(userId);
+		return UserValidateIdResponseDto.from(user.getUserId());
+	}
+
 	public UserMyInfoResponseDto getUserMyInfo(String userId) {
 		User user=validateUserById(Long.parseLong(userId));
 		return UserMyInfoResponseDto.from(user);
@@ -96,7 +128,7 @@ public class UserService {
 	}
 
 	@Transactional
-	public 	void deleteUser(String headerId,String role, Long userId) {
+	public void deleteUser(String headerId,String role, Long userId) {
 		User user=validateSameUser(Long.valueOf(headerId),userId,role);
 		user.deleteUser(user.getUserId());
 	}
@@ -164,5 +196,6 @@ public class UserService {
 			}
 		);
 	}
+
 
 }

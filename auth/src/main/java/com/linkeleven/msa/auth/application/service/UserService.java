@@ -96,7 +96,7 @@ public class UserService {
 	}
 
 	@Transactional
-	public 	void deleteUser(String headerId,String role, Long userId) {
+	public void deleteUser(String headerId,String role, Long userId) {
 		User user=validateSameUser(Long.valueOf(headerId),userId,role);
 		user.deleteUser(user.getUserId());
 	}

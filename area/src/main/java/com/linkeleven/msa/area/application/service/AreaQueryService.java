@@ -5,8 +5,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.linkeleven.msa.area.application.dto.AreaSearchResponseDto;
+import com.linkeleven.msa.area.application.dto.LocationSearchDetailResponseDto;
 import com.linkeleven.msa.area.application.dto.LocationSearchResponseDto;
 import com.linkeleven.msa.area.application.dto.message.PlaceMessageDto;
 import com.linkeleven.msa.area.application.service.message.PlaceProduceService;
@@ -21,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AreaService {
+public class AreaQueryService {
 	private final AreaRepository areaRepository;
 	private final LocationQueryService locationQueryService;
 	private final PlaceProduceService placeProduceService;
@@ -31,7 +37,6 @@ public class AreaService {
 		LocationSearchRequestDto locationSearchRequestDto
 	){
 
-		// TODO: 2025-01-03 유저 로그인 인증 추가 예정
 		Area area = areaRepository.findById(areaId).orElseThrow(
 			() -> new CustomException(ErrorCode.NOT_FOUND_AREA)
 		);
@@ -67,5 +72,19 @@ public class AreaService {
 			.filter(Objects::nonNull)
 			.filter(s -> !s.isEmpty())
 			.collect(Collectors.joining(" "));
+	}
+
+	@Transactional(readOnly = true)
+	public Page<AreaSearchResponseDto> searchAreaByKeyword(String keyword, Pageable pageable){
+		// Pageable 여러 API 사용한다면 PageableHandlerMethodArgumentResolver 사용
+
+		int pageSize = Math.min(pageable.getPageSize(), 10);
+		pageable = PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
+		return areaRepository.findAllAreaInKeyword(keyword, pageable);
+	}
+
+	public LocationSearchDetailResponseDto searchDetailLocation(Long locationId){
+
+		return locationQueryService.searchDetailLocation(locationId);
 	}
 }

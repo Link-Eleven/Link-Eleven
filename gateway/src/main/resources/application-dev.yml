@@ -19,7 +19,7 @@ spring:
         - id: area-service
           uri: lb://area-service
           predicates:
-            - Path=/api/area/**
+            - Path=/api/areas/**
 
         - id: coupon-service
           uri: lb://coupon-service

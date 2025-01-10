@@ -20,7 +20,7 @@ import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.dto.external.PopularFeedResponseDto;
-import com.linkeleven.msa.feed.application.dto.external.UserInfoResponseDto;
+import com.linkeleven.msa.feed.application.dto.external.UserValidateIdResponseDto;
 import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.model.Feed;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
@@ -50,9 +50,9 @@ public class FeedService {
 	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files,
 		Long userId) {
 
-		// 유저 정보 가져오기 및 검증
-		// UserInfoResponseDto userInfo = authClient.getUsername(userId);
-		// validateUser(userId, userInfo);
+		// 유저 정보 검증
+		UserValidateIdResponseDto userInfo = getValidateUserId(userId);
+		validateUser(userId, userInfo);
 
 		Feed feed = Feed.of(
 			userId,
@@ -73,10 +73,6 @@ public class FeedService {
 	@Transactional
 	public FeedUpdateResponseDto updateFeed(Long feedId, FeedUpdateRequestDto feedUpdateRequestDto,
 		List<MultipartFile> files, Long userId, String userRole) {
-
-		// 유저 정보 가져오기 및 검증
-		// UserInfoResponseDto userInfo = authClient.getUsername(userId);
-		// validateUser(userId, userInfo);
 
 		Feed feed = findByIdAndDeletedAt(feedId);
 
@@ -100,10 +96,6 @@ public class FeedService {
 
 	@Transactional
 	public void deleteFeed(Long feedId, Long userId, String userRole) {
-
-		// 유저 정보 가져오기 및 검증
-		// UserInfoResponseDto userInfo = authClient.getUsername(userId);
-		// validateUser(userId, userInfo);
 
 		Feed feed = findByIdAndDeletedAt(feedId);
 
@@ -219,11 +211,13 @@ public class FeedService {
 			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
 	}
 
-	private void validateUser(Long headerUserId, UserInfoResponseDto userInfo) {
-		if (userInfo == null || userInfo.getUserId() == null || !headerUserId.equals(userInfo.getUserId())) {
+	private void validateUser(Long userId, UserValidateIdResponseDto userInfo) {
+		if (userInfo == null || !userId.equals(userInfo.getUserId())) {
 			throw new CustomException(ErrorCode.INVALID_USER);
 		}
 	}
+
+	private UserValidateIdResponseDto getValidateUserId(Long userId) { return authClient.getValidateUserId(userId); }
 
 	public boolean checkFeedExists(Long feedId, Long userId) {
 		return feedRepository.existsByFeedIdAndUserId(feedId, userId);

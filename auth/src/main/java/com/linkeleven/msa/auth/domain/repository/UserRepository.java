@@ -1,5 +1,6 @@
 package com.linkeleven.msa.auth.domain.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import com.linkeleven.msa.auth.domain.model.User;
 public interface UserRepository {
 
 	Optional<User> findById(Long userId);
+
 	Optional<User> findByUsername(String username);
 
 	boolean existsByUsername(String username);
@@ -18,4 +20,6 @@ public interface UserRepository {
 	User save(User user);
 
 	Slice<UserQueryResponseDto> findUserByUsername(String username, Pageable pageable);
+
+	List<User> findAllUserInId(List<Long> userIdList);
 }

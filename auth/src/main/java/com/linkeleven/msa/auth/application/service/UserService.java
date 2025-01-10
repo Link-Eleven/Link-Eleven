@@ -2,6 +2,9 @@ package com.linkeleven.msa.auth.application.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -45,9 +48,18 @@ public class UserService {
 	public List<UserIdAndRoleResponseDto> getUserRoleList(List<Long> userIdList) {
 		List<UserIdAndRoleResponseDto> responseDtoList =new ArrayList<>();
 
+		List<User> userList = userRepository.findAllUserInId(userIdList);
+		// userIdList ->인기 게시글 1, 2, 3 등 작성자
+		// -> where in을 사용 매치 안되면 안나올텐데
+		// 그러면 중간에 탈퇴한 사람 있으면 우짬? -> 빼고 보내주자
+		Map<Long, User> userMap = userList.stream()
+			.collect(Collectors.toMap(User::getUserId, Function.identity()));
+
 		for (Long userId : userIdList) {
-			User user=validateUserById(userId);
-			responseDtoList.add(UserIdAndRoleResponseDto.of(user.getUserId(),user.getRole().toString()));
+			if(userMap.containsKey(userId)){
+				User user=userMap.get(userId);
+				responseDtoList.add(UserIdAndRoleResponseDto.of(user.getUserId(),user.getRole().toString()));
+			}
 		}
 		return responseDtoList;
 	}

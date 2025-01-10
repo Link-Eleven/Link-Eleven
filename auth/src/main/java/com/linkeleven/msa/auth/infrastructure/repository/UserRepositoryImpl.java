@@ -1,5 +1,6 @@
 package com.linkeleven.msa.auth.infrastructure.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -38,6 +39,11 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public Slice<UserQueryResponseDto> findUserByUsername(String username, Pageable pageable){
 		return userQueryRepository.findUserByUsername(username, pageable);
+	}
+
+	@Override
+	public List<User> findAllUserInId(List<Long> userIdList){
+		return userQueryRepository.findAllUserInId(userIdList);
 	}
 
 }

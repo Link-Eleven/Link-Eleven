@@ -38,7 +38,7 @@ public class UserExternalController {
 		return userService.getUserRoleList(userIdList);
 	}
 
-	@GetMapping("/{userId}/validaete")
+	@GetMapping("/{userId}/validate")
 	UserValidateIdResponseDto getValidateUserId(@PathVariable Long userId){
 		return userService.getValidateUserId(userId);
 	}

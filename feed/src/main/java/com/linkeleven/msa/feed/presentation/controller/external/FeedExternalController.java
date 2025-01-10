@@ -20,7 +20,7 @@ public class FeedExternalController {
 	@GetMapping("/external/feeds/{feedId}/users/{userId}")
 	public boolean checkFeedExists(@PathVariable Long feedId, @PathVariable Long userId) {
 		return feedService.checkFeedExists(feedId, userId);
-	};
+	}
 
 	@GetMapping("/external/feeds/popular")
 	public List<PopularFeedResponseDto> getPopularFeeds() {

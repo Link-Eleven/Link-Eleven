@@ -15,6 +15,7 @@ import com.linkeleven.msa.auth.application.dto.UserRoleResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateAnonymousResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateCouponIssuedResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserUpdateUsernameResponseDto;
+import com.linkeleven.msa.auth.application.dto.UserValidateIdResponseDto;
 import com.linkeleven.msa.auth.domain.common.UserRole;
 import com.linkeleven.msa.auth.domain.model.User;
 import com.linkeleven.msa.auth.domain.repository.UserRepository;
@@ -49,6 +50,11 @@ public class UserService {
 			responseDtoList.add(UserIdAndRoleResponseDto.of(user.getUserId(),user.getRole().toString()));
 		}
 		return responseDtoList;
+	}
+
+	public UserValidateIdResponseDto getValidateUserId(Long userId) {
+		User user=validateUserById(userId);
+		return UserValidateIdResponseDto.from(user.getUserId());
 	}
 
 	public UserMyInfoResponseDto getUserMyInfo(String userId) {

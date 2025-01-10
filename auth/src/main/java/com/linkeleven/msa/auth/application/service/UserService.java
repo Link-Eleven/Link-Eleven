@@ -1,10 +1,14 @@
 package com.linkeleven.msa.auth.application.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.linkeleven.msa.auth.application.dto.KafkaUpdateUsernameDto;
+import com.linkeleven.msa.auth.application.dto.UserIdAndRoleResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserMyInfoResponseDto;
 import com.linkeleven.msa.auth.application.dto.UserRoleResponseDto;
@@ -37,6 +41,16 @@ public class UserService {
 		User user=validateUserById(userId);
 		return UserInfoResponseDto.from(user.getUsername());
 	}
+	public List<UserIdAndRoleResponseDto> getUserRoleList(List<Long> userIdList) {
+		List<UserIdAndRoleResponseDto> responseDtoList =new ArrayList<>();
+
+		for (Long userId : userIdList) {
+			User user=validateUserById(userId);
+			responseDtoList.add(UserIdAndRoleResponseDto.of(user.getUserId(),user.getRole().toString()));
+		}
+		return responseDtoList;
+	}
+
 	public UserMyInfoResponseDto getUserMyInfo(String userId) {
 		User user=validateUserById(Long.parseLong(userId));
 		return UserMyInfoResponseDto.from(user);
@@ -164,5 +178,6 @@ public class UserService {
 			}
 		);
 	}
+
 
 }

@@ -1,5 +1,7 @@
 package com.linkeleven.msa.feed.application.dto.external;
 
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LikeCountResponseDto {
 
-	private Long count;
+	private Map<Long, Integer> count;
 }

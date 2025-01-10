@@ -138,8 +138,8 @@ public class FeedService {
 
 		// feed Id 별 댓글 및 좋아요 수 조회
 		List<Long> feedIdList = feeds.stream().map(Feed::getFeedId).toList();
-		Map<Long, Integer> commentCounts = interactionClient.getCommentCounts(feedIdList);
-		Map<Long, Integer> likeCounts = interactionClient.getLikeCounts(feedIdList);
+		Map<Long, Integer> commentCounts = interactionClient.getCommentCount(feedIdList).getCount();
+		Map<Long, Integer> likeCounts = interactionClient.getLikeCount(feedIdList).getCount();
 
 		// 각 피드의 인기도 점수 계산
 		feeds.forEach(feed -> {

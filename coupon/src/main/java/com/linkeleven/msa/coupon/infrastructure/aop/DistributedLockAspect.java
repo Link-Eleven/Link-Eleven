@@ -9,6 +9,9 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
+import com.linkeleven.msa.coupon.libs.exception.CustomException;
+import com.linkeleven.msa.coupon.libs.exception.ErrorCode;
+
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -30,7 +33,7 @@ public class DistributedLockAspect {
 			boolean available = rLock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(),
 				distributedLock.timeUnit());
 			if (!available) {
-				throw new RuntimeException("Lock을 획득할 수 없습니다.");
+				throw new CustomException(ErrorCode.LOCK_ACQUISITION_FAILED);
 			}
 			return joinPoint.proceed();
 		} finally {

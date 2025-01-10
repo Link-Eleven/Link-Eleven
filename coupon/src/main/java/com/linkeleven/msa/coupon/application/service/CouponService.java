@@ -47,7 +47,8 @@ public class CouponService {
 		List<Coupon> expiredCoupons = couponRepository.findExpiredCoupons(currentTime);
 
 		for (Coupon coupon : expiredCoupons) {
-			couponPolicyRepository.updateCouponPolicyStatusToInactive(coupon.getCouponId());
+			couponPolicyRepository.updateCouponPolicyStatusToInactive(coupon.getCouponId(),
+				CouponPolicyStatus.INACTIVE);
 		}
 	}
 

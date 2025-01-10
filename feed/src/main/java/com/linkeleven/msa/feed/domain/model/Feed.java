@@ -95,4 +95,9 @@ public class Feed extends BaseTime {
 		this.setDeletedBy(userId);
 		this.files.forEach(file -> file.delete(userId));
 	}
+
+	public void setCreatedByAndUpdatedBy (Long userId) {
+		this.setCreatedBy(userId);
+		this.setUpdatedBy(userId);
+	}
 }

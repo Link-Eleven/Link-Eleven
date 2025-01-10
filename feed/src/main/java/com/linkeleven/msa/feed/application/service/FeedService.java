@@ -65,6 +65,8 @@ public class FeedService {
 
 		feed.getFiles().addAll(fileService.uploadFiles(files));
 
+		feed.setCreatedByAndUpdatedBy(userId);
+
 		Feed savedFeed = feedRepository.save(feed);
 
 		return FeedCreateResponseDto.from(savedFeed);
@@ -90,6 +92,8 @@ public class FeedService {
 		feed.getFiles().addAll(fileService.uploadFiles(files));
 
 		Feed updatedFeed = feedRepository.save(feed);
+
+		updatedFeed.setCreatedByAndUpdatedBy(userId);
 
 		return FeedUpdateResponseDto.from(updatedFeed);
 	}

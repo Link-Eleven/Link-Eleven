@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.auth.application.dto.UserQueryResponseDto;
-import com.linkeleven.msa.auth.domain.repository.UserRepositoryCustom;
+import com.linkeleven.msa.auth.domain.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserQueryService {
-	private final UserRepositoryCustom userRepository;
+	private final UserRepository userRepository;
 
 	public Slice<UserQueryResponseDto> getUsersByUsername(String username, Pageable pageable) {
 		return userRepository.findUserByUsername(username, pageable);

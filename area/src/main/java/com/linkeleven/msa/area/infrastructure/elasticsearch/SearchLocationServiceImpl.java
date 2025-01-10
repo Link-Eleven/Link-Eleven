@@ -11,11 +11,14 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
+import com.linkeleven.msa.area.application.dto.LocationSearchDetailResponseDto;
 import com.linkeleven.msa.area.application.dto.LocationSearchResponseDto;
 import com.linkeleven.msa.area.application.service.SearchLocationService;
 import com.linkeleven.msa.area.domain.common.CategoryType;
 import com.linkeleven.msa.area.domain.entity.Location;
 import com.linkeleven.msa.area.infrastructure.repository.LocationElasticSearchRepository;
+import com.linkeleven.msa.area.libs.exception.CustomException;
+import com.linkeleven.msa.area.libs.exception.ErrorCode;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
@@ -56,9 +59,33 @@ public class SearchLocationServiceImpl implements SearchLocationService {
 		SearchHits<SearchLocation> searchHits = elasticsearchOperations.search(query, SearchLocation.class);
 
 		return searchHits.getSearchHits().stream()
-			.map(hit -> toDto(hit.getContent()))
-			.collect(Collectors.toList());
+			.map(hit -> LocationSearchResponseDto.from(hit.getContent()))
+			.toList();
 	}
+
+	@Override
+	public LocationSearchDetailResponseDto searchLocation(Long locationId) {
+		BoolQuery.Builder boolQuery = QueryBuilders.bool();
+		boolQuery.filter(QueryBuilders.term(t -> t.field("location_id").value(locationId)));
+
+		NativeQuery query = NativeQuery.builder()
+			.withQuery(boolQuery.build()._toQuery())
+			.build();
+
+		log.info("Generated Query: {}", query.getQuery());
+
+		SearchHits<SearchLocation> searchHits = elasticsearchOperations.search(query, SearchLocation.class);
+
+		if (!searchHits.hasSearchHits()) {
+			throw new CustomException(ErrorCode.NOT_FOUND_ES_LOCATION);
+		}
+
+		SearchLocation location = searchHits.getSearchHit(0).getContent();
+
+		return LocationSearchDetailResponseDto.from(location);
+	}
+
+
 
 	@Override
 	public void create(List<Location> locationList, String keyword) {
@@ -84,19 +111,19 @@ public class SearchLocationServiceImpl implements SearchLocationService {
 		locationElasticSearchRepository.saveAll(searchLocationList);
 	}
 
+
+
 	// 기존에 있는 location 데이터 있는지 확인
 	private Map<Long, SearchLocation> findExistingDocs(List<Long> locationIdList) {
-		// List<Long>을 FieldValue 리스트로 변환
 		List<FieldValue> fieldValues = locationIdList.stream()
-			.map(FieldValue::of) // FieldValue.of를 사용하여 변환
+			.map(FieldValue::of)
 			.toList();
 
-		// TermsQueryField에 변환된 FieldValue 리스트 사용
 		TermsQueryField termsQueryField = new TermsQueryField.Builder()
 			.value(fieldValues)
 			.build();
 
-		// NativeQuery 생성
+
 		NativeQuery query = NativeQuery.builder()
 			.withQuery(QueryBuilders.terms(t -> t.field("location_id").terms(termsQueryField)))
 			.build();
@@ -108,18 +135,6 @@ public class SearchLocationServiceImpl implements SearchLocationService {
 			.collect(Collectors.toMap(SearchLocation::getLocationId, doc -> doc));
 	}
 
-	private static LocationSearchResponseDto toDto(SearchLocation searchLocation) {
-		return LocationSearchResponseDto.builder()
-			.searchLocationId(searchLocation.getId())
-			.locationId(searchLocation.getLocationId())
-			.areaId(searchLocation.getAreaId())
-			.mapX(searchLocation.getMapX())
-			.mapY(searchLocation.getMapY())
-			.placeName(searchLocation.getPlaceName())
-			.address(searchLocation.getAddress())
-			.category(searchLocation.getCategory())
-			.build();
-	}
 }
 
 

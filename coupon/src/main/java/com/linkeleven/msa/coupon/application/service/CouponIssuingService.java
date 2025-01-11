@@ -42,6 +42,7 @@ public class CouponIssuingService {
 	 */
 	@Transactional
 	public IssuedCouponDto issueCoupon(Long userId, String role, Long couponId) {
+		// 자정 이전 시간인지 확인
 		if (isBeforeMidnight()) {
 			throw new CustomException(ErrorCode.COUPON_CANNOT_BE_ISSUED_YET);
 		}
@@ -73,13 +74,18 @@ public class CouponIssuingService {
 	 */
 	@DistributedLock(key = "'coupon_issue:' + #couponId")
 	private IssuedCouponDto tryIssueCoupon(Long userId, Long couponId) {
+
 		List<CouponPolicy> availablePolicies = couponPolicyRepository.findAvailablePolicies(couponId);
+		// 정책 유효성 검사
 		validateAvailablePolicies(availablePolicies);
 
+		// 쿠폰 코드 발급
 		String couponCode = issueCouponCode(couponId, availablePolicies);
 
+		// 쿠폰 정책 ID 추출
 		Long issuedPolicyId = parsePolicyIdFromCouponCode(couponCode);
 
+		// 정책 ID로 정책 찾기
 		CouponPolicy selectedPolicy = findPolicyById(availablePolicies, issuedPolicyId);
 
 		selectedPolicy.issueCoupon();
@@ -102,7 +108,9 @@ public class CouponIssuingService {
 	 */
 	@Transactional
 	public IssuedCouponDto useCoupon(Long userId, Long couponId) {
+		// 발급된 쿠폰을 조회
 		IssuedCoupon issuedCoupon = findIssuedCoupon(userId, couponId);
+		// 쿠폰 상태를 검증
 		validateCouponStatus(issuedCoupon);
 
 		issuedCoupon.updateStatus(IssuedCouponStatus.USED);
@@ -123,14 +131,12 @@ public class CouponIssuingService {
 			.toList();
 	}
 
-	// 자정 이전 시간인지 확인하는 메서드
 	private boolean isBeforeMidnight() {
 		LocalDateTime currentTime = LocalDateTime.now();
 		LocalDateTime midnight = currentTime.toLocalDate().atStartOfDay().plusDays(1);
 		return currentTime.isBefore(midnight);
 	}
 
-	// 정책 유효성 검사 메서드
 	private void validateAvailablePolicies(List<CouponPolicy> availablePolicies) {
 		if (availablePolicies.isEmpty()) {
 			throw new CustomException(ErrorCode.NO_AVAILABLE_POLICY);
@@ -141,11 +147,10 @@ public class CouponIssuingService {
 		try {
 			return Long.parseLong(couponCode.split(":")[0]);
 		} catch (NumberFormatException e) {
-			throw new CustomException(ErrorCode.INVALID_COUPON_CODE, e);
+			throw new CustomException(ErrorCode.INVALID_COUPON_CODE);
 		}
 	}
 
-	// 정책 ID로 정책 찾기 메서드
 	private CouponPolicy findPolicyById(List<CouponPolicy> availablePolicies, Long policyId) {
 		return availablePolicies.stream()
 			.filter(policy -> policy.getPolicyId().equals(policyId))
@@ -161,13 +166,11 @@ public class CouponIssuingService {
 			.orElseThrow(() -> new CustomException(ErrorCode.COUPON_SOLD_OUT));
 	}
 
-	// 발급된 쿠폰을 조회하는 메서드
 	private IssuedCoupon findIssuedCoupon(Long userId, Long couponId) {
 		return issuedCouponRepository.findByUserIdAndCouponId(userId, couponId)
 			.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
 	}
 
-	// 쿠폰 상태를 검증하는 메서드
 	private void validateCouponStatus(IssuedCoupon issuedCoupon) {
 		if (issuedCoupon.getStatus() != IssuedCouponStatus.ISSUED) {
 			throw new CustomException(ErrorCode.EXPIRED_COUPON);

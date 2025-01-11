@@ -1,6 +1,7 @@
 package com.linkeleven.msa.coupon.application.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,21 +25,15 @@ public class CouponRedisService {
 	}
 
 	// 정책별로 Redis에서 쿠폰 발급 (우선순위에 따라)
-	public String issueCouponFromRedis(Long couponId, List<Long> policyIds) {
+	public Optional<String> issueCouponFromRedis(Long couponId, List<Long> policyIds) {
 		for (Long policyId : policyIds) {
 			String redisKey = "coupon:" + couponId + ":" + policyId;
 			String couponCode = redisTemplate.opsForList().leftPop(redisKey);
 
 			if (couponCode != null) {
-				return couponCode;  // 발급 성공
+				return Optional.of(couponCode);  // 발급 성공
 			}
 		}
-		return null;  // 모든 정책 쿠폰 소진
-	}
-
-	// 남아있는 쿠폰 개수 확인
-	public Long getRemainingCoupons(Long couponId, Long policyId) {
-		String redisKey = "coupon:" + couponId + ":" + policyId;
-		return redisTemplate.opsForList().size(redisKey);
+		return Optional.empty();  // 모든 정책 쿠폰 소진
 	}
 }

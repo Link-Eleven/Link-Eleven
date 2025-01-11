@@ -55,7 +55,7 @@ public class CouponIssuingService {
 
 		try {
 			// 쿠폰 발급 메서드 실행
-			return tryIssueCoupon(userId, couponId);
+			return processCouponIssuance(userId, couponId);
 		} catch (Exception e) {
 			// 실패 시 Redis에서 중복 체크 키 삭제
 			redisTemplate.delete(userCouponKey);
@@ -73,7 +73,7 @@ public class CouponIssuingService {
 	 * @throws CustomException 사용 가능한 정책이 없거나 쿠폰이 소진된 경우
 	 */
 	@DistributedLock(key = "'coupon_issue:' + #couponId")
-	private IssuedCouponDto tryIssueCoupon(Long userId, Long couponId) {
+	private IssuedCouponDto processCouponIssuance(Long userId, Long couponId) {
 
 		List<CouponPolicy> availablePolicies = couponPolicyRepository.findAvailablePolicies(couponId);
 		// 정책 유효성 검사

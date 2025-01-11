@@ -20,7 +20,7 @@ spring:
     open-in-view: false
 
   kafka:
-#    bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
+#    bootstrap-servers: localhost:20094,localhost:20095,localhost:20096
     bootstrap-servers: 127.0.0.1:20094,127.0.0.1:20095,127.0.0.1:20096
     properties:
       schema.registry.url: http://localhost:28081

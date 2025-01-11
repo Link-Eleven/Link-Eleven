@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -24,9 +25,9 @@ public class RedisConfig {
 	 * 키와 값의 직렬화 방법을 지정합니다.
 	 * 키는 문자열로, 값은 FeedTopResponseDto의 리스트로 직렬화됩니다. */
 	@Bean
-	public RedisTemplate<String, List<FeedTopResponseDto>> redisTemplate(
+	public RedisTemplate<String, List<?>> redisTemplate(
 		RedisConnectionFactory redisConnectionFactory) {
-		RedisTemplate<String, List<FeedTopResponseDto>> template = new RedisTemplate<>();
+		RedisTemplate<String, List<?>> template = new RedisTemplate<>();
 		template.setConnectionFactory(redisConnectionFactory);
 		template.setKeySerializer(new StringRedisSerializer());
 
@@ -42,6 +43,16 @@ public class RedisConfig {
 		);
 
 		template.setValueSerializer(serializer);
+		return template;
+	}
+
+	@Bean
+	public RedisTemplate<String, Object> opsHashRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+		RedisTemplate<String, Object> template = new RedisTemplate<>();
+		template.setConnectionFactory(redisConnectionFactory);
+		template.setKeySerializer(new StringRedisSerializer());
+		template.setHashKeySerializer(new StringRedisSerializer());
+		template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
 		return template;
 	}
 }

@@ -76,9 +76,8 @@ public class FeedController {
 	}
 
 	@GetMapping("/popular")
-	public ResponseEntity<SuccessResponseDto<List<FeedTopResponseDto>>> getTopFeed(
-		@RequestParam(defaultValue = "3") int limit) {
-		List<FeedTopResponseDto> response = feedService.getTopFeed(limit);
+	public ResponseEntity<SuccessResponseDto<List<FeedTopResponseDto>>> getTopFeed() {
+		List<FeedTopResponseDto> response = feedService.getAllTopFeed();
 		return ResponseEntity.ok(SuccessResponseDto.success("인기 게시글 조회 완료", response));
 	}
 

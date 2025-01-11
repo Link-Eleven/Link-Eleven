@@ -10,7 +10,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,7 +31,6 @@ public class OutBox extends BaseTime{
 	@Column(nullable = false)
 	private String eventType;
 
-	@Lob
 	@Column(nullable = false)
 	private byte[] payload;
 

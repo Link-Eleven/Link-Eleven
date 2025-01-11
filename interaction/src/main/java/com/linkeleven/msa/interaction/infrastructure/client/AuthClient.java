@@ -9,7 +9,7 @@ import com.linkeleven.msa.interaction.application.dto.external.UserInfoResponseD
 @FeignClient(name = "auth-service")
 public interface AuthClient {
 
-	@GetMapping("/external/auth/{userId}")
+	@GetMapping("/external/users/{userId}")
 	UserInfoResponseDto getUsername(@PathVariable Long userId);
 
 }

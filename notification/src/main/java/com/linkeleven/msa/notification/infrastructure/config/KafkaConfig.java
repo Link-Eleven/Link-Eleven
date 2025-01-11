@@ -1,4 +1,4 @@
-package com.linkeleven.msa.interaction.infrastructure.config;
+package com.linkeleven.msa.notification.infrastructure.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +59,8 @@ public class KafkaConfig {
 		configProps.put("specific.avro.reader", true);
 		return new DefaultKafkaConsumerFactory<>(configProps);
 	}
+
+
 
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {

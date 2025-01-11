@@ -32,7 +32,7 @@ public class JwtUtil {
         .claim("role", role)
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(new Date(System.currentTimeMillis() + accessExpiration))
-        .signWith(secretKey, SignatureAlgorithm.HS512)
+        .signWith(secretKey, SignatureAlgorithm.HS256)
         .compact();
     return "Bearer "+token;
   }

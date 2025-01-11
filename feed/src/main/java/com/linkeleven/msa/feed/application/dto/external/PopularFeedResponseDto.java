@@ -1,7 +1,5 @@
 package com.linkeleven.msa.feed.application.dto.external;
 
-import java.util.Map;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentCountResponseDto {
+public class PopularFeedResponseDto {
 
-	private Map<Long, Integer> count;
+	private Long feedId;
+	private Long userId;
 }

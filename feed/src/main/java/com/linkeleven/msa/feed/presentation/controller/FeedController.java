@@ -3,6 +3,9 @@ package com.linkeleven.msa.feed.presentation.controller;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
+import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.service.FeedService;
@@ -73,41 +77,19 @@ public class FeedController {
 
 	@GetMapping("/popular")
 	public ResponseEntity<SuccessResponseDto<List<FeedTopResponseDto>>> getTopFeed(
-		@RequestParam(defaultValue = "5") int limit) {
+		@RequestParam(defaultValue = "3") int limit) {
 		List<FeedTopResponseDto> response = feedService.getTopFeed(limit);
 		return ResponseEntity.ok(SuccessResponseDto.success("인기 게시글 조회 완료", response));
 	}
 
 	@GetMapping
-	public ResponseEntity<SuccessResponseDto<List<FeedReadResponseDto>>> searchFeeds(@RequestParam String keyword) {
-		// TODO : 게시글 서치 실제 구현
-		// 더미 데이터 검색 로직
-		List<FeedReadResponseDto> responses = List.of(
-			FeedReadResponseDto.builder()
-				.feedId(1L)
-				.title("Title 1")
-				.content("Content 1")
-				.category(Category.valueOf("HOTEL"))
-				.views(15)
-				.popularityScore(4.0)
-				.build(),
-			FeedReadResponseDto.builder()
-				.feedId(2L)
-				.title("Title 2")
-				.content("Content 2")
-				.category(Category.valueOf("RESTAURANT"))
-				.views(20)
-				.popularityScore(4.2)
-				.build(),
-			FeedReadResponseDto.builder()
-				.feedId(3L)
-				.title("Title 3")
-				.content("Content 3")
-				.category(Category.valueOf("PLACE"))
-				.views(25)
-				.popularityScore(4.5)
-				.build()
-		);
-		return ResponseEntity.ok(SuccessResponseDto.success("게시글 조회 완료", responses));
+	public Slice<FeedSearchResponseDto> searchFeeds(
+		@RequestParam(required = false) String title,
+		@RequestParam(required = false) String content,
+		@RequestParam(required = false) String region,
+		@RequestParam(required = false) Category category,
+		@PageableDefault(size = 10) Pageable pageable) {
+		return feedService.searchFeeds(title, content, region, category, pageable);
 	}
+
 }

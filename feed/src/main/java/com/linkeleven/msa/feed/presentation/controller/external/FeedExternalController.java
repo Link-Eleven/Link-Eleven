@@ -24,6 +24,6 @@ public class FeedExternalController {
 
 	@GetMapping("/external/feeds/popular")
 	public List<PopularFeedResponseDto> getPopularFeeds() {
-		return feedService.getPopularFeedForCoupon(3);
+		return feedService.getPopularFeedForCoupon();
 	}
 }

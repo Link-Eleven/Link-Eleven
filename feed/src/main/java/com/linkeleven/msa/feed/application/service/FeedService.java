@@ -3,6 +3,7 @@ package com.linkeleven.msa.feed.application.service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import com.linkeleven.msa.feed.application.dto.external.UserValidateIdResponseDt
 import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.model.Feed;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
+import com.linkeleven.msa.feed.domain.repository.TopFeedRepository;
 import com.linkeleven.msa.feed.infrastructure.client.AuthClient;
 import com.linkeleven.msa.feed.infrastructure.client.CouponClient;
 import com.linkeleven.msa.feed.infrastructure.client.InteractionClient;
@@ -40,11 +42,13 @@ import lombok.RequiredArgsConstructor;
 public class FeedService {
 
 	private final FeedRepository feedRepository;
+	private final TopFeedRepository topFeedRepository;
 	private final FileService fileService;
 	private final InteractionClient interactionClient;
 	private final AuthClient authClient;
 	private final CouponClient couponClient;
-	private final RedisTemplate<String, List<FeedTopResponseDto>> redisTemplate;
+	private final RedisTemplate<String, List<?>> redisTemplate;
+	private final RedisTemplate<String, Object> opsHashRedisTemplate;
 
 	@Transactional
 	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files,
@@ -130,6 +134,9 @@ public class FeedService {
 
 	@Transactional
 	public void updateTopFeed() {
+		topFeedRepository.deleteAll();
+		opsHashRedisTemplate.delete("commentCounts");
+		opsHashRedisTemplate.delete("likeCounts");
 
 		// 현재 날짜 기준으로 23:30을 설정 (24시 기준으로 계산)
 		LocalDateTime adjustedCurrentDate = LocalDateTime.now().withHour(23).withMinute(30).withSecond(0).withNano(0);
@@ -145,6 +152,9 @@ public class FeedService {
 		Map<Long, Integer> commentCounts = interactionClient.getCommentCount(feedIdList).getCount();
 		Map<Long, Integer> likeCounts = interactionClient.getLikeCount(feedIdList).getCount();
 
+		opsHashRedisTemplate.opsForHash().putAll("commentCounts", commentCounts);
+		opsHashRedisTemplate.opsForHash().putAll("likeCounts", likeCounts);
+
 		// 각 피드의 인기도 점수 계산
 		feeds.forEach(feed -> {
 			long daysSincePosted = ChronoUnit.DAYS.between(feed.getCreatedAt(), adjustedCurrentDate);
@@ -155,36 +165,95 @@ public class FeedService {
 			feed.updatePopularityScore(popularityScore);
 		});
 
-		// 상위 100개의 게시글을 인기 순으로 정렬하고 FeedTopResponseDto로 변환하여 캐시에 저장
-		List<FeedTopResponseDto> top100Feed = feeds.stream()
+		// // 상위 100개의 게시글을 인기 순으로 정렬하고 FeedTopResponseDto로 변환하여 캐시에 저장
+		// List<FeedTopResponseDto> top100Feed = feeds.stream()
+		// 	.sorted(Comparator.comparingDouble(Feed::getPopularityScore).reversed())
+		// 	.limit(100)
+		// 	.map(feed -> FeedTopResponseDto.of(feed,
+		// 		commentCounts.getOrDefault(feed.getFeedId(), 0),
+		// 		likeCounts.getOrDefault(feed.getFeedId(), 0)))
+		// 	.toList();
+		List<Feed> topFeedList = feeds.stream()
 			.sorted(Comparator.comparingDouble(Feed::getPopularityScore).reversed())
 			.limit(100)
-			.map(feed -> FeedTopResponseDto.of(feed,
-				commentCounts.getOrDefault(feed.getFeedId(), 0),
-				likeCounts.getOrDefault(feed.getFeedId(), 0)))
 			.toList();
 
-		redisTemplate.opsForValue().set("popularFeeds", top100Feed);
-
-		// 요청이 들어오면 top 3를(userId / feedId)포함해서 캐시에서 꺼내서 보내기
-
+		topFeedRepository.saveAll(topFeedList);
+		redisTemplate.opsForValue().set("popularFeeds", topFeedList);
 	}
 
-	public List<FeedTopResponseDto> getTopFeed(int limit) {
-		// 캐시에서 인기 게시글 조회
-		List<FeedTopResponseDto> top100Feeds = redisTemplate.opsForValue().get("popularFeeds");
-		if (top100Feeds == null || top100Feeds.isEmpty()) {
-			throw new CustomException(ErrorCode.CACHE_NOT_FOUND);
+	public List<FeedTopResponseDto> getAllTopFeed() {
+		@SuppressWarnings("unchecked")
+		List<Feed> top100FeedList = (List<Feed>)redisTemplate.opsForValue().get("popularFeeds");
+		if (top100FeedList.isEmpty()) {
+			top100FeedList = topFeedRepository.findAll();
+			redisTemplate.opsForValue().set("popularFeeds", top100FeedList);
 		}
 
-		// 상위 limit 개수만 조회하여 응답 DTO로 변환
-		return top100Feeds.stream()
-			.limit(limit)
-			.collect(Collectors.toList());
+		Map<Object, Object> redisCommentCounts = opsHashRedisTemplate.opsForHash().entries("commentCounts");
+		Map<Long, Integer> commentCounts = new HashMap<>();
+		for (Map.Entry<Object, Object> entry : redisCommentCounts.entrySet()) {
+			commentCounts.put(
+				Long.valueOf(entry.getKey().toString()),
+				Integer.valueOf(entry.getValue().toString())
+			);
+		}
+
+		Map<Object, Object> redisLikeCounts = opsHashRedisTemplate.opsForHash().entries("likeCounts");
+		Map<Long, Integer> likeCounts = new HashMap<>();
+		for (Map.Entry<Object, Object> entry : redisLikeCounts.entrySet()) {
+			likeCounts.put(
+				Long.valueOf(entry.getKey().toString()),
+				Integer.valueOf(entry.getValue().toString())
+			);
+		}
+
+		return top100FeedList.stream()
+			.map(feed -> FeedTopResponseDto.of(feed,
+				commentCounts.getOrDefault(feed.getFeedId(), 0),
+				likeCounts.getOrDefault(feed.getFeedId(), 0)
+			))
+			.toList();
 	}
 
-	public List<PopularFeedResponseDto> getPopularFeedForCoupon(int limit) {
-		return getTopFeed(limit).stream()
+	public List<FeedTopResponseDto> getTopFeed() {
+		@SuppressWarnings("unchecked")
+		List<Feed> top100FeedList = (List<Feed>)redisTemplate.opsForValue().get("popularFeeds");
+		if (top100FeedList.isEmpty()) {
+			top100FeedList = topFeedRepository.findAll();
+			redisTemplate.opsForValue().set("popularFeeds", top100FeedList);
+		}
+
+		Map<Object, Object> redisCommentCounts = opsHashRedisTemplate.opsForHash().entries("commentCounts");
+		Map<Long, Integer> commentCounts = new HashMap<>();
+		for (Map.Entry<Object, Object> entry : redisCommentCounts.entrySet()) {
+			commentCounts.put(
+				Long.valueOf(entry.getKey().toString()),
+				Integer.valueOf(entry.getValue().toString())
+			);
+		}
+
+		Map<Object, Object> redisLikeCounts = opsHashRedisTemplate.opsForHash().entries("likeCounts");
+		Map<Long, Integer> likeCounts = new HashMap<>();
+		for (Map.Entry<Object, Object> entry : redisLikeCounts.entrySet()) {
+			redisLikeCounts.put(
+				Long.valueOf(entry.getKey().toString()),
+				Integer.valueOf(entry.getValue().toString())
+			);
+		}
+
+		return top100FeedList.stream()
+			.limit(3)
+			.map(feed -> FeedTopResponseDto.of(feed,
+				commentCounts.getOrDefault(feed.getFeedId(), 0),
+				likeCounts.getOrDefault(feed.getFeedId(), 0)
+			))
+			.toList();
+	}
+
+
+	public List<PopularFeedResponseDto> getPopularFeedForCoupon() {
+		return getTopFeed().stream()
 			.map(feed -> new PopularFeedResponseDto(feed.getFeedId(), feed.getUserId()))
 			.collect(Collectors.toList());
 	}

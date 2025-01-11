@@ -42,11 +42,8 @@ public class CouponService {
 	 */
 	@Transactional
 	public void createCoupon(PopularFeedResponseDto request) {
-		boolean exists = couponRepository.existsByFeedId(request.getFeedId());
-		// 쿠폰 중복 생성 방지
-		if (exists) {
-			throw new CustomException(ErrorCode.DUPLICATE_FEED_ID);
-		}
+		// 중복 쿠폰 생성 방지
+		checkFeedIdDuplication(request.getFeedId());
 		// 쿠폰 생성
 		Coupon coupon = creatingCoupon(request);
 
@@ -132,9 +129,16 @@ public class CouponService {
 		softDeleteCouponAndRelatedData(userId, coupon);
 	}
 
+	private void checkFeedIdDuplication(Long feedId) {
+		if (couponRepository.existsByFeedId(feedId)) {
+			throw new CustomException(ErrorCode.DUPLICATE_FEED_ID);
+		}
+	}
+
 	private void savePoliciesToRedis(Long couponId, List<CouponPolicy> policies) {
 		policies.forEach(policy ->
-			couponRedisService.addCouponsToRedis(couponId, policy.getPolicyId(), policy.getQuantity())
+			couponRedisService.addCouponsToRedis(couponId, policy.getPolicyId(), policy.getQuantity(),
+				policy.getDiscountRate())
 		);
 	}
 

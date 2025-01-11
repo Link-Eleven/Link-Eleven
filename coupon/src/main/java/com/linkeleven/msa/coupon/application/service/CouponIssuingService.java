@@ -39,12 +39,13 @@ public class CouponIssuingService {
 	 */
 	@Transactional
 	public IssuedCouponDto issueCoupon(Long userId, String role, Long couponId) {
-		// 자정 이전 시간인지 확인
+		// 쿠폰 발급 가능 시간 확인
 		if (isBeforeMidnight()) {
 			throw new CustomException(ErrorCode.COUPON_CANNOT_BE_ISSUED_YET);
 		}
 
-		if (!couponRedisService.checkAndSetUserCoupon(userId, couponId)) {
+		if (couponRedisService.isUserCouponAlreadyIssued(userId, couponId) ||
+			issuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
 			throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);
 		}
 

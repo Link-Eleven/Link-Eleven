@@ -11,8 +11,6 @@ import com.linkeleven.msa.coupon.domain.model.IssuedCoupon;
 import com.linkeleven.msa.coupon.domain.model.enums.IssuedCouponStatus;
 
 public interface IssuedCouponRepository extends JpaRepository<IssuedCoupon, Long> {
-	boolean existsByUserIdAndCouponId(Long userId, Long couponId);
-
 	Optional<IssuedCoupon> findByUserIdAndCouponId(Long userId, Long couponId);
 
 	@Query("SELECT ic FROM IssuedCoupon ic " +
@@ -23,4 +21,7 @@ public interface IssuedCouponRepository extends JpaRepository<IssuedCoupon, Long
 
 	// 파라미터 상태 제외 후 조회
 	List<IssuedCoupon> findByCouponIdAndStatusNot(Long couponId, IssuedCouponStatus issuedCouponStatus);
+
+	// 쿠폰 발급 유무 조회
+	boolean existsByUserIdAndCouponId(Long userId, Long couponId);
 }

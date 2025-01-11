@@ -18,9 +18,11 @@ import com.linkeleven.msa.coupon.infrastructure.client.FeedServiceClient;
 import com.linkeleven.msa.coupon.infrastructure.configuration.JpaAuditorAware;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CouponScheduledService {
 
 	private final JpaAuditorAware jpaAuditorAware;
@@ -33,7 +35,6 @@ public class CouponScheduledService {
 	@Scheduled(cron = "0 50 23 * * ?")
 	public void generateCouponsForPopularFeeds() {
 		try {
-
 			// 인기 게시글 목록 - Feign Client 호출
 			List<PopularFeedResponseDto> popularFeeds = feedServiceClient.getPopularFeeds();
 
@@ -63,7 +64,7 @@ public class CouponScheduledService {
 				}
 			});
 		} catch (Exception e) {
-			// 예외처리..
+			log.error("인기 게시글 쿠폰 생성 중 예외 발생: {}", e.getMessage());
 		}
 	}
 

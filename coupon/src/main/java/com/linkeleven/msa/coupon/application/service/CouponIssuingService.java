@@ -1,9 +1,10 @@
 package com.linkeleven.msa.coupon.application.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,22 +26,35 @@ public class CouponIssuingService {
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final IssuedCouponRepository issuedCouponRepository;
 	private final CouponRedisService couponRedisService;
+	private final RedisTemplate<String, String> redisTemplate;
 
-	@DistributedLock(key = "coupon_issue")
 	@Transactional
 	public IssuedCouponDto issueCoupon(Long userId, String role, Long couponId) {
-		// 현재 시간이 자정 00시 이전인 경우 쿠폰 발급을 막음
-		LocalDateTime currentTime = LocalDateTime.now();
-		LocalDateTime midnight = currentTime.toLocalDate().atStartOfDay().plusDays(1); // 자정 00시
+		// // 현재 시간이 자정 00시 이전인 경우 쿠폰 발급을 막음
+		// LocalDateTime currentTime = LocalDateTime.now();
+		// LocalDateTime midnight = currentTime.toLocalDate().atStartOfDay().plusDays(1); // 자정 00시
+		//
+		// if (currentTime.isBefore(midnight)) {
+		// 	throw new CustomException(ErrorCode.COUPON_CANNOT_BE_ISSUED_YET);
+		// }
 
-		if (currentTime.isBefore(midnight)) {
-			throw new CustomException(ErrorCode.COUPON_CANNOT_BE_ISSUED_YET);
-		}
-		// 유저가 이미 해당 쿠폰을 발급받았는지 확인
-		if (issuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
+		// 중복 발급 체크를 Redis로 이동
+		String userCouponKey = "user_coupon:" + userId + ":" + couponId;
+		if (Boolean.FALSE.equals(redisTemplate.opsForValue().setIfAbsent(userCouponKey, "1", 24, TimeUnit.HOURS))) {
 			throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);
 		}
 
+		try {
+			return tryIssueCoupon(userId, couponId);
+		} catch (Exception e) {
+			// 실패 시 Redis에서 중복 체크 키 삭제
+			redisTemplate.delete(userCouponKey);
+			throw e;
+		}
+	}
+
+	@DistributedLock(key = "'coupon_issue:' + #couponId")
+	private IssuedCouponDto tryIssueCoupon(Long userId, Long couponId) {
 		List<CouponPolicy> availablePolicies = couponPolicyRepository.findAvailablePolicies(couponId);
 		if (availablePolicies.isEmpty()) {
 			throw new CustomException(ErrorCode.NO_AVAILABLE_POLICY);
@@ -56,10 +70,7 @@ public class CouponIssuingService {
 			throw new CustomException(ErrorCode.COUPON_SOLD_OUT);
 		}
 
-		// 발급된 쿠폰 코드에서 policyId 추출
 		Long issuedPolicyId = Long.parseLong(couponCode.split(":")[0]);
-
-		// 정책 수량 감소
 		CouponPolicy selectedPolicy = availablePolicies.stream()
 			.filter(policy -> policy.getPolicyId().equals(issuedPolicyId))
 			.findFirst()
@@ -68,7 +79,6 @@ public class CouponIssuingService {
 		selectedPolicy.issueCoupon();
 		couponPolicyRepository.save(selectedPolicy);
 
-		// 쿠폰 발급 내역 저장
 		IssuedCoupon issuedCoupon = IssuedCoupon.of(userId, couponId, selectedPolicy.getDiscountRate());
 		issuedCoupon = issuedCouponRepository.save(issuedCoupon);
 

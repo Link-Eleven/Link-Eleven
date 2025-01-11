@@ -60,7 +60,7 @@ public class CouponPolicy extends BaseTime {
 		if (this.issuedCount < this.quantity) {
 			this.issuedCount++;
 		} else {
-			throw new CustomException(ErrorCode.NO_AVAILABLE_COUPON);
+			throw new CustomException(ErrorCode.COUPON_SOLD_OUT);
 		}
 	}
 

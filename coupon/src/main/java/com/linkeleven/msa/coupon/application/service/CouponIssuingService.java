@@ -2,10 +2,8 @@ package com.linkeleven.msa.coupon.application.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +25,6 @@ public class CouponIssuingService {
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final IssuedCouponRepository issuedCouponRepository;
 	private final CouponRedisService couponRedisService;
-	private final RedisTemplate<String, String> redisTemplate;
 
 	/**
 	 * 주어진 사용자 ID와 쿠폰 ID를 기반으로 쿠폰 발급
@@ -47,18 +44,14 @@ public class CouponIssuingService {
 			throw new CustomException(ErrorCode.COUPON_CANNOT_BE_ISSUED_YET);
 		}
 
-		// 중복 발급 체크를 Redis로 이동
-		String userCouponKey = "user_coupon:" + userId + ":" + couponId;
-		if (Boolean.FALSE.equals(redisTemplate.opsForValue().setIfAbsent(userCouponKey, "1", 24, TimeUnit.HOURS))) {
+		if (!couponRedisService.checkAndSetUserCoupon(userId, couponId)) {
 			throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);
 		}
 
 		try {
-			// 쿠폰 발급 메서드 실행
 			return processCouponIssuance(userId, couponId);
 		} catch (Exception e) {
-			// 실패 시 Redis에서 중복 체크 키 삭제
-			redisTemplate.delete(userCouponKey);
+			couponRedisService.deleteUserCouponCheck(userId, couponId);
 			throw e;
 		}
 	}

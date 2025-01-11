@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.linkeleven.msa.interaction.domain.model.entity.OutBox;
 import com.linkeleven.msa.interaction.domain.model.enums.EventStatus;
-import com.linkeleven.msa.interaction.infrastructure.messaging.KafkaProducerService;
 import com.linkeleven.msa.interaction.infrastructure.repository.OutboxRepository;
 
 import lombok.RequiredArgsConstructor;

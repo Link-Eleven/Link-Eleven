@@ -21,6 +21,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://packages.confluent.io/maven/' }
 }
 
 ext {
@@ -30,6 +31,9 @@ ext {
 dependencies {
 	// JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	// PostgreSQL
 	runtimeOnly 'org.postgresql:postgresql'
@@ -47,8 +51,78 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// kafka & Related Dependency
+	implementation 'org.springframework.kafka:spring-kafka'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	implementation 'io.confluent:kafka-avro-serializer:7.8.0'
+	implementation 'org.springframework.retry:spring-retry'
+
+	// avro schema
+	configurations {
+		avroTools
+	}
+	avroTools 'org.apache.avro:avro-tools:1.12.0'
+}
+sourceSets {
+	main {
+		java {
+			srcDirs += "build/generated/avro-java"
+		}
+	}
+}
+tasks.register("downloadAvroSchemas") {
+	group = "avro"
+	description = "Download Avro schemas from Schema Registry"
+
+	doLast {
+		def schemaRegistryUrl = "http://localhost:28081" // Schema Registry URL
+		def subjects = ['comment-events-value', 'reply-events-value', 'like-events-value']
+		def outputDir = file("src/main/resources/avro") // 이거 위치 고치기
+
+		if (!outputDir.exists()) {
+			outputDir.mkdirs()
+		}
+
+		subjects.each { subject ->
+			def schemaFile = new File(outputDir, "${subject}.avsc")
+			def schemaUrl = "${schemaRegistryUrl}/subjects/${subject}/versions/latest"
+
+			println "Downloading schema for $subject from $schemaUrl"
+			def schemaToJson = new URL(schemaUrl).text
+			def parsedSchema = new groovy.json.JsonSlurper().parseText(schemaToJson)
+
+			// JSON 데이터에서 "schema" 필드만 추출
+			if (parsedSchema.containsKey("schema")) {
+				def avroSchema = parsedSchema['schema']
+				schemaFile.text = avroSchema // JSON 문자열로 저장
+			} else {
+				throw new RuntimeException("Schema field not found in response for $subject")
+			}
+		}
+
+		println "Schemas downloaded to ${outputDir.absolutePath}"
+	}
 }
 
+
+// Generate Avro Java classes
+tasks.register("generateAvroJava", JavaExec) {
+	group = "build"
+	description = "Compiles Avro schemas into Java classes"
+
+	// Ensure schemas are downloaded before generating Java classes
+	dependsOn("downloadAvroSchemas")
+
+	mainClass.set("org.apache.avro.tool.Main")
+	classpath = configurations.avroTools
+
+	args = [
+			"compile", "-string", "schema",
+			"src/main/resources/avro", // 다운로드 스키마 위치
+			"build/generated/avro-java" // 스키마 자바클래스 생성 위치
+	]
+}
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"

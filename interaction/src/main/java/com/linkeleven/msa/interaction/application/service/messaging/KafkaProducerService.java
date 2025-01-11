@@ -1,4 +1,4 @@
-package com.linkeleven.msa.interaction.infrastructure.messaging;
+package com.linkeleven.msa.interaction.application.service.messaging;
 
 import java.util.concurrent.CompletableFuture;
 

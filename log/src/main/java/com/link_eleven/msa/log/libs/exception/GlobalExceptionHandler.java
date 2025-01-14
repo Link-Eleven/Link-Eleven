@@ -1,10 +1,10 @@
-package com.linkeleven.msa.recommendation.libs.exception;
+package com.link_eleven.msa.log.libs.exception;
 
-import com.linkeleven.msa.recommendation.libs.dto.ExceptionResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.link_eleven.msa.log.libs.dto.ExceptionResponseDto;
 
 import lombok.extern.slf4j.Slf4j;
 

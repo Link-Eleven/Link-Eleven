@@ -42,9 +42,6 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    // H2 DB
-    runtimeOnly 'com.h2database:h2'
-
     // Web, Lombok, Test
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'

@@ -1,5 +1,7 @@
 package com.linkeleven.msa.recommendation.infrastructure.messaging;
 
+import java.time.LocalDateTime;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -33,6 +35,7 @@ public class LogToRecommendationServiceProducer {
 		return RecommendationMessage.builder()
 			.userId(analysis.getUserId())
 			.recommendationKeywords(analysis.getKeywords())
+			.timestamp(LocalDateTime.now())
 			.build();
 	}
 

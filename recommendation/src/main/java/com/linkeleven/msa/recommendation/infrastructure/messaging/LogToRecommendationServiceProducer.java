@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LogToRecommendationServiceProducer {
 
 	private final KafkaTemplate<String, RecommendationMessage> kafkaTemplate;
-	private static final String TOPIC = "recommendationKeywords";
+	private static final String TOPIC = "recommendation-keywords";
 
 	@Retryable(
 		maxAttempts = 3,

@@ -41,3 +41,5 @@ out/
 ### Docker compose yml ###
 docker-compose.yml
 /.env
+/.txt
+notification/src/main/resources/*.json

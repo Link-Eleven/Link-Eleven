@@ -48,3 +48,8 @@ eureka:
 
 server:
   port: 19098
+
+
+firebase:
+  project-id: firebase-project-id
+  database-url: https://firebase-project-id.firebaseio.com/

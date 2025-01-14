@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${RECOMMENDATION_DB_URL}
-    username: ${RECOMMENDATION_DB_USER}
-    password: ${RECOMMENDATION_DB_PASSWORD}
+    url: ${INTERACTION_DB_URL}
+    username: ${INTERACTION_DB_USER}
+    password: ${INTERACTION_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -15,10 +15,21 @@ spring:
         format_sql: true
     open-in-view: false
 
-    eureka:
-      client:
-        service-url:
-          defaultZone: http://localhost:19090/eureka/
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringSerializer
+      value-deserializer: org.apache.kafka.common.serialization.StringSerializer
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
 
 server:
   port: 19096

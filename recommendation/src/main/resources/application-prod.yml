@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: recommendation-service
   datasource:
     url: ${RECOMMENDATION_DB_URL}
     username: ${RECOMMENDATION_DB_USER}

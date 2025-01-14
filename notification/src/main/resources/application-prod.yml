@@ -27,3 +27,6 @@ eureka:
 
 server:
   port: ${NOTIFICATION_PORT}
+
+firebase:
+  config-path: ${firebase_config_path}

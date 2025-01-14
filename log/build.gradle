@@ -42,6 +42,9 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // PostgreSQL
+    runtimeOnly 'org.postgresql:postgresql'
+    
     // Web, Lombok, Test
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'

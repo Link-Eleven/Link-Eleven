@@ -17,7 +17,6 @@ import com.linkeleven.msa.feed.presentation.request.FeedSearchRequestDto;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -49,22 +48,26 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 		if (searchRequestDto.getCategory() != null) {
 			builder.and(categoryEq(searchRequestDto.getCategory()));
 		}
+
+		if (searchRequestDto.getCursorFeedId() != null) {
+			builder.and(feedIdLessThan(searchRequestDto.getCursorFeedId()));
+		}
+
 		List<FeedSearchResponseDto> feedList = queryFactory.query()
 			.select(
-			Projections.constructor(FeedSearchResponseDto.class,
-				feed.feedId,
-				feed.title,
-				feed.content,
-				feed.category,
-				feed.region
+				Projections.constructor(FeedSearchResponseDto.class,
+					feed.feedId,
+					feed.title,
+					feed.content,
+					feed.category,
+					feed.region
+				)
 			)
-		)
-		.from(feed)
-		.where(builder)
-		.orderBy(feed.createdAt.desc())
-		.limit(pageable.getPageSize() + 1)
+			.from(feed)
+			.where(builder)
+			.orderBy(feed.feedId.desc())
+			.limit(pageable.getPageSize() + 1)
 			.fetch();
-
 
 		boolean hasNext = feedList.size() > pageable.getPageSize();
 		if (hasNext) {
@@ -88,6 +91,10 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 
 	private BooleanExpression categoryEq(Category category) {
 		return category != null ? feed.category.eq(category) : null;
+	}
+
+	private BooleanExpression feedIdLessThan(Long cursorFeedId) {
+		return cursorFeedId != null ? feed.feedId.lt(cursorFeedId) : null;
 	}
 
 }

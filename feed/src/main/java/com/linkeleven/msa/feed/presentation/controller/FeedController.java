@@ -82,13 +82,16 @@ public class FeedController {
 	}
 
 	@GetMapping
-	public Slice<FeedSearchResponseDto> searchFeeds(
+	public ResponseEntity<SuccessResponseDto<Slice<FeedSearchResponseDto>>> searchFeeds(
+		@RequestParam(required = false) Long cursorFeedId,
 		@RequestParam(required = false) String title,
 		@RequestParam(required = false) String content,
 		@RequestParam(required = false) String region,
 		@RequestParam(required = false) Category category,
 		@PageableDefault(size = 10) Pageable pageable) {
-		return feedService.searchFeeds(title, content, region, category, pageable);
+		Slice<FeedSearchResponseDto> response = feedService.searchFeeds(cursorFeedId, title, content, region,
+			category, pageable);
+		return ResponseEntity.ok(SuccessResponseDto.success("게시글 검색 완료", response));
 	}
 
 }

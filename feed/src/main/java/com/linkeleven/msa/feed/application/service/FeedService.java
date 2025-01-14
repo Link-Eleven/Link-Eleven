@@ -3,7 +3,6 @@ package com.linkeleven.msa.feed.application.service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -80,8 +79,7 @@ public class FeedService {
 
 		Feed feed = findByIdAndDeletedAt(feedId);
 
-
-		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER") ) {
+		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER")) {
 			throw new CustomException(ErrorCode.NO_UPDATE_PERMISSION);
 		}
 
@@ -180,10 +178,11 @@ public class FeedService {
 
 	public List<FeedTopResponseDto> getAllTopFeed() {
 		@SuppressWarnings("unchecked")
-		List<FeedTopResponseDto> top100FeedList = (List<FeedTopResponseDto>)redisTemplate.opsForValue().get("popularFeeds");
+		List<FeedTopResponseDto> top100FeedList = (List<FeedTopResponseDto>)redisTemplate.opsForValue()
+			.get("popularFeeds");
 		// if (top100FeedList.isEmpty()) {
-			// top100FeedList = topFeedRepository.findAll();
-			// redisTemplate.opsForValue().set("popularFeeds", top100FeedList);
+		// top100FeedList = topFeedRepository.findAll();
+		// redisTemplate.opsForValue().set("popularFeeds", top100FeedList);
 		// }
 
 		// Map<Object, Object> redisCommentCounts = opsHashRedisTemplate.opsForHash().entries("commentCounts");
@@ -215,7 +214,8 @@ public class FeedService {
 
 	public List<FeedTopResponseDto> getTopFeed() {
 		@SuppressWarnings("unchecked")
-		List<FeedTopResponseDto> top100FeedList = (List<FeedTopResponseDto>)redisTemplate.opsForValue().get("popularFeeds");
+		List<FeedTopResponseDto> top100FeedList = (List<FeedTopResponseDto>)redisTemplate.opsForValue()
+			.get("popularFeeds");
 		// if (top100FeedList.isEmpty()) {
 		// 	top100FeedList = topFeedRepository.findAll();
 		// 	redisTemplate.opsForValue().set("popularFeeds", top100FeedList);
@@ -249,7 +249,6 @@ public class FeedService {
 		return top100FeedList.stream().limit(3).toList();
 	}
 
-
 	public List<PopularFeedResponseDto> getPopularFeedForCoupon() {
 		return getTopFeed().stream()
 			.map(feed -> new PopularFeedResponseDto(feed.getFeedId(), feed.getUserId()))
@@ -257,14 +256,15 @@ public class FeedService {
 	}
 
 	@Transactional(readOnly = true)
-	public Slice<FeedSearchResponseDto> searchFeeds(String title, String content, String region, Category category,
-		Pageable pageable) {
+	public Slice<FeedSearchResponseDto> searchFeeds(Long cursorFeedId, String title, String content, String region,
+		Category category, Pageable pageable) {
 
 		FeedSearchRequestDto searchRequestDto = FeedSearchRequestDto.builder()
 			.title(title)
 			.content(content)
 			.region(region)
 			.category(category)
+			.cursorFeedId(cursorFeedId)
 			.build();
 
 		return feedRepository.searchFeeds(searchRequestDto, pageable);
@@ -288,7 +288,9 @@ public class FeedService {
 		}
 	}
 
-	private UserValidateIdResponseDto getValidateUserId(Long userId) { return authClient.getValidateUserId(userId); }
+	private UserValidateIdResponseDto getValidateUserId(Long userId) {
+		return authClient.getValidateUserId(userId);
+	}
 
 	public boolean checkFeedExists(Long feedId, Long userId) {
 		return feedRepository.existsByFeedIdAndUserId(feedId, userId);

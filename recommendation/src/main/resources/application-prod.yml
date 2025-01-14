@@ -25,7 +25,8 @@ spring:
   kafka:
     bootstrap-servers: ${BOOTSTRAP_SERVER}
     consumer:
-      group-id: ${GROUP_ID}
+      log-service-group-id: ${LOG_SERVICE_GROUP_ID}
+      recommendation-service-group-id: ${RECOMMENDATION_SERVICE_GROUP_ID}
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -36,7 +37,7 @@ spring:
 gemini:
   api:
     key: ${EXTERNAL_API_KEY}
-    
+
 eureka:
   client:
     service-url:

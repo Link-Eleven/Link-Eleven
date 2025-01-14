@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.linkeleven.msa.feed.domain.enums.Region;
+
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -49,6 +51,10 @@ public class Feed extends BaseTime {
 	@Enumerated(EnumType.STRING)
 	private Category category;
 
+	@Column(name = "region", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Region region;
+
 	@Builder.Default
 	@Column(name = "views", nullable = false)
 	private int views = 0;
@@ -62,13 +68,15 @@ public class Feed extends BaseTime {
 	@Builder.Default
 	private List<File> files = new ArrayList<>();
 
-	public static Feed of(Long userId, Long locationId, String title, String content, Category category) {
+	public static Feed of(Long userId, Long locationId, String title, String content, Category category,
+		Region region) {
 		return Feed.builder()
 			.userId(userId)
 			.locationId(locationId)
 			.title(title)
 			.content(content)
 			.category(category)
+			.region(region)
 			.build();
 	}
 
@@ -86,5 +94,10 @@ public class Feed extends BaseTime {
 		this.setDeletedAt(LocalDateTime.now());
 		this.setDeletedBy(userId);
 		this.files.forEach(file -> file.delete(userId));
+	}
+
+	public void setCreatedByAndUpdatedBy (Long userId) {
+		this.setCreatedBy(userId);
+		this.setUpdatedBy(userId);
 	}
 }

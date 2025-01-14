@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.linkeleven.msa.interaction.application.dto.CommentCreateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.CommentUpdateResponseDto;
 import com.linkeleven.msa.interaction.application.dto.external.UserInfoResponseDto;
+import com.linkeleven.msa.interaction.application.service.messaging.OutboxService;
 import com.linkeleven.msa.interaction.domain.model.entity.Comment;
 import com.linkeleven.msa.interaction.domain.model.vo.ContentDetails;
 import com.linkeleven.msa.interaction.domain.repository.CommentRepository;
@@ -22,19 +23,31 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CommentService {
 
 	private final CommentRepository commentRepository;
+	private final OutboxService outboxService;
 	private final FeedClient feedClient;
 	private final AuthClient authClient;
 
+	@Transactional
 	public CommentCreateResponseDto createComment(Long userId, Long feedId, CommentCreateRequestDto requestDto) {
+		checkLogIn(userId);
 		UserInfoResponseDto userInfo = getUsername(userId);
-		checkFeedExists(feedId);
+		checkFeedExists(feedId, requestDto.getAuthorId());
 		ContentDetails contentDetails = ContentDetails.of(requestDto.getContent(), userId, userInfo.getUsername());
 		Comment comment = Comment.of(contentDetails, feedId);
 		commentRepository.save(comment);
+
+		outboxService.saveCommentCreatedEvent(
+			feedId,
+			requestDto.getAuthorId(),
+			comment.getContentDetails().getContent(),
+			comment.getContentDetails().getUserId(),
+			comment.getContentDetails().getUsername(),
+			comment.getCreatedAt().toString()
+		);
+
 		return CommentCreateResponseDto.of(
 			comment.getId(),
 			comment.getContentDetails().getUserId(),
@@ -42,6 +55,7 @@ public class CommentService {
 			comment.getContentDetails().getContent());
 	}
 
+	@Transactional
 	public CommentUpdateResponseDto updateComment(Long userId, Long feedId, Long commentId, CommentUpdateRequestDto requestDto) {
 		Comment comment = getComment(commentId);
 		checkValidateComment(userId, feedId, comment);
@@ -55,6 +69,7 @@ public class CommentService {
 			comment.getContentDetails().getContent());
 	}
 
+	@Transactional
 	public void deleteComment(Long userId, Long feedId, Long commentId) {
 		Comment comment = getComment(commentId);
 		checkValidateComment(userId, feedId, comment);
@@ -95,13 +110,19 @@ public class CommentService {
 		return localDateTime != null;
 	}
 
-	private void checkFeedExists(Long feedId) {
-		if (!feedClient.checkFeedExists(feedId)) {
+	private void checkFeedExists(Long feedId, Long userId) {
+		if (!feedClient.checkFeedExists(feedId, userId)) {
 			throw new CustomException(ErrorCode.FEED_NOT_FOUND);
 		}
 	}
 
 	private UserInfoResponseDto getUsername(Long userId) {
 		return authClient.getUsername(userId);
+	}
+
+	private void checkLogIn(Long userId) {
+		if (userId == null) {
+			throw new CustomException(ErrorCode.INVALID_USERID);
+		}
 	}
 }

@@ -44,15 +44,17 @@ class ReplyServiceTest {
 	@MockitoBean
 	private AuthClient authClient;
 
-	private Long userId;
+	private Long setupUserId;
 	private Long commentId;
+	private Long userId;
 
 	@BeforeEach
 	void setUp() {
-		userId = 1L;
+		setupUserId = 1L;
 		Long feedId = 50L;
+		userId = 9L;
 
-		Mockito.when(feedClient.checkFeedExists(50L)).thenReturn(true);
+		Mockito.when(feedClient.checkFeedExists(50L, 9L)).thenReturn(true);
 
 		UserInfoResponseDto userInfo = new UserInfoResponseDto("username");
 		Mockito.when(authClient.getUsername(1L)).thenReturn(userInfo);
@@ -60,8 +62,9 @@ class ReplyServiceTest {
 		String content = "테스트";
 		CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
 		requestDto.setContent(content);
+		requestDto.setAuthorId(userId);
 
-		CommentCreateResponseDto responseDto = commentService.createComment(userId, feedId, requestDto);
+		CommentCreateResponseDto responseDto = commentService.createComment(setupUserId, feedId, requestDto);
 		commentId = responseDto.getCommentId();
 	}
 	@Test
@@ -70,8 +73,9 @@ class ReplyServiceTest {
 		String content = "테스트";
 		ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto();
 		requestDto.setContent(content);
+		requestDto.setAuthorId(userId);
 
-		ReplyCreateResponseDto responseDto = replyService.createReply(userId, commentId, requestDto);
+		ReplyCreateResponseDto responseDto = replyService.createReply(setupUserId, commentId, requestDto);
 
 		assertThat(responseDto.getReplyId()).isNotNull();
 		assertThat(responseDto.getContent()).isEqualTo(content);
@@ -83,13 +87,14 @@ class ReplyServiceTest {
 		String content = "테스트";
 		ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto();
 		requestDto.setContent(content);
-		ReplyCreateResponseDto responseDto = replyService.createReply(userId, commentId, requestDto);
+		requestDto.setAuthorId(userId);
+		ReplyCreateResponseDto responseDto = replyService.createReply(setupUserId, commentId, requestDto);
 		Long replyId = responseDto.getReplyId();
 
 		String newContent = "수정 테스트";
 		ReplyUpdateRequestDto newRequestDto = new ReplyUpdateRequestDto();
 		newRequestDto.setContent(newContent);
-		replyService.updateReply(userId, replyId, commentId, newRequestDto);
+		replyService.updateReply(setupUserId, replyId, commentId, newRequestDto);
 
 		var updateReply = replyRepository.findById(replyId)
 			.orElseThrow(() -> new AssertionError("수정된 댓글이 없습니다."));
@@ -102,15 +107,16 @@ class ReplyServiceTest {
 		String content = "테스트";
 		ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto();
 		requestDto.setContent(content);
-		ReplyCreateResponseDto responseDto = replyService.createReply(userId, commentId, requestDto);
+		requestDto.setAuthorId(userId);
+		ReplyCreateResponseDto responseDto = replyService.createReply(setupUserId, commentId, requestDto);
 		Long replyId = responseDto.getReplyId();
 
-		replyService.deleteReply(userId, commentId, replyId);
+		replyService.deleteReply(setupUserId, commentId, replyId);
 
 		var deleteReply = replyRepository.findById(replyId)
 			.orElseThrow(() -> new AssertionError("삭제됨. 존재하지 않습니다."));
 		assertThat(deleteReply.getDeletedAt()).isNotNull();
 		assertThat(deleteReply.getId()).isEqualTo(replyId);
-		assertThat(deleteReply.getContentDetails().getUserId()).isEqualTo(userId);
+		assertThat(deleteReply.getContentDetails().getUserId()).isEqualTo(setupUserId);
 	}
 }

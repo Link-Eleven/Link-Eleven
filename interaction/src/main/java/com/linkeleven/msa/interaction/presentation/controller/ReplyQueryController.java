@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.linkeleven.msa.interaction.application.dto.PageResponseDto;
 import com.linkeleven.msa.interaction.application.dto.ReplyQueryResponseDto;
 import com.linkeleven.msa.interaction.application.service.ReplyQueryService;
 import com.linkeleven.msa.interaction.libs.dto.SuccessResponseDto;
@@ -27,7 +26,7 @@ public class ReplyQueryController {
 	private final ReplyQueryService replyQueryService;
 
 	@GetMapping("/{commentId}/replies")
-	public ResponseEntity<SuccessResponseDto<PageResponseDto<ReplyQueryResponseDto>>> getReplyList(
+	public ResponseEntity<SuccessResponseDto<Slice<ReplyQueryResponseDto>>> getReplyList(
 		@PathVariable Long commentId,
 		@RequestParam(required = false) Long cursorId,
 		@RequestParam(required = false) LocalDateTime cursorCreatedAt,
@@ -40,9 +39,7 @@ public class ReplyQueryController {
 			commentId, cursorId, cursorCreatedAt, cursorLikeCount, pageSize, sortByEnum
 		);
 
-		PageResponseDto<ReplyQueryResponseDto> responseDto = PageResponseDto.from(slice);
-
 		return ResponseEntity.ok()
-			.body(SuccessResponseDto.success("조회 성공", responseDto));
+			.body(SuccessResponseDto.success("조회 성공", slice));
 	}
 }

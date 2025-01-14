@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.linkeleven.msa.interaction.libs.dto.ExceptionResponseDto;
+import com.linkeleven.msa.notification.libs.dto.ExceptionResponseDto;
 
 import lombok.extern.slf4j.Slf4j;
 

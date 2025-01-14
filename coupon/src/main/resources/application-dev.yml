@@ -1,9 +1,15 @@
 spring:
+  application:
+    name: coupon-service
   datasource:
     url: ${COUPON_DB_URL}
     username: ${COUPON_DB_USER}
     password: ${COUPON_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -15,10 +21,10 @@ spring:
         format_sql: true
     open-in-view: false
 
-    eureka:
-      client:
-        service-url:
-          defaultZone: http://localhost:19090/eureka/
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
 
 server:
   port: 19097

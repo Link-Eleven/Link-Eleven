@@ -1,8 +1,9 @@
 package com.linkeleven.msa.interaction.presentation.controller.external;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.interaction.application.dto.external.LikeCountResponseDto;
@@ -13,15 +14,14 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/external/feeds/{feedId}/likes")
 public class ExtLikeController {
 
 	private final LikeQueryService likeQueryService;
 
-	@GetMapping
+	@GetMapping("/external/feeds/likes")
 	public LikeCountResponseDto getLikeCount(
-		@PathVariable Long feedId
+		@RequestParam("feedIdList") List<Long> feedIdList
 	) {
-		return likeQueryService.getLikeCount(feedId, ContentType.FEED);
+		return likeQueryService.getLikeCount(feedIdList, ContentType.FEED);
 	}
 }

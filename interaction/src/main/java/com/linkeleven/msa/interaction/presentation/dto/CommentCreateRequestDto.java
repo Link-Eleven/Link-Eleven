@@ -10,4 +10,6 @@ public class CommentCreateRequestDto {
 	@ValidateContent
 	private String Content;
 
+	private Long authorId;
+
 }

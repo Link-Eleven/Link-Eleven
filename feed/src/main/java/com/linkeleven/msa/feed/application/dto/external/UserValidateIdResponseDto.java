@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserInfoResponseDto {
+public class UserValidateIdResponseDto {
 	private Long userId;
 }

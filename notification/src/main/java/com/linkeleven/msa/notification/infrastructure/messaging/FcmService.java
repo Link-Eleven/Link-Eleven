@@ -25,7 +25,7 @@ public class FcmService {
 				.setToken(token)
 				.setNotification(createNotification(title, body))
 				.putData("targetId", String.valueOf(targetId))
-				.putData("notificationType", "CONTENT_REDIRECT")
+				.putData("notificationType", contentType)
 				.build();
 
 			String fcmResponse = FirebaseMessaging.getInstance().send(message);

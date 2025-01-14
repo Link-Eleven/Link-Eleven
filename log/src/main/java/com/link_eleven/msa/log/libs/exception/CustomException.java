@@ -1,4 +1,4 @@
-package com.linkeleven.msa.recommendation.libs.exception;
+package com.link_eleven.msa.log.libs.exception;
 
 import lombok.Getter;
 

@@ -1,4 +1,4 @@
-package com.linkeleven.msa.recommendation.libs.exception;
+package com.link_eleven.msa.log.libs.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,13 +10,11 @@ public enum ErrorCode {
 	/*  400 BAD_REQUEST : 잘못된 요청  */
 	ILLEGAL_ARGUMENT_ERROR(400, "잘못된 파라미터 전달"),
 
-
 	/*  401 UNAUTHORIZED : 인증 안됨  */
 	UNAUTHORIZED(401, "인증되지 않았습니다."),
 
 	/*  403 FORBIDDEN : 권한 없음  */
 	FORBIDDEN(403, "권한이 없습니다."),
-
 
 	/*  404 NOT_FOUND : Resource 권한 없음, Resource 를 찾을 수 없음  */
 	ACCESS_DENIED(404, "접근 권한이 없습니다."),
@@ -27,6 +25,7 @@ public enum ErrorCode {
 	/*  409 CONFLICT : Resource 중복  */
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
+	KAFKA_SEND_FAILURE(500, "Kafka에 메시지를 보내지 못했습니다."),
 	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다.");
 
 

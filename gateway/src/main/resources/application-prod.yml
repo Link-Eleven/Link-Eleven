@@ -9,49 +9,44 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/auth/**
+            - Path=/api/auth/** ,/api/follows/**,/api/users/**
 
         - id: feed-service
           uri: lb://feed-service
           predicates:
-            - Path=/feed/**
+            - Path=/api/feeds/**
 
         - id: area-service
           uri: lb://area-service
           predicates:
-            - Path=/area/**
+            - Path=/api/areas/**
 
         - id: coupon-service
           uri: lb://coupon-service
           predicates:
-            - Path=/coupon/**
+            - Path=/api/coupons/**
 
         - id: interaction-service
           uri: lb://interaction-service
           predicates:
-            - Path=/interaction/**
+            - Path=/api/interaction/**, /api/comments/**, /api/likes/**
 
         - id: notification-service
           uri: lb://notification-service
           predicates:
-            - Path=/notification/**
-
-        - id: order-service
-          uri: lb://order-service
-          predicates:
-            - Path=/orders/**
+            - Path=/api/notification/**
 
         - id: recommendation-service
           uri: lb://recommendation-service
           predicates:
-            - Path=/recommendation/**
+            - Path=/api/recommendation/**
 
       discovery:
         locator:
           enabled: true
 
 server:
-  port: ${GATEWAY_PORT}
+  port: 19091
 
 eureka:
   client:

@@ -34,7 +34,7 @@ public class PlaceConsumerService {
 	private final CategoryCommandService categoryCommandService;
 	private final SearchLocationService searchLocationService;
 
-	@KafkaListener(groupId = "area-service", topics = "place-create-topic")
+	@KafkaListener(groupId = "area-group", topics = "place-create-topic")
 	@RetryableTopic(attempts = "3", backoff = @Backoff(delay = 2000, multiplier = 1.1))
 	@Transactional
 	public void consumePlaceCreateMessage(PlaceMessageDto placeMessage) {

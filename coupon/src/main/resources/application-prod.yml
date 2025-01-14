@@ -26,4 +26,4 @@ eureka:
       defaultZone: ${SERVER_URL}
 
 server:
-  port: ${COUPON_PORT}
+  port: 19097

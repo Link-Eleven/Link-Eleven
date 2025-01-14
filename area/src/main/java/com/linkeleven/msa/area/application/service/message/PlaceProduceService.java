@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service;
 
 import com.linkeleven.msa.area.application.dto.message.PlaceMessageDto;
 
-@Service
-public class PlaceProduceService {
-	private final KafkaTemplate<String, PlaceMessageDto> kafkaTemplate;
+import lombok.RequiredArgsConstructor;
 
-	public PlaceProduceService(KafkaTemplate kafkaTemplate) {
-		this.kafkaTemplate = kafkaTemplate;
-	}
+@Service
+@RequiredArgsConstructor
+public class PlaceProduceService {
+	private final KafkaTemplate<String, Object> kafkaTemplate;
+
 
 	public void sendPlaceCreateMessage(PlaceMessageDto message) {
 		kafkaTemplate.send("place-create-topic", message);

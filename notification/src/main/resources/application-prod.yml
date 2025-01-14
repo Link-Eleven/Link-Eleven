@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: notification-service
   datasource:
     url: ${NOTIFICATION_DB_URL}
     username: ${NOTIFICATION_DB_USER}
@@ -15,6 +17,27 @@ spring:
         format_sql: true
     open-in-view: false
 
+  kafka:
+    bootstrap-servers: ${BOOTSTRAP_SERVER}
+    properties:
+      schema.registry.url: ${SCHEMA_REGISTRY_URL}
+      retry:
+        enable: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    consumer:
+      group-id: ${NOTIFICATION_GROUP_ID}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        specific.avro.reader: true
+    listener:
+      try:
+        topic:
+          enabled: true
+
   data:
     redis:
       host: ${REDIS_HOST}
@@ -26,4 +49,4 @@ eureka:
       defaultZone: ${SERVER_URL}
 
 server:
-  port: ${NOTIFICATION_PORT}
+  port: 19098

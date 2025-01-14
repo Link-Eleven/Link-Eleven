@@ -1,9 +1,17 @@
 spring:
+  application:
+    name: feed-service
   datasource:
     url: ${FEED_DB_URL}
     username: ${FEED_DB_USER}
     password: ${FEED_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -15,10 +23,20 @@ spring:
         format_sql: true
     open-in-view: false
 
-    eureka:
-      client:
-        service-url:
-          defaultZone: ${SERVER_URL}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${SERVER_URL}
+
+aws:
+  s3:
+    access-key: ${ACCESS_KEY_ID}
+    secret-key: ${SECRET_ACCESS_KEY}
+    bucket: ${S3_BUCKET}
+    region: ${S3_REGION}
+    stack:
+      auto: false
+
 
 server:
-  port: ${FEED_PORT}
+  port: 19093

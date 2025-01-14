@@ -18,6 +18,12 @@ spring:
         format_sql: true
     open-in-view: false
 
+  kafka:
+    bootstrap-servers: ${BOOTSTRAP_SERVER}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 eureka:
   client:
     service-url:
@@ -25,7 +31,8 @@ eureka:
 
 service:
   jwt:
+    access-expiration: 3600000
     secret-key: ${JWT_SECRET_KEY}
 
 server:
-  port: ${AUTH_PORT}
+  port: 19092

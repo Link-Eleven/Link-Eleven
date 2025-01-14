@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @Component
 public class JpaAuditorAware implements AuditorAware<Long> {
+	private static final Long SYSTEM_USER_ID = -1L; // 시스템 사용자 ID
+	private final ThreadLocal<Long> currentAuditor = new ThreadLocal<>();
 
 	private final HttpServletRequest request;
 
@@ -18,16 +20,28 @@ public class JpaAuditorAware implements AuditorAware<Long> {
 		this.request = request;
 	}
 
+	public void setCurrentAuditor(Long userId) {
+		currentAuditor.set(userId);
+	}
+
+	public void clearCurrentAuditor() {
+		currentAuditor.remove();
+	}
+
 	@Override
 	public Optional<Long> getCurrentAuditor() {
-		String userIdStr = request.getHeader("X-User-Id");
-		if (userIdStr != null) {
-			try {
-				return Optional.of(Long.parseLong(userIdStr));
-			} catch (NumberFormatException e) {
-				return Optional.empty();
-			}
+		Long auditor = currentAuditor.get();
+		if (auditor != null) {
+			return Optional.of(auditor);
 		}
-		return Optional.empty();
+		try {
+			String userIdStr = request.getHeader("X-User-Id");
+			if (userIdStr != null) {
+				return Optional.of(Long.parseLong(userIdStr));
+			}
+		} catch (Exception e) {
+			return Optional.of(SYSTEM_USER_ID);
+		}
+		return Optional.of(SYSTEM_USER_ID);
 	}
 }

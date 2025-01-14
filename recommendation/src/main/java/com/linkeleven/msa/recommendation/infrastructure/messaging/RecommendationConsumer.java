@@ -17,7 +17,7 @@ public class RecommendationConsumer {
 
 	private final RecommendationService recommendationService;
 
-	@KafkaListener(topics = "recommendationKeywords", groupId = "${kafka.consumer.recommendation-service-group-id}")
+	@KafkaListener(topics = "recommendationKeywords", groupId = "${spring.kafka.consumer.group-id}")
 	public void consume(RecommendationMessage message) {
 		if (isInvalidMessage(message)) {
 			handleInvalidMessage(message);

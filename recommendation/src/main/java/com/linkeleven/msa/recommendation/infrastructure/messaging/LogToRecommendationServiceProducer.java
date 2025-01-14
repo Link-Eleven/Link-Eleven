@@ -3,7 +3,7 @@ package com.linkeleven.msa.recommendation.infrastructure.messaging;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import com.linkeleven.msa.recommendation.domain.model.Recommend;
+import com.linkeleven.msa.recommendation.domain.model.Recommendation;
 import com.linkeleven.msa.recommendation.libs.exception.CustomException;
 import com.linkeleven.msa.recommendation.libs.exception.ErrorCode;
 
@@ -13,14 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RecommendationProducer {
+public class LogToRecommendationServiceProducer {
 	private final KafkaTemplate<String, RecommendationMessage> kafkaTemplate;
-	private static final String TOPIC = "log.keywords";
+	private static final String TOPIC = "recommendationKeywords";
 
-	public void sendToRecommendationService(Recommend analysis) {
+	public void sendToRecommendationService(Recommendation analysis) {
 		RecommendationMessage message = RecommendationMessage.builder()
 			.userId(analysis.getUserId())
-			.keywords(analysis.getKeywords())
+			.recommendationKeywords(analysis.getKeywords())
 			.build();
 
 		kafkaTemplate.send(TOPIC, message)

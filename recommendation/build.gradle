@@ -31,6 +31,9 @@ dependencies {
     // JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+    // TSID
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.5'
+
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
@@ -47,9 +50,6 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
-    // todo: H2 DB 테스트 후 제거하기
-    runtimeOnly 'com.h2database:h2'
-	
     // Web, Lombok, Test
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'

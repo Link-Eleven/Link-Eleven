@@ -2,6 +2,8 @@ package com.linkeleven.msa.recommendation.infrastructure.messaging;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.converter.MessageConversionException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import com.linkeleven.msa.recommendation.application.dto.RecommendationCommand;
@@ -18,50 +20,24 @@ public class RecommendationConsumer {
 	private final RecommendationService recommendationService;
 
 	@KafkaListener(topics = "recommendationKeywords", groupId = "${spring.kafka.consumer.group-id}")
+	@Retryable(
+		maxAttempts = 3,  // 최대 3번 재시도
+		backoff = @Backoff(delay = 2000)  // 2초 간격으로 재시도
+	)
 	public void consume(RecommendationMessage message) {
-		if (isInvalidMessage(message)) {
-			handleInvalidMessage(message);
+		if (message == null || message.getUserId() == null) {
+			log.error("Invalid message received: {}", message);
 			return;
 		}
 
 		try {
-			RecommendationCommand command = convertToCommand(message);
-			processRecommendation(command);
+			RecommendationCommand command = RecommendationCommand.from(message);
+			recommendationService.processRecommendation(command);
 		} catch (MessageConversionException e) {
-			handleMessageConversionException(message, e);
-		} catch (Exception e) {
-			handleUnexpectedException(message, e);
-		}
-	}
-
-	private boolean isInvalidMessage(RecommendationMessage message) {
-		return message == null || message.getUserId() == null;
-	}
-
-	private void handleInvalidMessage(RecommendationMessage message) {
-		log.error("Invalid message received: {}", message);
-	}
-
-	private RecommendationCommand convertToCommand(RecommendationMessage message) {
-		try {
-			return RecommendationCommand.from(message);
-		} catch (Exception e) {
 			log.error("메시지 변환 중 오류 발생 - message: {}", message, e);
-			throw new MessageConversionException("Error converting message", e);
+		} catch (Exception e) {
+			log.error("예기치 않은 오류 발생 - message: {}", message, e);
+			throw e;
 		}
-	}
-
-	private void processRecommendation(RecommendationCommand command) {
-		recommendationService.processRecommendation(command);
-	}
-
-	private void handleMessageConversionException(RecommendationMessage message, MessageConversionException e) {
-		log.error("메시지 변환 중 오류 발생 - userId: {}, message: {}", message.getUserId(), message, e);
-		throw e;
-	}
-
-	private void handleUnexpectedException(RecommendationMessage message, Exception e) {
-		log.error("예기치 않은 오류 발생 - userId: {}, message: {}", message.getUserId(), message, e);
-		throw new RuntimeException(e);
 	}
 }

@@ -1,6 +1,8 @@
 package com.linkeleven.msa.recommendation.infrastructure.messaging;
 
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import com.linkeleven.msa.recommendation.domain.model.Recommendation;
@@ -14,9 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 public class LogToRecommendationServiceProducer {
+
 	private final KafkaTemplate<String, RecommendationMessage> kafkaTemplate;
 	private static final String TOPIC = "recommendationKeywords";
 
+	@Retryable(
+		maxAttempts = 3,
+		backoff = @Backoff(delay = 2000)
+	)
 	public void sendToRecommendationService(Recommendation analysis) {
 		RecommendationMessage message = buildRecommendationMessage(analysis);
 		sendKafkaMessage(message, analysis);

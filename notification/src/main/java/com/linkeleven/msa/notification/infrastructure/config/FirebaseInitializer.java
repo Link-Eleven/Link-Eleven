@@ -12,12 +12,15 @@ import com.google.firebase.FirebaseOptions;
 import com.linkeleven.msa.notification.libs.exception.CustomException;
 import com.linkeleven.msa.notification.libs.exception.ErrorCode;
 
+import jakarta.annotation.PostConstruct;
+
 @Configuration
 public class FirebaseInitializer {
 
 	@Value("${firebase.config-path}")
 	private String firebaseConfigPath;
 
+	@PostConstruct
 	public void initializeFirebase() {
 		try {
 			ClassPathResource serviceAccount = new ClassPathResource(firebaseConfigPath);
@@ -30,7 +33,6 @@ public class FirebaseInitializer {
 				FirebaseApp.initializeApp(options);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
 			throw new CustomException(ErrorCode.FIREBASE_ERROR);
 		}
 	}

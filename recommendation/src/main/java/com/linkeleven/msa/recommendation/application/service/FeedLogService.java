@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.linkeleven.msa.recommendation.domain.model.FeedLog;
-import com.linkeleven.msa.recommendation.domain.model.GeminiKeywordHolder;
+import com.linkeleven.msa.recommendation.domain.model.Recommend;
 import com.linkeleven.msa.recommendation.domain.repository.FeedLogRepository;
 import com.linkeleven.msa.recommendation.infrastructure.client.GeminiClient;
 import com.linkeleven.msa.recommendation.infrastructure.messaging.RecommendationProducer;
@@ -25,7 +25,7 @@ public class FeedLogService {
 
 		List<FeedLog> latestLogs = feedLogRepository.getLatestLogs(userId);
 		if (latestLogs.size() >= 3) {
-			GeminiKeywordHolder analysis = geminiClient.processLogs(latestLogs);
+			Recommend analysis = geminiClient.processLogs(latestLogs);
 			recommendationProducer.sendToRecommendationService(analysis);
 		}
 	}

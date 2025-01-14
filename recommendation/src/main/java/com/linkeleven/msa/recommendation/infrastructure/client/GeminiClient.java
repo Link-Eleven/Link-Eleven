@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkeleven.msa.recommendation.domain.model.FeedLog;
-import com.linkeleven.msa.recommendation.domain.model.GeminiKeywordHolder;
+import com.linkeleven.msa.recommendation.domain.model.Recommend;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class GeminiClient {
 	private static final String GEMINI_API_URL =
 		"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent";
 
-	public GeminiKeywordHolder processLogs(List<FeedLog> logs) {
+	public Recommend processLogs(List<FeedLog> logs) {
 		try {
 			String titles = logs.stream()
 				.map(FeedLog::getFeedTitle)
@@ -79,8 +79,9 @@ public class GeminiClient {
 				.asText();
 
 			List<String> keywords = Arrays.asList(result.trim().split(","));
-			return GeminiKeywordHolder.of(keywords, logs.get(0).getUserId());
+			Long userId = logs.get(0).getUserId();
 
+			return Recommend.of(userId, keywords);
 		} catch (Exception e) {
 			log.error("Failed to process logs with Gemini API", e);
 			throw new RuntimeException("Gemini API 처리 중 오류가 발생했습니다", e);

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FeedLog extends BaseTime {
+public class FeedLog {
 	private Long userId;
 	private String feedTitle;
 

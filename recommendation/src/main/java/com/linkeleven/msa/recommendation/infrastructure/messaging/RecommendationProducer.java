@@ -3,7 +3,7 @@ package com.linkeleven.msa.recommendation.infrastructure.messaging;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import com.linkeleven.msa.recommendation.domain.model.GeminiKeywordHolder;
+import com.linkeleven.msa.recommendation.domain.model.Recommend;
 import com.linkeleven.msa.recommendation.libs.exception.CustomException;
 import com.linkeleven.msa.recommendation.libs.exception.ErrorCode;
 
@@ -17,7 +17,7 @@ public class RecommendationProducer {
 	private final KafkaTemplate<String, RecommendationMessage> kafkaTemplate;
 	private static final String TOPIC = "log.keywords";
 
-	public void sendToRecommendationService(GeminiKeywordHolder analysis) {
+	public void sendToRecommendationService(Recommend analysis) {
 		RecommendationMessage message = RecommendationMessage.builder()
 			.userId(analysis.getUserId())
 			.keywords(analysis.getKeywords())

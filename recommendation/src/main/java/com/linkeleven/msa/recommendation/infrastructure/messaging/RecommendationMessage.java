@@ -9,5 +9,5 @@ import lombok.Getter;
 @Builder
 public class RecommendationMessage {
 	private Long userId;
-	private List<String> keywords;
+	private List<String> recommendationKeywords;
 }

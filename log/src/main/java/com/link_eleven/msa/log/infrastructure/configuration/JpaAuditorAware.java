@@ -11,8 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 @Component
 public class JpaAuditorAware implements AuditorAware<Long> {
 
+	private final HttpServletRequest request;
+
 	@Autowired
-	private HttpServletRequest request;
+	public JpaAuditorAware(HttpServletRequest request) {
+		this.request = request;
+	}
 
 	@Override
 	public Optional<Long> getCurrentAuditor() {

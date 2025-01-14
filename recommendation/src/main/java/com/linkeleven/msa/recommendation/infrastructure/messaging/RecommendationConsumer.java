@@ -21,7 +21,7 @@ public class RecommendationConsumer {
 
 	@KafkaListener(topics = "recommendation-keywords", groupId = "${spring.kafka.consumer.group-id}")
 	@Retryable(
-		maxAttempts = 3,
+		maxAttempts = 5,
 		backoff = @Backoff(delay = 2000)
 	)
 	public void consume(RecommendationMessage message) {

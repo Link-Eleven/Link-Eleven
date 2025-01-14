@@ -18,7 +18,7 @@ public class FeedLogConsumer {
 
 	@KafkaListener(topics = "feed-logs", groupId = "${spring.kafka.consumer.group-id}")
 	@RetryableTopic(
-		attempts = "3",
+		attempts = "5",
 		backoff = @Backoff(delay = 2000)
 	)
 	public void consumeFeedLog(FeedLogMessage message) {

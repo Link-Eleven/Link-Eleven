@@ -23,7 +23,7 @@ public class LogToRecommendationServiceProducer {
 	private static final String TOPIC = "recommendation-keywords";
 
 	@Retryable(
-		maxAttempts = 3,
+		maxAttempts = 5,
 		backoff = @Backoff(delay = 2000)
 	)
 	public void sendToRecommendationService(Recommendation analysis) {

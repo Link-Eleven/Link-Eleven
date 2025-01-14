@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Recommend extends BaseTime {
+public class Recommendation extends BaseTime {
 	@Id
 	@Tsid
 	private Long recommendationId;
@@ -36,8 +36,8 @@ public class Recommend extends BaseTime {
 	)
 	private List<String> keywords = new ArrayList<>();
 
-	public static Recommend of(Long userId, List<String> keywords) {
-		return Recommend.builder()
+	public static Recommendation of(Long userId, List<String> keywords) {
+		return Recommendation.builder()
 			.userId(userId)
 			.keywords(keywords)
 			.build();

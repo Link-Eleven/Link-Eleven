@@ -1,5 +1,6 @@
 package com.linkeleven.msa.recommendation.infrastructure.messaging;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -14,4 +15,5 @@ import lombok.NoArgsConstructor;
 public class RecommendationMessage {
 	private Long userId;
 	private List<String> recommendationKeywords;
+	private LocalDateTime timestamp;
 }

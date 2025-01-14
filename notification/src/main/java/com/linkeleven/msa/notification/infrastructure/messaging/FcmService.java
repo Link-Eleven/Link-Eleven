@@ -19,12 +19,13 @@ public class FcmService {
 
 	private final FcmErrorMapper fcmErrorMapper;
 
-	public void sendFcm(String token, String title, String body, Long targetId) {
+	public void sendFcm(String token, String title, String body, Long targetId, String contentType) {
 		try {
 			Message message = Message.builder()
 				.setToken(token)
 				.setNotification(createNotification(title, body))
 				.putData("targetId", String.valueOf(targetId))
+				.putData("notificationType", "CONTENT_REDIRECT")
 				.build();
 
 			String fcmResponse = FirebaseMessaging.getInstance().send(message);

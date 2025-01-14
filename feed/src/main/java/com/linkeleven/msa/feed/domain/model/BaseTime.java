@@ -30,12 +30,10 @@ public class BaseTime {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
-	@Setter
 	@CreatedBy
 	@Column(name = "created_by", updatable = false)
 	private Long createdBy;
 
-	@Setter
 	@LastModifiedBy
 	@Column(name = "updated_by")
 	private Long updatedBy;

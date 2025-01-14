@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 public class FeedLogConsumer {
 	private final FeedLogService feedLogService;
 
-	@KafkaListener(topics = "feed-logs", groupId = "${kafka.consumer.log-service-group-id}")
+	@KafkaListener(topics = "feed-logs", groupId = "${spring.kafka.consumer.group-id}")
 	public void consumeFeedLog(FeedLogMessage message) {
 		feedLogService.processNewLog(message.getUserId(), message.getFeedTitle());
 	}

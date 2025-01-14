@@ -6,6 +6,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.WebpushConfig;
 import com.linkeleven.msa.notification.libs.exception.CustomException;
 import com.linkeleven.msa.notification.libs.exception.ErrorCode;
 
@@ -19,13 +20,15 @@ public class FcmService {
 
 	private final FcmErrorMapper fcmErrorMapper;
 
-	public void sendFcm(String token, String title, String body, Long targetId, String contentType) {
+	public void sendFcm(String token, String body, Long targetId, String contentType) {
 		try {
 			Message message = Message.builder()
 				.setToken(token)
-				.setNotification(createNotification(title, body))
+				.setWebpushConfig(createWebPushConfig())
+				.setNotification(createNotification(body))
 				.putData("targetId", String.valueOf(targetId))
 				.putData("notificationType", contentType)
+				.putData("timestamp", String.valueOf(System.currentTimeMillis()))
 				.build();
 
 			String fcmResponse = FirebaseMessaging.getInstance().send(message);
@@ -39,10 +42,16 @@ public class FcmService {
 		}
 	}
 
-	private Notification createNotification(String title, String body) {
+	private Notification createNotification(String body) {
 		return Notification.builder()
-			.setTitle(title)
+			.setTitle("Link Eleven 알림")
 			.setBody(body)
+			.build();
+	}
+
+	private WebpushConfig createWebPushConfig() {
+		return WebpushConfig.builder()
+			.putHeader("TTL", "300")
 			.build();
 	}
 }

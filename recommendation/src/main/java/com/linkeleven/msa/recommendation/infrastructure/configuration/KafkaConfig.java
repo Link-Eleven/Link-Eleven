@@ -17,6 +17,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
@@ -30,11 +31,6 @@ public class KafkaConfig {
 	private String bootstrapServers;
 
 	@Bean
-	public KafkaTemplate<String, RecommendationMessage> kafkaTemplate() {
-		return new KafkaTemplate<>(producerFactory());
-	}
-
-	@Bean
 	public ProducerFactory<String, RecommendationMessage> producerFactory() {
 		Map<String, Object> configProps = new HashMap<>();
 		configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -44,26 +40,27 @@ public class KafkaConfig {
 	}
 
 	@Bean
-	public ConsumerFactory<String, RecommendationMessage> consumerFactory() {
-		Map<String, Object> configProps = new HashMap<>();
-		configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-		configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "recommendation-service-group");
-		configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-		configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-		configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, RecommendationMessage.class.getName());
+	public KafkaTemplate<String, RecommendationMessage> kafkaTemplate() {
+		return new KafkaTemplate<>(producerFactory());
+	}
 
-		return new DefaultKafkaConsumerFactory<>(
-			configProps,
-			new StringDeserializer(),
-			new JsonDeserializer<>(RecommendationMessage.class, false)
-		);
+	@Bean
+	public ConsumerFactory<String, RecommendationMessage> consumerFactory() {
+
+		Map<String, Object> configProps = new HashMap<>();
+
+		configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+		configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		JsonDeserializer<RecommendationMessage> deserializer = new JsonDeserializer<>(RecommendationMessage.class);
+
+		return new DefaultKafkaConsumerFactory<>(configProps, new StringDeserializer(),
+			new ErrorHandlingDeserializer<>(deserializer));
 	}
 
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, RecommendationMessage> kafkaListenerContainerFactory() {
-		ConcurrentKafkaListenerContainerFactory<String, RecommendationMessage> factory =
-			new ConcurrentKafkaListenerContainerFactory<>();
+		ConcurrentKafkaListenerContainerFactory<String, RecommendationMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory());
 		return factory;
 	}

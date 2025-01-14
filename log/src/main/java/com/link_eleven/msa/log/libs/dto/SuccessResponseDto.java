@@ -1,4 +1,4 @@
-package com.linkeleven.msa.recommendation.libs.dto;
+package com.link_eleven.msa.log.libs.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

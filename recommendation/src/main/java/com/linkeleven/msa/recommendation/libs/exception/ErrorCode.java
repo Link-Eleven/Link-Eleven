@@ -26,7 +26,9 @@ public enum ErrorCode {
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
 	KAFKA_SEND_FAILURE(500, "Kafka에 메시지를 보내지 못했습니다."),
-	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다.");
+	KAFKA_CONSUME_FAILURE(500, "메시지 수신 중 오류가 발생하였습니다."),
+	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다."),
+	MESSAGE_CONVERSION_FAILURE(500, "메시지 변환 실패");
 
 
 	/*  502 BAD_GATEWAY  연결 실패   */

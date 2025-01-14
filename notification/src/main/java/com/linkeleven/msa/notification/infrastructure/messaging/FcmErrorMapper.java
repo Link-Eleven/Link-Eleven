@@ -1,5 +1,7 @@
 package com.linkeleven.msa.notification.infrastructure.messaging;
 
+import org.springframework.stereotype.Component;
+
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.MessagingErrorCode;
 import com.linkeleven.msa.notification.libs.exception.CustomException;
@@ -8,6 +10,7 @@ import com.linkeleven.msa.notification.libs.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Component
 public class FcmErrorMapper {
 
 	public CustomException mappingFireBaseErrorCode(FirebaseMessagingException e) {

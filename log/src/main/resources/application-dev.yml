@@ -3,9 +3,9 @@ spring:
     name: log-service
 
   datasource:
-    url: ${COUPON_DB_URL}
-    username: ${COUPON_DB_USER}
-    password: ${COUPON_DB_PASSWORD}
+    url: ${LOG_DB_URL}
+    username: ${LOG_DB_USER}
+    password: ${LOG_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   kafka:

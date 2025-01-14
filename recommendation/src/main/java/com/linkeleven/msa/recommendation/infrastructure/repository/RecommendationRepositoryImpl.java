@@ -11,10 +11,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RecommendationRepositoryImpl implements RecommendationRepository {
 	private final JpaRecommendationRepository jpaRecommendationRepository;
+	private final RedisRecommendationRepository redisRecommendationRepository;
 
-	// private final RedisRecommendationRepository redisRecommendationRepository;
 	@Override
 	public void save(Recommendation recommendation) {
+		redisRecommendationRepository.save(recommendation);
 		jpaRecommendationRepository.save(recommendation);
 	}
 }

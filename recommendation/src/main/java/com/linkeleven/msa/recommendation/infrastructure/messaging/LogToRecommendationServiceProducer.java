@@ -18,19 +18,28 @@ public class LogToRecommendationServiceProducer {
 	private static final String TOPIC = "recommendationKeywords";
 
 	public void sendToRecommendationService(Recommendation analysis) {
-		RecommendationMessage message = RecommendationMessage.builder()
+		RecommendationMessage message = buildRecommendationMessage(analysis);
+		sendKafkaMessage(message, analysis);
+	}
+
+	private RecommendationMessage buildRecommendationMessage(Recommendation analysis) {
+		return RecommendationMessage.builder()
 			.userId(analysis.getUserId())
 			.recommendationKeywords(analysis.getKeywords())
 			.build();
+	}
 
+	private void sendKafkaMessage(RecommendationMessage message, Recommendation analysis) {
 		kafkaTemplate.send(TOPIC, message)
-			.whenComplete((result, ex) -> {
-				if (ex == null) {
-					log.info("사용자에 대한 키워드를 성공적으로 보냈습니다.: {}", analysis.getUserId());
-				} else {
-					log.error("키워드 전송에 실패했습니다", ex);
-					throw new CustomException(ErrorCode.KAFKA_SEND_FAILURE);
-				}
-			});
+			.whenComplete((result, ex) -> handleKafkaSendResult(ex, analysis));
+	}
+
+	private void handleKafkaSendResult(Throwable ex, Recommendation analysis) {
+		if (ex == null) {
+			log.info("사용자에 대한 키워드를 성공적으로 보냈습니다.: {}", analysis.getUserId());
+		} else {
+			log.error("키워드 전송에 실패했습니다: userId = {}, error = {}", analysis.getUserId(), ex.getMessage(), ex);
+			throw new CustomException(ErrorCode.KAFKA_SEND_FAILURE);
+		}
 	}
 }

@@ -1,0 +1,52 @@
+package com.linkeleven.msa.recommendation.infrastructure.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Repository;
+
+import com.linkeleven.msa.recommendation.domain.model.Recommendation;
+import com.linkeleven.msa.recommendation.domain.repository.RecommendationRepository;
+import com.linkeleven.msa.recommendation.infrastructure.cache.RecommendationCache;
+
+import lombok.RequiredArgsConstructor;
+
+@Repository
+@RequiredArgsConstructor
+public class RecommendationRepositoryImpl implements RecommendationRepository {
+	private final JpaRecommendationRepository jpaRecommendationRepository;
+	private final RedisRecommendationRepository redisRecommendationRepository;
+
+	@Override
+	public Optional<Recommendation> findByUserId(Long userId) {
+		Optional<RecommendationCache> cachedData = redisRecommendationRepository.findByUserId(userId);
+		if (cachedData.isPresent()) {
+			return Optional.of(cachedData.get().toEntity());
+		}
+
+		Optional<Recommendation> dbData = jpaRecommendationRepository.findByUserId(userId);
+		dbData.ifPresent(redisRecommendationRepository::save);
+		return dbData;
+	}
+
+	@Override
+	public void saveOrUpdate(Recommendation recommendation) {
+		redisRecommendationRepository.update(recommendation);
+
+		Optional<Recommendation> existingRecommendation =
+			jpaRecommendationRepository.findByUserId(recommendation.getUserId());
+
+		if (existingRecommendation.isPresent()) {
+			Recommendation existing = existingRecommendation.get();
+			existing.updateKeywords(recommendation.getKeywords());
+			jpaRecommendationRepository.save(existing);
+		} else {
+			jpaRecommendationRepository.save(recommendation);
+		}
+	}
+
+	@Override
+	public List<Recommendation> findAll() {
+		return jpaRecommendationRepository.findAll();
+	}
+}

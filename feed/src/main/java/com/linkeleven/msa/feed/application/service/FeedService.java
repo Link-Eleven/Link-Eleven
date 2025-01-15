@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,12 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
-import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.dto.external.PopularFeedResponseDto;
 import com.linkeleven.msa.feed.application.dto.external.UserValidateIdResponseDto;
-import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.model.Feed;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
 import com.linkeleven.msa.feed.domain.repository.TopFeedRepository;
@@ -31,7 +27,6 @@ import com.linkeleven.msa.feed.infrastructure.client.InteractionClient;
 import com.linkeleven.msa.feed.libs.exception.CustomException;
 import com.linkeleven.msa.feed.libs.exception.ErrorCode;
 import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;
-import com.linkeleven.msa.feed.presentation.request.FeedSearchRequestDto;
 import com.linkeleven.msa.feed.presentation.request.FeedUpdateRequestDto;
 
 import lombok.RequiredArgsConstructor;
@@ -54,7 +49,6 @@ public class FeedService {
 	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files,
 		Long userId) {
 
-		// 유저 정보 검증
 		UserValidateIdResponseDto userInfo = getValidateUserId(userId);
 		validateUser(userId, userInfo);
 
@@ -109,8 +103,7 @@ public class FeedService {
 		feed.delete(userId);
 		fileService.deleteFiles(feed, userId);
 
-		// 쿠폰 삭제 요청
-		// couponClient.deleteCoupons(feedId, userId, userRole);
+		couponClient.deleteCoupon(feedId, userId, userRole);
 
 	}
 
@@ -261,23 +254,8 @@ public class FeedService {
 			.collect(Collectors.toList());
 	}
 
-	@Transactional(readOnly = true)
-	public Slice<FeedSearchResponseDto> searchFeeds(Long cursorFeedId, String title, String content, String region,
-		Category category, Pageable pageable) {
-
-		FeedSearchRequestDto searchRequestDto = FeedSearchRequestDto.builder()
-			.title(title)
-			.content(content)
-			.region(region)
-			.category(category)
-			.cursorFeedId(cursorFeedId)
-			.build();
-
-		return feedRepository.searchFeeds(searchRequestDto, pageable);
-	}
-
 	private double calculatePopularityScore(int views, long commentCount, long likeCount, int weight) {
-		double popularityScore = (views * 0.2 + commentCount * 0.5 + likeCount * 0.3) * weight; // 
+		double popularityScore = (views * 0.2 + commentCount * 0.5 + likeCount * 0.3) * weight;
 
 		String formattedScore = String.format("%.2f", popularityScore);
 		return Double.parseDouble(formattedScore);

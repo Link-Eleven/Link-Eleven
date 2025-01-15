@@ -77,6 +77,37 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 		return new SliceImpl<>(feedList, pageable, hasNext);
 	}
 
+	public Slice<FeedSearchResponseDto> searchFeedsByKeywords(List<String> keywords, Pageable pageable) {
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(feed.deletedAt.isNull());
+		if (keywords != null && !keywords.isEmpty()) {
+			BooleanBuilder keywordBuilder = new BooleanBuilder();
+			for (String keyword : keywords) {
+				keywordBuilder.or(feed.title.containsIgnoreCase(keyword)).or(feed.content.containsIgnoreCase(keyword));
+			}
+			builder.and(keywordBuilder);
+		}
+		List<FeedSearchResponseDto> feedList = queryFactory.query()
+			.select(Projections.constructor(FeedSearchResponseDto.class,
+					feed.feedId,
+					feed.title,
+					feed.content,
+					feed.category,
+					feed.region
+				)
+			)
+			.from(feed)
+			.where(builder)
+			.orderBy(feed.feedId.desc())
+			.limit(pageable.getPageSize() + 1)
+			.fetch();
+		boolean hasNext = feedList.size() > pageable.getPageSize();
+		if (hasNext) {
+			feedList.remove(feedList.size() - 1);
+		}
+		return new SliceImpl<>(feedList, pageable, hasNext);
+	}
+
 	private BooleanExpression titleContains(String title) {
 		return title != null ? feed.title.containsIgnoreCase(title) : null;
 	}

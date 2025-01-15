@@ -12,5 +12,4 @@ public interface AuthClient {
 	@GetMapping("/external/users/{userId}/validate")
 	UserValidateIdResponseDto getValidateUserId(@PathVariable("userId") Long userId);
 
-
 }

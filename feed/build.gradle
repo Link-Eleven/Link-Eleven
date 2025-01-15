@@ -28,6 +28,9 @@ ext {
 }
 
 dependencies {
+    //kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
     // QueryDsl
     implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
     annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'

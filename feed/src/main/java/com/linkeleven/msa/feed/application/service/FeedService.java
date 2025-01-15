@@ -3,13 +3,10 @@ package com.linkeleven.msa.feed.application.service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
-import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.dto.external.PopularFeedResponseDto;
 import com.linkeleven.msa.feed.application.dto.external.UserValidateIdResponseDto;
-import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.model.Feed;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
 import com.linkeleven.msa.feed.domain.repository.TopFeedRepository;
@@ -32,7 +27,6 @@ import com.linkeleven.msa.feed.infrastructure.client.InteractionClient;
 import com.linkeleven.msa.feed.libs.exception.CustomException;
 import com.linkeleven.msa.feed.libs.exception.ErrorCode;
 import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;
-import com.linkeleven.msa.feed.presentation.request.FeedSearchRequestDto;
 import com.linkeleven.msa.feed.presentation.request.FeedUpdateRequestDto;
 
 import lombok.RequiredArgsConstructor;
@@ -49,12 +43,12 @@ public class FeedService {
 	private final CouponClient couponClient;
 	private final RedisTemplate<String, List<?>> redisTemplate;
 	private final RedisTemplate<String, Object> opsHashRedisTemplate;
+	private final UserActivityProducer userActivityProducer;
 
 	@Transactional
 	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files,
 		Long userId) {
 
-		// 유저 정보 검증
 		UserValidateIdResponseDto userInfo = getValidateUserId(userId);
 		validateUser(userId, userInfo);
 
@@ -69,8 +63,6 @@ public class FeedService {
 
 		feed.getFiles().addAll(fileService.uploadFiles(files));
 
-		feed.setCreatedByAndUpdatedBy(userId);
-
 		Feed savedFeed = feedRepository.save(feed);
 
 		return FeedCreateResponseDto.from(savedFeed);
@@ -82,8 +74,7 @@ public class FeedService {
 
 		Feed feed = findByIdAndDeletedAt(feedId);
 
-
-		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER") ) {
+		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER")) {
 			throw new CustomException(ErrorCode.NO_UPDATE_PERMISSION);
 		}
 
@@ -96,8 +87,6 @@ public class FeedService {
 		feed.getFiles().addAll(fileService.uploadFiles(files));
 
 		Feed updatedFeed = feedRepository.save(feed);
-
-		updatedFeed.setCreatedByAndUpdatedBy(userId);
 
 		return FeedUpdateResponseDto.from(updatedFeed);
 	}
@@ -114,8 +103,7 @@ public class FeedService {
 		feed.delete(userId);
 		fileService.deleteFiles(feed, userId);
 
-		// 쿠폰 삭제 요청
-		// couponClient.deleteCoupons(feedId, userId, userRole);
+		couponClient.deleteCoupon(feedId, userId, userRole);
 
 	}
 
@@ -129,12 +117,17 @@ public class FeedService {
 		feedRepository.incrementViews(feedId);
 
 		Feed feed = findByIdAndDeletedAt(feedId);
-		return FeedReadResponseDto.from(feed);
+
+		FeedReadResponseDto responseDto = FeedReadResponseDto.from(feed);
+
+		userActivityProducer.sendActivity(feed.getUserId(), feed.getTitle());
+
+		return responseDto;
 	}
 
 	@Transactional
 	public void updateTopFeed() {
-		topFeedRepository.deleteAll();
+		// topFeedRepository.deleteAll();
 		opsHashRedisTemplate.delete("commentCounts");
 		opsHashRedisTemplate.delete("likeCounts");
 
@@ -152,8 +145,8 @@ public class FeedService {
 		Map<Long, Integer> commentCounts = interactionClient.getCommentCount(feedIdList).getCount();
 		Map<Long, Integer> likeCounts = interactionClient.getLikeCount(feedIdList).getCount();
 
-		opsHashRedisTemplate.opsForHash().putAll("commentCounts", commentCounts);
-		opsHashRedisTemplate.opsForHash().putAll("likeCounts", likeCounts);
+		// opsHashRedisTemplate.opsForHash().putAll("commentCounts", commentCounts);
+		// opsHashRedisTemplate.opsForHash().putAll("likeCounts", likeCounts);
 
 		// 각 피드의 인기도 점수 계산
 		feeds.forEach(feed -> {
@@ -166,91 +159,94 @@ public class FeedService {
 		});
 
 		// // 상위 100개의 게시글을 인기 순으로 정렬하고 FeedTopResponseDto로 변환하여 캐시에 저장
-		// List<FeedTopResponseDto> top100Feed = feeds.stream()
-		// 	.sorted(Comparator.comparingDouble(Feed::getPopularityScore).reversed())
-		// 	.limit(100)
-		// 	.map(feed -> FeedTopResponseDto.of(feed,
-		// 		commentCounts.getOrDefault(feed.getFeedId(), 0),
-		// 		likeCounts.getOrDefault(feed.getFeedId(), 0)))
-		// 	.toList();
-		List<Feed> topFeedList = feeds.stream()
+		List<FeedTopResponseDto> topFeedList = feeds.stream()
 			.sorted(Comparator.comparingDouble(Feed::getPopularityScore).reversed())
 			.limit(100)
+			.map(feed -> FeedTopResponseDto.of(feed,
+				commentCounts.getOrDefault(feed.getFeedId(), 0),
+				likeCounts.getOrDefault(feed.getFeedId(), 0)))
 			.toList();
+		// List<Feed> topFeedList = feeds.stream()
+		// 	.sorted(Comparator.comparingDouble(Feed::getPopularityScore).reversed())
+		// 	.limit(100)
+		// 	.toList();
 
-		topFeedRepository.saveAll(topFeedList);
+		// topFeedRepository.saveAll(topFeedList);
 		redisTemplate.opsForValue().set("popularFeeds", topFeedList);
 	}
 
 	public List<FeedTopResponseDto> getAllTopFeed() {
 		@SuppressWarnings("unchecked")
-		List<Feed> top100FeedList = (List<Feed>)redisTemplate.opsForValue().get("popularFeeds");
-		if (top100FeedList.isEmpty()) {
-			top100FeedList = topFeedRepository.findAll();
-			redisTemplate.opsForValue().set("popularFeeds", top100FeedList);
-		}
+		List<FeedTopResponseDto> top100FeedList = (List<FeedTopResponseDto>)redisTemplate.opsForValue()
+			.get("popularFeeds");
+		// if (top100FeedList.isEmpty()) {
+		// top100FeedList = topFeedRepository.findAll();
+		// redisTemplate.opsForValue().set("popularFeeds", top100FeedList);
+		// }
 
-		Map<Object, Object> redisCommentCounts = opsHashRedisTemplate.opsForHash().entries("commentCounts");
-		Map<Long, Integer> commentCounts = new HashMap<>();
-		for (Map.Entry<Object, Object> entry : redisCommentCounts.entrySet()) {
-			commentCounts.put(
-				Long.valueOf(entry.getKey().toString()),
-				Integer.valueOf(entry.getValue().toString())
-			);
-		}
-
-		Map<Object, Object> redisLikeCounts = opsHashRedisTemplate.opsForHash().entries("likeCounts");
-		Map<Long, Integer> likeCounts = new HashMap<>();
-		for (Map.Entry<Object, Object> entry : redisLikeCounts.entrySet()) {
-			likeCounts.put(
-				Long.valueOf(entry.getKey().toString()),
-				Integer.valueOf(entry.getValue().toString())
-			);
-		}
-
-		return top100FeedList.stream()
-			.map(feed -> FeedTopResponseDto.of(feed,
-				commentCounts.getOrDefault(feed.getFeedId(), 0),
-				likeCounts.getOrDefault(feed.getFeedId(), 0)
-			))
-			.toList();
+		// Map<Object, Object> redisCommentCounts = opsHashRedisTemplate.opsForHash().entries("commentCounts");
+		// Map<Long, Integer> commentCounts = new HashMap<>();
+		// for (Map.Entry<Object, Object> entry : redisCommentCounts.entrySet()) {
+		// 	commentCounts.put(
+		// 		Long.valueOf(entry.getKey().toString()),
+		// 		Integer.valueOf(entry.getValue().toString())
+		// 	);
+		// }
+		//
+		// Map<Object, Object> redisLikeCounts = opsHashRedisTemplate.opsForHash().entries("likeCounts");
+		// Map<Long, Integer> likeCounts = new HashMap<>();
+		// for (Map.Entry<Object, Object> entry : redisLikeCounts.entrySet()) {
+		// 	likeCounts.put(
+		// 		Long.valueOf(entry.getKey().toString()),
+		// 		Integer.valueOf(entry.getValue().toString())
+		// 	);
+		// }
+		//
+		// return top100FeedList.stream()
+		// 	.map(feed -> FeedTopResponseDto.of(feed,
+		// 		commentCounts.getOrDefault(feed.getFeedId(), 0),
+		// 		likeCounts.getOrDefault(feed.getFeedId(), 0)
+		// 	))
+		// 	.toList();
+		return top100FeedList;
 	}
 
 	public List<FeedTopResponseDto> getTopFeed() {
 		@SuppressWarnings("unchecked")
-		List<Feed> top100FeedList = (List<Feed>)redisTemplate.opsForValue().get("popularFeeds");
-		if (top100FeedList.isEmpty()) {
-			top100FeedList = topFeedRepository.findAll();
-			redisTemplate.opsForValue().set("popularFeeds", top100FeedList);
-		}
-
-		Map<Object, Object> redisCommentCounts = opsHashRedisTemplate.opsForHash().entries("commentCounts");
-		Map<Long, Integer> commentCounts = new HashMap<>();
-		for (Map.Entry<Object, Object> entry : redisCommentCounts.entrySet()) {
-			commentCounts.put(
-				Long.valueOf(entry.getKey().toString()),
-				Integer.valueOf(entry.getValue().toString())
-			);
-		}
-
-		Map<Object, Object> redisLikeCounts = opsHashRedisTemplate.opsForHash().entries("likeCounts");
-		Map<Long, Integer> likeCounts = new HashMap<>();
-		for (Map.Entry<Object, Object> entry : redisLikeCounts.entrySet()) {
-			redisLikeCounts.put(
-				Long.valueOf(entry.getKey().toString()),
-				Integer.valueOf(entry.getValue().toString())
-			);
-		}
-
-		return top100FeedList.stream()
-			.limit(3)
-			.map(feed -> FeedTopResponseDto.of(feed,
-				commentCounts.getOrDefault(feed.getFeedId(), 0),
-				likeCounts.getOrDefault(feed.getFeedId(), 0)
-			))
-			.toList();
+		List<FeedTopResponseDto> top100FeedList = (List<FeedTopResponseDto>)redisTemplate.opsForValue()
+			.get("popularFeeds");
+		// if (top100FeedList.isEmpty()) {
+		// 	top100FeedList = topFeedRepository.findAll();
+		// 	redisTemplate.opsForValue().set("popularFeeds", top100FeedList);
+		// }
+		//
+		// Map<Object, Object> redisCommentCounts = opsHashRedisTemplate.opsForHash().entries("commentCounts");
+		// Map<Long, Integer> commentCounts = new HashMap<>();
+		// for (Map.Entry<Object, Object> entry : redisCommentCounts.entrySet()) {
+		// 	commentCounts.put(
+		// 		Long.valueOf(entry.getKey().toString()),
+		// 		Integer.valueOf(entry.getValue().toString())
+		// 	);
+		// }
+		//
+		// Map<Object, Object> redisLikeCounts = opsHashRedisTemplate.opsForHash().entries("likeCounts");
+		// Map<Long, Integer> likeCounts = new HashMap<>();
+		// for (Map.Entry<Object, Object> entry : redisLikeCounts.entrySet()) {
+		// 	redisLikeCounts.put(
+		// 		Long.valueOf(entry.getKey().toString()),
+		// 		Integer.valueOf(entry.getValue().toString())
+		// 	);
+		// }
+		//
+		// return top100FeedList.stream()
+		// 	.limit(3)
+		// 	.map(feed -> FeedTopResponseDto.of(feed,
+		// 		commentCounts.getOrDefault(feed.getFeedId(), 0),
+		// 		likeCounts.getOrDefault(feed.getFeedId(), 0)
+		// 	))
+		// 	.toList();
+		return top100FeedList.stream().limit(3).toList();
 	}
-
 
 	public List<PopularFeedResponseDto> getPopularFeedForCoupon() {
 		return getTopFeed().stream()
@@ -258,22 +254,8 @@ public class FeedService {
 			.collect(Collectors.toList());
 	}
 
-	@Transactional(readOnly = true)
-	public Slice<FeedSearchResponseDto> searchFeeds(String title, String content, String region, Category category,
-		Pageable pageable) {
-
-		FeedSearchRequestDto searchRequestDto = FeedSearchRequestDto.builder()
-			.title(title)
-			.content(content)
-			.region(region)
-			.category(category)
-			.build();
-
-		return feedRepository.searchFeeds(searchRequestDto, pageable);
-	}
-
 	private double calculatePopularityScore(int views, long commentCount, long likeCount, int weight) {
-		double popularityScore = (views * 0.2 + commentCount * 0.5 + likeCount * 0.3) * weight; // 
+		double popularityScore = (views * 0.2 + commentCount * 0.5 + likeCount * 0.3) * weight;
 
 		String formattedScore = String.format("%.2f", popularityScore);
 		return Double.parseDouble(formattedScore);
@@ -290,7 +272,9 @@ public class FeedService {
 		}
 	}
 
-	private UserValidateIdResponseDto getValidateUserId(Long userId) { return authClient.getValidateUserId(userId); }
+	private UserValidateIdResponseDto getValidateUserId(Long userId) {
+		return authClient.getValidateUserId(userId);
+	}
 
 	public boolean checkFeedExists(Long feedId, Long userId) {
 		return feedRepository.existsByFeedIdAndUserId(feedId, userId);

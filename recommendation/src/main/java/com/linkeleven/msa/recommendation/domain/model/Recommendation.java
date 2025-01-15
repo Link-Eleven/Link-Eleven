@@ -42,4 +42,8 @@ public class Recommendation extends BaseTime {
 			.keywords(keywords)
 			.build();
 	}
+
+	public void updateKeywords(List<String> newKeywords) {
+		this.keywords = newKeywords;
+	}
 }

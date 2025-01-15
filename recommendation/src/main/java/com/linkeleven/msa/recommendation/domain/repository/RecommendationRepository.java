@@ -5,4 +5,6 @@ import com.linkeleven.msa.recommendation.domain.model.Recommendation;
 public interface RecommendationRepository {
 
 	void save(Recommendation recommendation);
+
+	void saveOrUpdate(Recommendation recommendation);
 }

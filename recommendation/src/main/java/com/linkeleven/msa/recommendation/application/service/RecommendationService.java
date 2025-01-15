@@ -23,7 +23,7 @@ public class RecommendationService {
 		jpaAuditorAware.setCurrentAuditor(command.getUserId());
 
 		try {
-			saveRecommendation(command);
+			saveOrUpdateRecommendation(command);
 		} catch (Exception e) {
 			log.error("추천 처리 중 오류 발생: {}", e.getMessage(), e);
 			throw e;
@@ -32,11 +32,11 @@ public class RecommendationService {
 		}
 	}
 
-	private void saveRecommendation(RecommendationCommand command) {
+	private void saveOrUpdateRecommendation(RecommendationCommand command) {
 		Recommendation recommendation = Recommendation.builder()
 			.userId(command.getUserId())
 			.keywords(command.getKeywords())
 			.build();
-		recommendationRepository.save(recommendation);
+		recommendationRepository.saveOrUpdate(recommendation);
 	}
 }

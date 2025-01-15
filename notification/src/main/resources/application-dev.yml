@@ -49,5 +49,3 @@ eureka:
 server:
   port: 19098
 
-firebase:
-  config-path: linkeleven-firebase.json

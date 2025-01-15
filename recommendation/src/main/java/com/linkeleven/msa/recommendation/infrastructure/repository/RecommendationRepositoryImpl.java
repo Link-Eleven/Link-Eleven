@@ -1,5 +1,6 @@
 package com.linkeleven.msa.recommendation.infrastructure.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -14,12 +15,6 @@ import lombok.RequiredArgsConstructor;
 public class RecommendationRepositoryImpl implements RecommendationRepository {
 	private final JpaRecommendationRepository jpaRecommendationRepository;
 	private final RedisRecommendationRepository redisRecommendationRepository;
-
-	@Override
-	public void save(Recommendation recommendation) {
-		redisRecommendationRepository.save(recommendation);
-		jpaRecommendationRepository.save(recommendation);
-	}
 
 	@Override
 	public void saveOrUpdate(Recommendation recommendation) {
@@ -37,5 +32,10 @@ public class RecommendationRepositoryImpl implements RecommendationRepository {
 		} else {
 			jpaRecommendationRepository.save(recommendation);
 		}
+	}
+
+	@Override
+	public List<Recommendation> findAll() {
+		return jpaRecommendationRepository.findAll();
 	}
 }

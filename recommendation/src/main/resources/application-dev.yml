@@ -33,6 +33,12 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 gemini:
   api:
     key: ${EXTERNAL_API_KEY}

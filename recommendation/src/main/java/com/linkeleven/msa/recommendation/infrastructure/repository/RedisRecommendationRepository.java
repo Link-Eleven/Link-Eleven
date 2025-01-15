@@ -8,24 +8,36 @@ import org.springframework.stereotype.Repository;
 import com.linkeleven.msa.recommendation.domain.model.Recommendation;
 import com.linkeleven.msa.recommendation.infrastructure.cache.RecommendationCache;
 
+import io.lettuce.core.RedisConnectionException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class RedisRecommendationRepository {
 	private final RedisTemplate<String, RecommendationCache> redisTemplate;
 	private static final String KEY_PREFIX = "recommendation:";
 
 	public void save(Recommendation recommendation) {
-		String key = KEY_PREFIX + recommendation.getUserId();
-		RecommendationCache keywordsCache = RecommendationCache.from(recommendation);
-		redisTemplate.opsForValue().set(key, keywordsCache);
+		try {
+			String key = KEY_PREFIX + recommendation.getUserId();
+			RecommendationCache cache = RecommendationCache.from(recommendation);
+			redisTemplate.opsForValue().set(key, cache);
+		} catch (RedisConnectionException e) {
+			log.error("Redis 저장 실패: {}", e.getMessage());
+			// Redis 실패를 상위로 전파하지 않고 로깅만 수행
+		}
 	}
 
 	public Optional<RecommendationCache> findByUserId(Long userId) {
-		String key = KEY_PREFIX + userId;
-		RecommendationCache keywordsCache = redisTemplate.opsForValue().get(key);
-		return Optional.ofNullable(keywordsCache);
+		try {
+			String key = KEY_PREFIX + userId;
+			return Optional.ofNullable(redisTemplate.opsForValue().get(key));
+		} catch (RedisConnectionException e) {
+			log.error("Redis 조회 실패: {}", e.getMessage());
+			return Optional.empty();
+		}
 	}
 
 	public void update(Recommendation recommendation) {

@@ -3,7 +3,7 @@ package com.linkeleven.msa.recommendation.application.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.linkeleven.msa.recommendation.application.dto.RecommendationCommand;
+import com.linkeleven.msa.recommendation.application.dto.KeywordRecommendationDto;
 import com.linkeleven.msa.recommendation.domain.model.Recommendation;
 import com.linkeleven.msa.recommendation.domain.repository.RecommendationRepository;
 import com.linkeleven.msa.recommendation.infrastructure.configuration.JpaAuditorAware;
@@ -19,7 +19,7 @@ public class RecommendationService {
 	private final JpaAuditorAware jpaAuditorAware;
 
 	@Transactional
-	public void processRecommendation(RecommendationCommand command) {
+	public void processRecommendation(KeywordRecommendationDto command) {
 		jpaAuditorAware.setCurrentAuditor(command.getUserId());
 
 		try {
@@ -32,7 +32,7 @@ public class RecommendationService {
 		}
 	}
 
-	private void saveOrUpdateRecommendation(RecommendationCommand command) {
+	private void saveOrUpdateRecommendation(KeywordRecommendationDto command) {
 		Recommendation recommendation = Recommendation.builder()
 			.userId(command.getUserId())
 			.keywords(command.getKeywords())

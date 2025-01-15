@@ -42,7 +42,7 @@ public class KafkaNotificationListener {
 			SpecificDatumReader<CommentEvent> reader = new SpecificDatumReader<>(CommentEvent.class);
 			Decoder decoder = DecoderFactory.get().binaryDecoder(message, null);
 			CommentEvent event = reader.read(null, decoder);
-			notificationService.saveNotificationEvent(
+			notificationService.saveNotificationAndSend(
 				NotificationType.COMMENT,
 				event.getFeedId(),
 				event.getFeedAuthorId(),
@@ -72,7 +72,7 @@ public class KafkaNotificationListener {
 			SpecificDatumReader<ReplyEvent> reader = new SpecificDatumReader<>(ReplyEvent.class);
 			Decoder decoder = DecoderFactory.get().binaryDecoder(message, null);
 			ReplyEvent event = reader.read(null, decoder);
-			notificationService.saveNotificationEvent(
+			notificationService.saveNotificationAndSend(
 				NotificationType.REPLY,
 				event.getCommentId(),
 				event.getCommentAuthorId(),
@@ -102,7 +102,7 @@ public class KafkaNotificationListener {
 			SpecificDatumReader<LikeEvent> reader = new SpecificDatumReader<>(LikeEvent.class);
 			Decoder decoder = DecoderFactory.get().binaryDecoder(message, null);
 			LikeEvent event = reader.read(null, decoder);
-			notificationService.saveNotificationEvent(
+			notificationService.saveNotificationAndSend(
 				NotificationType.LIKE,
 				event.getTargetId(),
 				event.getTargetAuthorId(),

@@ -1,5 +1,6 @@
 package com.linkeleven.msa.notification.application.service;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.linkeleven.msa.notification.domain.model.entity.Notification;
@@ -13,8 +14,9 @@ import lombok.RequiredArgsConstructor;
 public class NotificationService {
 
 	private final NotificationRepository notificationRepository;
+	private final RedisTemplate<String, String> redisTemplate;
 
-	public void saveNotificationEvent(
+	public void saveNotificationAndSend(
 		NotificationType type,
 		Long targetId, Long targetAuthorId,
 		Long userId, String username, String contentType)

@@ -28,12 +28,19 @@ spring:
     redis:
       port: ${REDIS_PORT}
       host: ${REDIS_HOST}
-      username: ${REDIS_USERNAME}
-      password: ${REDIS_PASSWORD}
 
   cache:
     type: redis
     cache-names: popularFeeds
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 logging:
   level:

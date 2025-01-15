@@ -25,50 +25,31 @@ public class RedisSyncService {
 	private final RedisTemplate<String, RecommendationCache> redisTemplate;
 	private static final int MAX_RETRY_COUNT = 3;
 	private static final long RETRY_DELAY_MS = 1000;
+	private static final long FIXED_DELAY = 300000L;
 
-	@Scheduled(fixedDelay = 300000)
+	@Scheduled(fixedDelay = FIXED_DELAY)
 	@Transactional
 	public void syncRedisFromRdbms() {
 		if (!isRedisConnected()) {
-			log.warn("Redis 연결이 불안정합니다. 동기화를 건너뜁니다.");
+			log.warn("Redis 연결이 불안정합니다. 동기화를 중지합니다.");
 			return;
 		}
 
-		int retryCount = 0;
-		while (retryCount < MAX_RETRY_COUNT) {
-			try {
-				log.info("Redis 동기화 시작 (시도 #{}/{})", retryCount + 1, MAX_RETRY_COUNT);
-				List<Recommendation> allRecommendations = recommendationRepository.findAll();
-
-				// 동기화 로직
-				synchronizeData(allRecommendations);
-
-				log.info("Redis 동기화 완료: {} 건", allRecommendations.size());
-				return;
-
-			} catch (RedisConnectionException e) {
-				log.error("Redis 연결 오류: {}", e.getMessage());
-				retryCount++;
-				if (retryCount < MAX_RETRY_COUNT) {
-					sleep();
-				}
-			} catch (Exception e) {
-				log.error("Redis 동기화 중 예외 발생: {}", e.getMessage(), e);
-				retryCount++;
-				if (retryCount < MAX_RETRY_COUNT) {
-					sleep();
-				}
-			}
-		}
-		log.error("최대 재시도 횟수 초과. Redis 동기화 실패");
+		retryWithBackoff(this::performSync, MAX_RETRY_COUNT, RETRY_DELAY_MS);
 	}
 
-	public Boolean isRedisConnected() {
+	private void performSync() {
+		List<Recommendation> allRecommendations = recommendationRepository.findAll();
+		synchronizeData(allRecommendations);
+		log.info("Redis 동기화 완료: {} 건", allRecommendations.size());
+	}
+
+	private Boolean isRedisConnected() {
 		try {
 			String pong = Objects.requireNonNull(redisTemplate.getConnectionFactory())
 				.getConnection()
 				.ping();
-			return pong != null;
+			return "PONG".equals(pong);
 		} catch (Exception e) {
 			log.warn("Redis 서버 연결 실패: {}", e.getMessage());
 			return false;
@@ -76,29 +57,60 @@ public class RedisSyncService {
 	}
 
 	private void synchronizeData(List<Recommendation> recommendations) {
-		// 기존 캐시 삭제
-		Objects.requireNonNull(redisTemplate.getConnectionFactory())
-			.getConnection()
-			.serverCommands()
-			.flushDb(RedisServerCommands.FlushOption.ASYNC);
-
-		// 새로운 데이터 동기화
+		flushRedisCache();
 		for (Recommendation recommendation : recommendations) {
-			try {
-				RecommendationCache cache = RecommendationCache.from(recommendation);
-				String key = "recommendation:" + recommendation.getUserId();
-				redisTemplate.opsForValue().set(key, cache);
-			} catch (Exception e) {
-				log.error("데이터 동기화 중 오류 발생 (ID: {}): {}",
-					recommendation.getUserId(), e.getMessage());
-				throw e;
-			}
+			cacheRecommendation(recommendation);
 		}
 	}
 
-	private void sleep() {
+	private void flushRedisCache() {
 		try {
-			Thread.sleep(RedisSyncService.RETRY_DELAY_MS);
+			Objects.requireNonNull(redisTemplate.getConnectionFactory())
+				.getConnection()
+				.serverCommands()
+				.flushDb(RedisServerCommands.FlushOption.ASYNC);
+		} catch (Exception e) {
+			log.error("Redis 캐시 플러시 중 오류 발생: {}", e.getMessage());
+			throw e;
+		}
+	}
+
+	private void cacheRecommendation(Recommendation recommendation) {
+		try {
+			RecommendationCache cache = RecommendationCache.from(recommendation);
+			String key = "recommendation:" + recommendation.getUserId();
+			redisTemplate.opsForValue().set(key, cache);
+		} catch (Exception e) {
+			log.error("데이터 동기화 중 오류 발생 (ID: {}): {}", recommendation.getUserId(), e.getMessage());
+			throw e;
+		}
+	}
+
+	private void retryWithBackoff(Runnable task, int maxRetries, long delayMs) {
+		int retryCount = 0;
+		while (retryCount < maxRetries) {
+			try {
+				task.run();
+				return;
+			} catch (RedisConnectionException e) {
+				handleRetry(retryCount++, maxRetries, delayMs, e);
+			} catch (Exception e) {
+				handleRetry(retryCount++, maxRetries, delayMs, e);
+			}
+		}
+		log.error("최대 재시도 횟수 초과. Redis 동기화 실패");
+	}
+
+	private void handleRetry(int retryCount, int maxRetries, long delayMs, Exception e) {
+		log.error("오류 발생 (시도 #{}): {}", retryCount + 1, e.getMessage(), e);
+		if (retryCount < maxRetries - 1) {
+			sleep(delayMs);
+		}
+	}
+
+	private void sleep(long delayMs) {
+		try {
+			Thread.sleep(delayMs);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}

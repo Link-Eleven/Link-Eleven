@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.linkeleven.msa.recommendation.domain.model.Recommendation;
 import com.linkeleven.msa.recommendation.domain.repository.RecommendationRepository;
+import com.linkeleven.msa.recommendation.infrastructure.cache.RecommendationCache;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,11 +18,21 @@ public class RecommendationRepositoryImpl implements RecommendationRepository {
 	private final RedisRecommendationRepository redisRecommendationRepository;
 
 	@Override
+	public Optional<Recommendation> findByUserId(Long userId) {
+		Optional<RecommendationCache> cachedData = redisRecommendationRepository.findByUserId(userId);
+		if (cachedData.isPresent()) {
+			return Optional.of(cachedData.get().toEntity());
+		}
+
+		Optional<Recommendation> dbData = jpaRecommendationRepository.findByUserId(userId);
+		dbData.ifPresent(redisRecommendationRepository::save);
+		return dbData;
+	}
+
+	@Override
 	public void saveOrUpdate(Recommendation recommendation) {
-		// Redis 업데이트
 		redisRecommendationRepository.update(recommendation);
 
-		// RDBMS 업데이트
 		Optional<Recommendation> existingRecommendation =
 			jpaRecommendationRepository.findByUserId(recommendation.getUserId());
 

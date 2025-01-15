@@ -26,4 +26,11 @@ public class RecommendationCache {
 			.keywords(recommendation.getKeywords())
 			.build();
 	}
+
+	public Recommendation toEntity() {
+		return Recommendation.builder()
+			.userId(this.userId)
+			.keywords(this.keywords)
+			.build();
+	}
 }

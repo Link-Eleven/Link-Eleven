@@ -48,6 +48,7 @@ public class FeedService {
 	private final CouponClient couponClient;
 	private final RedisTemplate<String, List<?>> redisTemplate;
 	private final RedisTemplate<String, Object> opsHashRedisTemplate;
+	private final UserActivityProducer userActivityProducer;
 
 	@Transactional
 	public FeedCreateResponseDto createFeed(FeedCreateRequestDto feedCreateRequestDto, List<MultipartFile> files,
@@ -123,7 +124,12 @@ public class FeedService {
 		feedRepository.incrementViews(feedId);
 
 		Feed feed = findByIdAndDeletedAt(feedId);
-		return FeedReadResponseDto.from(feed);
+
+		FeedReadResponseDto responseDto = FeedReadResponseDto.from(feed);
+
+		userActivityProducer.sendActivity(feed.getUserId(), feed.getTitle());
+
+		return responseDto;
 	}
 
 	@Transactional

@@ -13,7 +13,6 @@ import com.linkeleven.msa.recommendation.domain.model.Recommendation;
 import com.linkeleven.msa.recommendation.domain.repository.RecommendationRepository;
 import com.linkeleven.msa.recommendation.infrastructure.cache.RecommendationCache;
 
-import io.lettuce.core.RedisConnectionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +34,7 @@ public class RedisSyncService {
 			return;
 		}
 
-		retryWithBackoff(this::performSync, MAX_RETRY_COUNT, RETRY_DELAY_MS);
+		retryWithBackoff(this::performSync);
 	}
 
 	private void performSync() {
@@ -86,31 +85,29 @@ public class RedisSyncService {
 		}
 	}
 
-	private void retryWithBackoff(Runnable task, int maxRetries, long delayMs) {
+	private void retryWithBackoff(Runnable task) {
 		int retryCount = 0;
-		while (retryCount < maxRetries) {
+		while (retryCount < MAX_RETRY_COUNT) {
 			try {
 				task.run();
 				return;
-			} catch (RedisConnectionException e) {
-				handleRetry(retryCount++, maxRetries, delayMs, e);
 			} catch (Exception e) {
-				handleRetry(retryCount++, maxRetries, delayMs, e);
+				handleRetry(retryCount++, e);
 			}
 		}
 		log.error("최대 재시도 횟수 초과. Redis 동기화 실패");
 	}
 
-	private void handleRetry(int retryCount, int maxRetries, long delayMs, Exception e) {
+	private void handleRetry(int retryCount, Exception e) {
 		log.error("오류 발생 (시도 #{}): {}", retryCount + 1, e.getMessage(), e);
-		if (retryCount < maxRetries - 1) {
-			sleep(delayMs);
+		if (retryCount < MAX_RETRY_COUNT - 1) {
+			sleep();
 		}
 	}
 
-	private void sleep(long delayMs) {
+	private void sleep() {
 		try {
-			Thread.sleep(delayMs);
+			Thread.sleep(RETRY_DELAY_MS);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}

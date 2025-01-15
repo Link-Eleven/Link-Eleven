@@ -16,12 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 public class FeedLogConsumer {
 	private final FeedLogService feedLogService;
 
-	@KafkaListener(topics = "feed-logs", groupId = "${spring.kafka.consumer.group-id}")
+	@KafkaListener(topics = "feed-logs-topic", groupId = "${spring.kafka.consumer.group-id}")
 	@RetryableTopic(
 		attempts = "5",
 		backoff = @Backoff(delay = 2000)
 	)
-	public void consumeFeedLog(FeedLogMessage message) {
+	public void consumeLogMessage(FeedLogMessage message) {
 		try {
 			feedLogService.processNewLog(message.getUserId(), message.getFeedTitle());
 			log.info("메시지가 성공적으로 처리되었습니다.: {}", message);

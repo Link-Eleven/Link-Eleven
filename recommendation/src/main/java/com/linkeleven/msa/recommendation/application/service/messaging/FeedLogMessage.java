@@ -1,10 +1,12 @@
 package com.linkeleven.msa.recommendation.application.service.messaging;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class FeedLogMessage {
 	private Long userId;
 	private String feedTitle;

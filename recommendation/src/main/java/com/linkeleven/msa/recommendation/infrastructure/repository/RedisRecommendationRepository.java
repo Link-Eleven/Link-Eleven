@@ -26,7 +26,6 @@ public class RedisRecommendationRepository {
 			redisTemplate.opsForValue().set(key, cache);
 		} catch (RedisConnectionException e) {
 			log.error("Redis 저장 실패: {}", e.getMessage());
-			// Redis 실패를 상위로 전파하지 않고 로깅만 수행
 		}
 	}
 

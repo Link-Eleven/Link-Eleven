@@ -1,5 +1,9 @@
 package com.linkeleven.msa.recommendation.application.service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,5 +42,13 @@ public class RecommendationService {
 			.keywords(command.getKeywords())
 			.build();
 		recommendationRepository.saveOrUpdate(recommendation);
+	}
+
+	public List<String> getKeywordsForUser(Long userId) {
+		Optional<Recommendation> recommendationOpt = recommendationRepository.findByUserId(userId);
+
+		return recommendationOpt
+			.map(Recommendation::getKeywords)
+			.orElse(Collections.emptyList());
 	}
 }

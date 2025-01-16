@@ -1,4 +1,4 @@
-package com.linkeleven.msa.recommendation.application.service.messaging;
+package com.linkeleven.msa.recommendation.application.dto.message;
 
 import java.time.LocalDateTime;
 import java.util.List;

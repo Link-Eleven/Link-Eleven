@@ -1,13 +1,13 @@
-package com.linkeleven.msa.recommendation.infrastructure.messaging;
+package com.linkeleven.msa.recommendation.application.service.messaging;
 
 import java.time.LocalDateTime;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import com.linkeleven.msa.recommendation.application.service.messaging.RecommendationMessage;
+import com.linkeleven.msa.recommendation.application.dto.message.RecommendationMessage;
 import com.linkeleven.msa.recommendation.domain.model.Recommendation;
 import com.linkeleven.msa.recommendation.libs.exception.CustomException;
 import com.linkeleven.msa.recommendation.libs.exception.ErrorCode;
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class LogToRecommendationKafkaProducer {
 

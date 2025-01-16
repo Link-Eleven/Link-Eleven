@@ -1,4 +1,4 @@
-package com.linkeleven.msa.recommendation.application.service.messaging;
+package com.linkeleven.msa.recommendation.application.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

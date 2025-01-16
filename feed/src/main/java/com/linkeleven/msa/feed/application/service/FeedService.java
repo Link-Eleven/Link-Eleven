@@ -75,9 +75,7 @@ public class FeedService {
 
 		Feed feed = findByIdAndDeletedAt(feedId);
 
-		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER")) {
-			throw new CustomException(ErrorCode.NO_UPDATE_PERMISSION);
-		}
+		confirmFeedPermission(feed, userId, userRole);
 
 		feed.update(
 			feedUpdateRequestDto.getTitle(),
@@ -97,11 +95,10 @@ public class FeedService {
 
 		Feed feed = findByIdAndDeletedAt(feedId);
 
-		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER")) {
-			throw new CustomException(ErrorCode.NO_DELETE_PERMISSION);
-		}
+		confirmFeedPermission(feed, userId, userRole);
 
 		feed.delete(userId);
+
 		fileService.deleteFiles(feed, userId);
 
 		couponClient.deleteCoupon(feedId, userId, userRole);
@@ -110,10 +107,7 @@ public class FeedService {
 
 	@Transactional
 	public FeedReadResponseDto getDetailsByFeedId(Long feedId) {
-		boolean exists = feedRepository.existsByFeedId(feedId);
-		if (!exists) {
-			throw new CustomException(ErrorCode.FEED_NOT_FOUND);
-		}
+		confirmFeedExists(feedId);
 
 		feedRepository.incrementViews(feedId);
 
@@ -266,6 +260,19 @@ public class FeedService {
 		return feedRepository.findByIdAndDeletedAt(feedId)
 			.orElseThrow(() -> new CustomException(ErrorCode.FEED_NOT_FOUND));
 	}
+
+	private void confirmFeedExists(Long feedId) {
+		if (!feedRepository.existsByFeedId(feedId)) {
+			throw new CustomException(ErrorCode.FEED_NOT_FOUND);
+		}
+	}
+
+	private void confirmFeedPermission(Feed feed, Long userId, String userRole) {
+		if (!feed.getUserId().equals(userId) && !userRole.equals("MASTER")) {
+			throw new CustomException(ErrorCode.NO_FEED_PERMISSION);
+		}
+	}
+
 
 	private void validateUser(Long userId, UserValidateIdResponseDto userInfo) {
 		if (userInfo == null || !userId.equals(userInfo.getUserId())) {

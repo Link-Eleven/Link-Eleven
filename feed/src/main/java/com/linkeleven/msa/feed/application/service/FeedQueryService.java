@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class FeedSearchService {
+public class FeedQueryService {
 
 	private final FeedRepository feedRepository;
 	private final RecommendationClient recommendationClient;

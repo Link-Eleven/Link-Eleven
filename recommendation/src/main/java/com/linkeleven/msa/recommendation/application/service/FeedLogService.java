@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.linkeleven.msa.recommendation.application.service.messaging.LogToRecommendationKafkaProducer;
 import com.linkeleven.msa.recommendation.domain.model.FeedLog;
 import com.linkeleven.msa.recommendation.domain.model.Recommendation;
 import com.linkeleven.msa.recommendation.domain.repository.FeedLogRepository;
 import com.linkeleven.msa.recommendation.infrastructure.client.GeminiClient;
-import com.linkeleven.msa.recommendation.infrastructure.messaging.LogToRecommendationKafkaProducer;
 
 import lombok.RequiredArgsConstructor;
 

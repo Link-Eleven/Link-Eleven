@@ -7,6 +7,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import com.linkeleven.msa.recommendation.application.dto.KeywordRecommendationDto;
+import com.linkeleven.msa.recommendation.application.dto.message.RecommendationMessage;
 import com.linkeleven.msa.recommendation.application.service.RecommendationService;
 
 import lombok.RequiredArgsConstructor;

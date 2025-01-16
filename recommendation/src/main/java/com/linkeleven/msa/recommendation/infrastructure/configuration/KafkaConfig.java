@@ -21,7 +21,7 @@ import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import com.linkeleven.msa.recommendation.application.service.messaging.RecommendationMessage;
+import com.linkeleven.msa.recommendation.application.dto.message.RecommendationMessage;
 
 @EnableKafka
 @Configuration

@@ -5,6 +5,7 @@ import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
+import com.linkeleven.msa.recommendation.application.dto.message.FeedLogMessage;
 import com.linkeleven.msa.recommendation.application.service.FeedLogService;
 
 import lombok.RequiredArgsConstructor;

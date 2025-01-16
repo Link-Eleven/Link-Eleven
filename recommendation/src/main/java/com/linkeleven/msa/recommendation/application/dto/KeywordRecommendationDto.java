@@ -2,7 +2,7 @@ package com.linkeleven.msa.recommendation.application.dto;
 
 import java.util.List;
 
-import com.linkeleven.msa.recommendation.application.service.messaging.RecommendationMessage;
+import com.linkeleven.msa.recommendation.application.dto.message.RecommendationMessage;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -10,6 +10,7 @@ public enum ErrorCode {
 	/*  400 BAD_REQUEST : 잘못된 요청  */
 	ILLEGAL_ARGUMENT_ERROR(400, "잘못된 파라미터 전달"),
 	CANNOT_FOLLOWING_SELF(400,"유저 본인을 팔로잉 할 수 없습니다."),
+	CHATROOM_NAME_ERROR(400,"채팅방 이름은 10자 이하입니다."),
 
 
 	/*  401 UNAUTHORIZED : 인증 안됨  */
@@ -27,6 +28,8 @@ public enum ErrorCode {
 	ACCESS_DENIED(404, "접근 권한이 없습니다."),
 	USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
 	NOT_FOLLOWING_USER(404,"팔로잉 하지 않은 유저입니다."),
+	CHAT_ROOM_NOT_FOUND(404,"채팅방이 없습니다."),
+	NOT_YOUR_CHAT_ROOM(404,"유저의 채팅방이 아닙니다."),
 
 	/*  408 REQUEST_TIMEOUT : 요청에 대한 응답 시간 초과  */
 	TIMEOUT_ERROR(408, "응답시간을 초과하였습니다."),
@@ -35,6 +38,7 @@ public enum ErrorCode {
 	USERNAME_ALREADY_EXISTS(409, "이미 존재하는 사용자 이름입니다."),
 	ALREADY_FOLLOWING(409,"이미 팔로잉한 유저입니다."),
 	ALREADY_UNFOLLOWING(409,"이미 팔로잉을 삭제한 유저입니다."),
+	ALREADY_CHATROOM(409,"채팅방은 이미 존재합니다."),
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
 	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다.");

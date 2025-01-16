@@ -24,7 +24,6 @@ public class ChatController {
 		@Header("X-User-Id") Long userId,
 		@Payload ChatSendMessageRequestDto sendMessageRequestDto
 	) {
-		log.info("controller : "+userId);
 		chatService.sendMessage(chatRoomId, userId, sendMessageRequestDto);
 	}
 }

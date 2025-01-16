@@ -32,8 +32,6 @@ public class ChatService {
 		Long userId,
 		ChatSendMessageRequestDto chatSendMessageRequestDto
 	) {
-		log.info("Sender : "+userId);
-		log.info("receiver : "+chatSendMessageRequestDto.getReceiverId());
 		User sender = validateUserById(userId);
 		User receiver = validateUserById(chatSendMessageRequestDto.getReceiverId());
 

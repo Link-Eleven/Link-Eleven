@@ -9,8 +9,11 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/api/auth/** ,/api/follows/**,/api/users/**
-
+            - Path=/api/auth/** ,/api/follows/**,/api/users/**,/api/chatrooms/**,/ws/**,/pub/**
+        - id: auth-service
+          uri: ws://auth-servic
+          predicates:
+            - Path=/ws/**,/pub/**
         - id: feed-service
           uri: lb://feed-service
           predicates:

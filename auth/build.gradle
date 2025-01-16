@@ -28,6 +28,9 @@ ext {
 }
 
 dependencies {
+	//websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 	//kafka
 	implementation 'org.springframework.kafka:spring-kafka'
 

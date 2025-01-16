@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     String path = exchange.getRequest().getURI().getPath();
 
     if (path.equals("/api/auth/signin")||path.equals("/api/auth/signup")) {;
-      return chain.filter(exchange);  // /signIn 경로는 필터를 적용하지 않음
+      return chain.filter(exchange);
     }
 
     String token = extractToken(exchange);
@@ -40,10 +40,10 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     Claims claims = jwtProvider.parseToken(token);
     exchange = exchange.mutate()
         .request(exchange.getRequest().mutate()
-            .header("X-User-Id", claims.get("user_id").toString())  // 원하는 값으로 설정
-            .header("X-Role", claims.get("role").toString())     // 원하는 값으로 설정
-            .build())  // 새로운 요청 객체를 생성
-        .build();  // 변경된 요청 객체를 exchange에 반영
+            .header("X-User-Id", claims.get("user_id").toString())
+            .header("X-Role", claims.get("role").toString())
+            .build())
+        .build();
     return chain.filter(exchange);
   }
 

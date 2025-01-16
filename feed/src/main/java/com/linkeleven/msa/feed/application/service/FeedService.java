@@ -24,6 +24,7 @@ import com.linkeleven.msa.feed.domain.repository.TopFeedRepository;
 import com.linkeleven.msa.feed.infrastructure.client.AuthClient;
 import com.linkeleven.msa.feed.infrastructure.client.CouponClient;
 import com.linkeleven.msa.feed.infrastructure.client.InteractionClient;
+import com.linkeleven.msa.feed.infrastructure.messaging.UserActivityProducer;
 import com.linkeleven.msa.feed.libs.exception.CustomException;
 import com.linkeleven.msa.feed.libs.exception.ErrorCode;
 import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;

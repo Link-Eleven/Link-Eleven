@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
-import com.linkeleven.msa.feed.infrastructure.client.RecommendationClient;
+import com.linkeleven.msa.feed.domain.service.RecommendationService;
 import com.linkeleven.msa.feed.presentation.request.FeedSearchRequestDto;
 
 import lombok.RequiredArgsConstructor;
@@ -20,11 +20,13 @@ import lombok.RequiredArgsConstructor;
 public class FeedQueryService {
 
 	private final FeedRepository feedRepository;
-	private final RecommendationClient recommendationClient;
+	private final RecommendationService RecommendationService;
 
 	@Transactional(readOnly = true)
 	public Slice<FeedSearchResponseDto> searchFeeds(Long cursorFeedId, String title, String content, String region,
-		Category category, Pageable pageable) {
+		Category category, List<String> keywordList, Long userId, Pageable pageable) {
+
+		List<String> finalKeywordList = RecommendationService.getRecommendedKeywords(userId, keywordList);
 
 		FeedSearchRequestDto searchRequestDto = FeedSearchRequestDto.builder()
 			.title(title)
@@ -34,14 +36,7 @@ public class FeedQueryService {
 			.cursorFeedId(cursorFeedId)
 			.build();
 
-		return feedRepository.searchFeeds(searchRequestDto, pageable);
+		return feedRepository.searchFeeds(finalKeywordList, searchRequestDto, pageable);
 	}
 
-	@Transactional(readOnly = true)
-	public Slice<FeedSearchResponseDto> searchFeedsByKeywords(Long userId, Pageable pageable) {
-
-		List<String> keywords = recommendationClient.getRecommendationKeywords(userId);
-
-		return feedRepository.searchFeedsByKeywords(keywords, pageable);
-	}
 }

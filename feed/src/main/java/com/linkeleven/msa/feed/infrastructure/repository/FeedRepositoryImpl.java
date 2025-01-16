@@ -28,30 +28,10 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public Slice<FeedSearchResponseDto> searchFeeds(FeedSearchRequestDto searchRequestDto, Pageable pageable) {
+	public Slice<FeedSearchResponseDto> searchFeeds(List<String> keywordList, FeedSearchRequestDto searchRequestDto,
+		Pageable pageable) {
 
-		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(feed.deletedAt.isNull());
-
-		if (searchRequestDto.getTitle() != null && !searchRequestDto.getTitle().isEmpty()) {
-			builder.and(titleContains(searchRequestDto.getTitle()));
-		}
-
-		if (searchRequestDto.getContent() != null && !searchRequestDto.getContent().isEmpty()) {
-			builder.and(contentContains(searchRequestDto.getContent()));
-		}
-
-		if (searchRequestDto.getRegionEnum() != null) {
-			builder.and(regionEq(searchRequestDto.getRegionEnum()));
-		}
-
-		if (searchRequestDto.getCategory() != null) {
-			builder.and(categoryEq(searchRequestDto.getCategory()));
-		}
-
-		if (searchRequestDto.getCursorFeedId() != null) {
-			builder.and(feedIdLessThan(searchRequestDto.getCursorFeedId()));
-		}
+		BooleanBuilder builder = SearchConditionBuilder(keywordList, searchRequestDto);
 
 		List<FeedSearchResponseDto> feedList = queryFactory.query()
 			.select(
@@ -77,35 +57,37 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 		return new SliceImpl<>(feedList, pageable, hasNext);
 	}
 
-	public Slice<FeedSearchResponseDto> searchFeedsByKeywords(List<String> keywords, Pageable pageable) {
+	private BooleanBuilder SearchConditionBuilder(List<String> keywordList, FeedSearchRequestDto searchRequestDto) {
 		BooleanBuilder builder = new BooleanBuilder();
 		builder.and(feed.deletedAt.isNull());
-		if (keywords != null && !keywords.isEmpty()) {
-			BooleanBuilder keywordBuilder = new BooleanBuilder();
-			for (String keyword : keywords) {
-				keywordBuilder.or(feed.title.containsIgnoreCase(keyword)).or(feed.content.containsIgnoreCase(keyword));
+
+		if (searchRequestDto.getTitle() != null && !searchRequestDto.getTitle().isEmpty()) {
+			builder.and(titleContains(searchRequestDto.getTitle()));
+		}
+
+		if (searchRequestDto.getContent() != null && !searchRequestDto.getContent().isEmpty()) {
+			builder.and(contentContains(searchRequestDto.getContent()));
+		}
+
+		if (searchRequestDto.getRegionEnum() != null) {
+			builder.and(regionEq(searchRequestDto.getRegionEnum()));
+		}
+
+		if (searchRequestDto.getCategory() != null) {
+			builder.and(categoryEq(searchRequestDto.getCategory()));
+		}
+
+		if (searchRequestDto.getCursorFeedId() != null) {
+			builder.and(feedIdLessThan(searchRequestDto.getCursorFeedId()));
+		}
+
+		if (keywordList != null && !keywordList.isEmpty()) {
+			for (String keyword : keywordList) {
+				builder.or(feed.title.like("%" + keyword + "%"));
 			}
-			builder.and(keywordBuilder);
 		}
-		List<FeedSearchResponseDto> feedList = queryFactory.query()
-			.select(Projections.constructor(FeedSearchResponseDto.class,
-					feed.feedId,
-					feed.title,
-					feed.content,
-					feed.category,
-					feed.region
-				)
-			)
-			.from(feed)
-			.where(builder)
-			.orderBy(feed.feedId.desc())
-			.limit(pageable.getPageSize() + 1)
-			.fetch();
-		boolean hasNext = feedList.size() > pageable.getPageSize();
-		if (hasNext) {
-			feedList.remove(feedList.size() - 1);
-		}
-		return new SliceImpl<>(feedList, pageable, hasNext);
+
+		return builder;
 	}
 
 	private BooleanExpression titleContains(String title) {

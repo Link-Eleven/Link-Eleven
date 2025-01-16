@@ -1,5 +1,7 @@
 package com.linkeleven.msa.feed.presentation.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
@@ -30,17 +32,12 @@ public class FeedQueryController {
 		@RequestParam(required = false) String content,
 		@RequestParam(required = false) String region,
 		@RequestParam(required = false) Category category,
+		@RequestParam(required = false) List<String> keywordList,
+		@RequestParam Long userId,
 		@PageableDefault(size = 10) Pageable pageable) {
 		Slice<FeedSearchResponseDto> response = feedQueryService.searchFeeds(cursorFeedId, title, content, region,
-			category, pageable);
+			category, keywordList, userId, pageable);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 검색 완료", response));
 	}
 
-	@GetMapping
-	public ResponseEntity<SuccessResponseDto<Slice<FeedSearchResponseDto>>> searchFeedsByKeywords(
-		@RequestParam Long userId,
-		@PageableDefault(size = 10) Pageable pageable) {
-		Slice<FeedSearchResponseDto> response = feedQueryService.searchFeedsByKeywords(userId, pageable);
-		return ResponseEntity.ok(SuccessResponseDto.success("키워드 기반 게시글 검색 완료", response));
-	}
 }

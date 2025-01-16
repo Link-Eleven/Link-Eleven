@@ -273,7 +273,6 @@ public class FeedService {
 		}
 	}
 
-
 	private void validateUser(Long userId, UserValidateIdResponseDto userInfo) {
 		if (userInfo == null || !userId.equals(userInfo.getUserId())) {
 			throw new CustomException(ErrorCode.INVALID_USER);

@@ -9,7 +9,7 @@ import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.presentation.request.FeedSearchRequestDto;
 
 public interface FeedRepositoryCustom {
-	Slice<FeedSearchResponseDto> searchFeeds(FeedSearchRequestDto searchRequestDto, Pageable pageable);
+	Slice<FeedSearchResponseDto> searchFeeds(List<String> keywordList, FeedSearchRequestDto searchRequestDto,
+		Pageable pageable);
 
-	Slice<FeedSearchResponseDto> searchFeedsByKeywords(List<String> keywords, Pageable pageable);
 }

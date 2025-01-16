@@ -1,7 +1,6 @@
 package com.linkeleven.msa.recommendation.infrastructure.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -18,14 +17,16 @@ public class RecommendationRepositoryImpl implements RecommendationRepository {
 	private final RedisRecommendationRepository redisRecommendationRepository;
 
 	@Override
-	public Optional<Recommendation> findByUserId(Long userId) {
-		Optional<RecommendationCache> cachedData = redisRecommendationRepository.findByUserId(userId);
-		if (cachedData.isPresent()) {
-			return Optional.of(cachedData.get().toEntity());
+	public Recommendation findByUserId(Long userId) {
+		RecommendationCache cachedData = redisRecommendationRepository.findByUserId(userId);
+		if (cachedData != null) {
+			return cachedData.toEntity();
 		}
 
-		Optional<Recommendation> dbData = jpaRecommendationRepository.findByUserId(userId);
-		dbData.ifPresent(redisRecommendationRepository::save);
+		Recommendation dbData = jpaRecommendationRepository.findByUserId(userId);
+		if (dbData != null) {
+			redisRecommendationRepository.save(dbData);
+		}
 		return dbData;
 	}
 
@@ -33,13 +34,10 @@ public class RecommendationRepositoryImpl implements RecommendationRepository {
 	public void saveOrUpdate(Recommendation recommendation) {
 		redisRecommendationRepository.update(recommendation);
 
-		Optional<Recommendation> existingRecommendation =
-			jpaRecommendationRepository.findByUserId(recommendation.getUserId());
-
-		if (existingRecommendation.isPresent()) {
-			Recommendation existing = existingRecommendation.get();
-			existing.updateKeywords(recommendation.getKeywords());
-			jpaRecommendationRepository.save(existing);
+		Recommendation existingRecommendation = jpaRecommendationRepository.findByUserId(recommendation.getUserId());
+		if (existingRecommendation != null) {
+			existingRecommendation.updateKeywords(recommendation.getKeywords());
+			jpaRecommendationRepository.save(existingRecommendation);
 		} else {
 			jpaRecommendationRepository.save(recommendation);
 		}

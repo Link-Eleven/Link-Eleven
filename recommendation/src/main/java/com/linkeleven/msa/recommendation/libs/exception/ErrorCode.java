@@ -34,7 +34,7 @@ public enum ErrorCode {
 	REDIS_CONNECTION_ERROR(503, "Redis 서버 연결에 실패했습니다."),
 	REDIS_SYNC_ERROR(500, "Redis 동기화 중 오류가 발생했습니다."),
 	REDIS_OPERATION_ERROR(500, "Redis 작업 중 오류가 발생했습니다."),
-	REDIS_MAX_RETRY_EXCEEDED(503, "Redis 작업 최대 재시도 횟수를 초과했습니다.");;
+	REDIS_MAX_RETRY_EXCEEDED(503, "Redis 작업 최대 재시도 횟수를 초과했습니다.");
 
 
 	/*  502 BAD_GATEWAY  연결 실패   */

@@ -5,7 +5,6 @@ import java.util.List;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -16,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "p_recommendation")
@@ -38,19 +36,9 @@ public class Recommendation extends BaseTime {
 	)
 	private List<String> keywords = new ArrayList<>();
 
-	@Setter
-	@Column(name = "created_by", updatable = false)
-	private Long createdBy;
-
-	@Setter
-	@Column(name = "updated_by")
-	private Long updatedBy;
-
 	public static Recommendation of(Long userId, List<String> keywords) {
 		return Recommendation.builder()
 			.userId(userId)
-			.createdBy(userId)
-			.updatedBy(userId)
 			.keywords(keywords)
 			.build();
 	}

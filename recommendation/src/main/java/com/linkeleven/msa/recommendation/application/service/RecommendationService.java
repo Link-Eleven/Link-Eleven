@@ -26,8 +26,6 @@ public class RecommendationService {
 	private void saveOrUpdateRecommendation(KeywordRecommendationDto recommendationData) {
 		Recommendation recommendation = Recommendation.builder()
 			.userId(recommendationData.getUserId())
-			.createdBy(recommendationData.getUserId())
-			.updatedBy(recommendationData.getUserId())
 			.keywords(recommendationData.getKeywordList())
 			.build();
 		recommendationRepository.saveOrUpdate(recommendation);

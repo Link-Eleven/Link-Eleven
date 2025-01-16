@@ -39,7 +39,7 @@ public class RecommendationService {
 	private void saveOrUpdateRecommendation(KeywordRecommendationDto command) {
 		Recommendation recommendation = Recommendation.builder()
 			.userId(command.getUserId())
-			.keywords(command.getKeywords())
+			.keywords(command.getKeywordList())
 			.build();
 		recommendationRepository.saveOrUpdate(recommendation);
 	}

@@ -11,12 +11,12 @@ import lombok.Getter;
 @Builder
 public class KeywordRecommendationDto {
 	private final Long userId;
-	private final List<String> keywords;
+	private final List<String> keywordList;
 
 	public static KeywordRecommendationDto from(RecommendationMessage message) {
 		return KeywordRecommendationDto.builder()
 			.userId(message.getUserId())
-			.keywords(message.getRecommendationKeywords())
+			.keywordList(message.getRecommendationKeywords())
 			.build();
 	}
 }

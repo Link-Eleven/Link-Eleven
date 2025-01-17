@@ -2,7 +2,6 @@ package com.linkeleven.msa.notification.application.service;
 
 import org.springframework.stereotype.Service;
 
-import com.linkeleven.msa.notification.application.AwsNotificationService;
 import com.linkeleven.msa.notification.domain.model.entity.Notification;
 import com.linkeleven.msa.notification.domain.model.enums.NotificationType;
 import com.linkeleven.msa.notification.domain.repository.NotificationRepository;

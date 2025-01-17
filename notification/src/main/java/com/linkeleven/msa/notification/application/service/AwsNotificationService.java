@@ -1,4 +1,4 @@
-package com.linkeleven.msa.notification.application;
+package com.linkeleven.msa.notification.application.service;
 
 import org.springframework.stereotype.Service;
 

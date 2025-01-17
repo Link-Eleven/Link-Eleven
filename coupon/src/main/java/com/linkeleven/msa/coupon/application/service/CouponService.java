@@ -33,13 +33,6 @@ public class CouponService {
 	private final IssuedCouponRepository issuedCouponRepository;
 	private final CouponRedisService couponRedisService;
 
-	/**
-	 * 주어진 인기 피드 요청을 기반으로 쿠폰 생성.
-	 * 피드 ID 중복을 방지하고, 생성된 쿠폰과 쿠폰 정책을 Redis에 저장.
-	 *
-	 * @param request 인기 피드 요청 데이터
-	 * @throws CustomException 피드 ID가 중복된 경우
-	 */
 	@Transactional
 	public void createCoupon(PopularFeedResponseDto request) {
 		// 중복 쿠폰 생성 방지
@@ -54,16 +47,6 @@ public class CouponService {
 		savePoliciesToRedis(coupon.getCouponId(), policies);
 	}
 
-	/**
-	 * 주어진 쿠폰 ID로 쿠폰을 조회.
-	 * 사용자 역할에 따라 조회 분기.
-	 *
-	 * @param userId   요청하는 사용자의 ID
-	 * @param role     사용자의 역할
-	 * @param couponId 조회할 쿠폰의 ID
-	 * @return CouponResponseDto 쿠폰의 세부 정보
-	 * @throws CustomException 쿠폰을 찾을 수 없거나 권한이 없는 경우
-	 */
 	@Transactional(readOnly = true)
 	public CouponResponseDto getCouponById(Long userId, String role, Long couponId) {
 		Coupon coupon;
@@ -82,20 +65,6 @@ public class CouponService {
 		return CouponResponseDto.from(coupon);
 	}
 
-	/**
-	 * 모든 쿠폰을 조회.
-	 * 권한에 따라 조회 조건 변경
-	 *
-	 * @param userId   요청하는 사용자의 ID
-	 * @param role     사용자의 역할
-	 * @param status   쿠폰 정책 상태 필터
-	 * @param feedId   피드 ID 필터
-	 * @param validFrom 유효 기간 시작일 필터
-	 * @param validTo  유효 기간 종료일 필터
-	 * @param pageable 페이지 정보
-	 * @return Page<CouponSearchResponseDto> 검색된 쿠폰 목록
-	 * @throws CustomException 권한이 없는 경우
-	 */
 	@Transactional(readOnly = true)
 	public Page<CouponSearchResponseDto> searchCoupons(Long userId, String role, CouponPolicyStatus status,
 		Long feedId, String validFrom, String validTo, Pageable pageable
@@ -109,15 +78,6 @@ public class CouponService {
 		}
 	}
 
-	/**
-	 * 주어진 피드 ID를 기반으로 쿠폰 삭제.
-	 * 사용자 역할에 따라 권한 검사를 수행하며, 쿠폰과 관련된 정책 및 발급된 쿠폰은 소프트 삭제.
-	 *
-	 * @param userId 요청하는 사용자의 ID
-	 * @param role   사용자의 역할
-	 * @param feedId 삭제할 쿠폰의 피드 ID
-	 * @throws CustomException 권한이 없거나 쿠폰을 찾을 수 없는 경우
-	 */
 	@Transactional
 	public void deleteCoupon(Long userId, String role, Long feedId) {
 		// 권한 체크

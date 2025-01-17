@@ -35,15 +35,12 @@ public class CouponScheduledService {
 	@Scheduled(cron = "0 50 23 * * ?")
 	public void generateCouponsForPopularFeeds() {
 		try {
-			// 인기 게시글 목록 - Feign Client 호출
 			List<PopularFeedResponseDto> popularFeeds = feedServiceClient.getPopularFeeds();
 
-			// UserId 추출 -> 리스트
 			List<Long> userIds = popularFeeds.stream()
 				.map(PopularFeedResponseDto::getUserId)
 				.toList();
 
-			// 유저 권한 불러오기
 			List<UserRoleResponseDto> userRoles = authServiceClient.getUserRoles(userIds);
 
 			userRoles.forEach(userRole -> {

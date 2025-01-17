@@ -38,11 +38,9 @@ public class CouponQueryService {
 		Coupon coupon;
 
 		if ("MASTER".equals(role)) {
-			// "MASTER"일 경우, 쿠폰 ID로 조회
 			coupon = couponRepository.findById(couponId)
 				.orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
 		} else if ("COMPANY".equals(role)) {
-			// "COMPANY"일 경우, 유저ID와 쿠폰ID로 조회
 			coupon = couponRepository.findByCouponIdAndCreatedBy(couponId, userId)
 				.orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN));
 		} else {

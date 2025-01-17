@@ -27,7 +27,6 @@ public class IssueCouponController {
 	private final CouponUsageService couponUsageService;
 	private final CouponQueryService couponQueryService;
 
-	// 쿠폰 발급 API
 	@PostMapping("/{couponId}/issue")
 	public ResponseEntity<SuccessResponseDto<IssuedCouponDto>> issueCoupon(
 		@RequestHeader(value = "X-User-Id") Long userId,
@@ -37,7 +36,6 @@ public class IssueCouponController {
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 발급 완료", issuedCoupon));
 	}
 
-	// 쿠폰 사용 API
 	@PostMapping("/{couponId}/use")
 	public ResponseEntity<SuccessResponseDto<IssuedCouponDto>> useCoupon(
 		@RequestHeader(value = "X-User-Id") Long userId,
@@ -47,7 +45,6 @@ public class IssueCouponController {
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 사용 완료", usedCoupon));
 	}
 
-	// 유저: 발급받은 쿠폰 목록 조회 API
 	@GetMapping
 	public ResponseEntity<SuccessResponseDto<List<IssuedCouponDto>>> getIssuedCoupons(
 		@RequestHeader(value = "X-User-Id") Long userId,

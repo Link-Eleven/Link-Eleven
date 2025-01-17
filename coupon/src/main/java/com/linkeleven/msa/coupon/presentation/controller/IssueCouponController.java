@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.coupon.application.dto.IssuedCouponDto;
 import com.linkeleven.msa.coupon.application.service.CouponIssuingService;
+import com.linkeleven.msa.coupon.application.service.CouponQueryService;
+import com.linkeleven.msa.coupon.application.service.CouponUsageService;
 import com.linkeleven.msa.coupon.libs.dto.SuccessResponseDto;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 public class IssueCouponController {
 
 	private final CouponIssuingService couponIssuingService;
+	private final CouponUsageService couponUsageService;
+	private final CouponQueryService couponQueryService;
 
 	// 쿠폰 발급 API
 	@PostMapping("/{couponId}/issue")
@@ -39,7 +43,7 @@ public class IssueCouponController {
 		@RequestHeader(value = "X-User-Id") Long userId,
 		@RequestHeader(value = "X-Role") String role,
 		@PathVariable Long couponId) {
-		IssuedCouponDto usedCoupon = couponIssuingService.useCoupon(userId, couponId);
+		IssuedCouponDto usedCoupon = couponUsageService.useCoupon(userId, couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 사용 완료", usedCoupon));
 	}
 
@@ -49,7 +53,7 @@ public class IssueCouponController {
 		@RequestHeader(value = "X-User-Id") Long userId,
 		@RequestHeader(value = "X-Role") String role
 	) {
-		List<IssuedCouponDto> issuedCoupons = couponIssuingService.getIssuedCouponsByUserId(userId);
+		List<IssuedCouponDto> issuedCoupons = couponQueryService.getIssuedCouponsByUserId(userId);
 		return ResponseEntity.ok(SuccessResponseDto.success("발급 쿠폰 조회 완료", issuedCoupons));
 	}
 }

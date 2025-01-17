@@ -55,3 +55,16 @@ aws:
 
 server:
   port: 19093
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  endpoint:
+    health:
+      show-details: always

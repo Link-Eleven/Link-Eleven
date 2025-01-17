@@ -53,3 +53,16 @@ place:
     client-id: ${CLIENT_ID}
     client-secret: ${CLIENT_SECRET}
     url: ${PLACE_URL}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  endpoint:
+    health:
+      show-details: always

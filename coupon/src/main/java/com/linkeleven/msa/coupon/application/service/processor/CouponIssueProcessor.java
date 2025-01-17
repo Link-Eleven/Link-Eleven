@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.coupon.application.dto.IssuedCouponDto;
-import com.linkeleven.msa.coupon.application.service.CouponRedisService;
 import com.linkeleven.msa.coupon.application.service.generator.CouponCodeGenerator;
 import com.linkeleven.msa.coupon.application.service.validator.CouponValidator;
 import com.linkeleven.msa.coupon.domain.model.CouponPolicy;
@@ -25,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class CouponIssueProcessor {
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final IssuedCouponRepository issuedCouponRepository;
-	private final CouponRedisService couponRedisService;
 	private final CouponCodeGenerator couponCodeGenerator;
 
 	@DistributedLock(key = "'coupon_issue:' + #couponId")

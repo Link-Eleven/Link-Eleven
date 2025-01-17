@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.linkeleven.msa.coupon.domain.model.CouponPolicy;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +38,11 @@ public class CouponRedisService {
 			}
 		}
 		return Optional.empty();
+	}
+
+	public void savePolicies(Long couponId, List<CouponPolicy> policies) {
+		policies.forEach(policy -> saveCouponsToRedis(couponId, policy.getPolicyId(),
+			policy.getQuantity(), policy.getDiscountRate()));
 	}
 
 	public boolean isUserCouponAlreadyIssued(Long userId, Long couponId) {

@@ -30,7 +30,7 @@ public class CouponScheduledService {
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final FeedServiceClient feedServiceClient;
 	private final AuthServiceClient authServiceClient;
-	private final CouponService couponService;
+	private final CouponCreateService couponCreateService;
 
 	@Scheduled(cron = "0 50 23 * * ?")
 	public void generateCouponsForPopularFeeds() {
@@ -55,7 +55,7 @@ public class CouponScheduledService {
 							// 각 쿠폰 생성 전에 ThreadLocal에 사용자 ID 설정
 							jpaAuditorAware.setCurrentAuditor(feed.getUserId());
 							try {
-								couponService.createCoupon(feed);
+								couponCreateService.createCoupon(feed);
 							} finally {
 								// 처리 완료 후 ThreadLocal 정리
 								jpaAuditorAware.clearCurrentAuditor();

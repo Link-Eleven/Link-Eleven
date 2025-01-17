@@ -68,7 +68,7 @@ public class CouponScheduledService {
 		}
 	}
 
-	@Scheduled(cron = "0 0 0 * * *")  // 매일 자정에 실행
+	@Scheduled(cron = "0 0 0 * * *")
 	@Transactional
 	public void updateExpiredCouponsStatus() {
 		// 유효기한 지난 쿠폰 상태변경

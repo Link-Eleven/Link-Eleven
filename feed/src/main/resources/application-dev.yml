@@ -1,4 +1,13 @@
 spring:
+  application:
+    name: feed-service
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
   datasource:
     url: ${FEED_DB_URL}
     username: ${FEED_DB_USER}
@@ -15,10 +24,34 @@ spring:
         format_sql: true
     open-in-view: false
 
-    eureka:
-      client:
-        service-url:
-          defaultZone: http://localhost:19090/eureka/
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+  cache:
+    type: redis
+    cache-names: popularFeeds
+
+logging:
+  level:
+    org:
+      springframework:
+        cache: DEBUG
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
+
+aws:
+  s3:
+    access-key: ${ACCESS_KEY_ID}
+    secret-key: ${SECRET_ACCESS_KEY}
+    bucket: link-eleven-bucket
+    region: ap-northeast-2
+    stack:
+      auto: false
 
 server:
   port: 19093

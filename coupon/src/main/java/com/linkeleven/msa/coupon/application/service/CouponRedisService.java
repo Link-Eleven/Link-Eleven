@@ -17,7 +17,7 @@ public class CouponRedisService {
 
 	private final RedisTemplate<String, String> redisTemplate;
 
-	public void addCouponsToRedis(Long couponId, Long policyId, int quantity, int discountRate) {
+	public void saveCouponsToRedis(Long couponId, Long policyId, int quantity, int discountRate) {
 		String redisKey = "coupon:" + couponId + ":" + policyId;
 
 		for (int i = 0; i < quantity; i++) {

@@ -97,7 +97,7 @@ public class CouponService {
 
 	private void savePoliciesToRedis(Long couponId, List<CouponPolicy> policies) {
 		policies.forEach(policy ->
-			couponRedisService.addCouponsToRedis(couponId, policy.getPolicyId(), policy.getQuantity(),
+			couponRedisService.saveCouponsToRedis(couponId, policy.getPolicyId(), policy.getQuantity(),
 				policy.getDiscountRate())
 		);
 	}

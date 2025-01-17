@@ -8,9 +8,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CouponRedisService {
 
 	private final RedisTemplate<String, String> redisTemplate;
@@ -31,6 +33,7 @@ public class CouponRedisService {
 			String couponCode = redisTemplate.opsForList().leftPop(redisKey);
 
 			if (couponCode != null) {
+				log.info("couponCode:" + couponCode + "쿠폰 코드 발급 성공");
 				return Optional.of(couponCode);  // 발급 성공
 			}
 		}

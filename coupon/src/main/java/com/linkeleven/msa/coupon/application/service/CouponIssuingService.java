@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.coupon.application.dto.IssuedCouponDto;
@@ -18,9 +19,11 @@ import com.linkeleven.msa.coupon.libs.exception.CustomException;
 import com.linkeleven.msa.coupon.libs.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CouponIssuingService {
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final IssuedCouponRepository issuedCouponRepository;
@@ -50,8 +53,11 @@ public class CouponIssuingService {
 		}
 
 		try {
+			log.info("issueCoupon-try : 쿠폰 발급 시작 - userId: {}, couponId: {}", userId, couponId);
 			return processCouponIssuance(userId, couponId);
 		} catch (Exception e) {
+			log.error("issueCoupon-try : 쿠폰 발급 실패 - userId: {}, couponId: {}, error: {}", userId, couponId,
+				e.getMessage());
 			couponRedisService.deleteUserCouponCheck(userId, couponId);
 			throw e;
 		}
@@ -67,8 +73,8 @@ public class CouponIssuingService {
 	 * @throws CustomException 사용 가능한 정책이 없거나 쿠폰이 소진된 경우
 	 */
 	@DistributedLock(key = "'coupon_issue:' + #couponId")
-	private IssuedCouponDto processCouponIssuance(Long userId, Long couponId) {
-
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public IssuedCouponDto processCouponIssuance(Long userId, Long couponId) {
 		List<CouponPolicy> availablePolicies = couponPolicyRepository.findAvailablePolicies(couponId);
 		// 정책 유효성 검사
 		validateAvailablePolicies(availablePolicies);

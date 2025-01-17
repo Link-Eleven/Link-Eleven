@@ -14,6 +14,7 @@ import com.linkeleven.msa.coupon.domain.model.QCoupon;
 import com.linkeleven.msa.coupon.domain.model.QCouponPolicy;
 import com.linkeleven.msa.coupon.domain.model.QIssuedCoupon;
 import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
+import com.linkeleven.msa.coupon.domain.model.enums.IssuedCouponStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -46,7 +47,11 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 				coupon.validTo,
 				queryFactory.select(issuedCoupon.count())
 					.from(issuedCoupon)
-					.where(issuedCoupon.couponId.eq(coupon.couponId))
+					.where(issuedCoupon.couponId.eq(coupon.couponId)),
+				queryFactory.select(issuedCoupon.count())
+					.from(issuedCoupon)
+					.where(issuedCoupon.couponId.eq(coupon.couponId)
+						.and(issuedCoupon.status.eq(IssuedCouponStatus.USED)))
 			))
 			.from(coupon)
 			.join(coupon.policies, couponPolicy)

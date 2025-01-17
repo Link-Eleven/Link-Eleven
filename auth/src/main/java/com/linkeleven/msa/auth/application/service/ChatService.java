@@ -1,14 +1,18 @@
 package com.linkeleven.msa.auth.application.service;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
+import com.linkeleven.msa.auth.application.dto.ChatQueryResponseDto;
 import com.linkeleven.msa.auth.domain.model.Chat;
 import com.linkeleven.msa.auth.domain.model.ChatRoom;
 import com.linkeleven.msa.auth.domain.model.User;
 import com.linkeleven.msa.auth.domain.repository.ChatRepository;
 import com.linkeleven.msa.auth.domain.repository.ChatRoomRepository;
 import com.linkeleven.msa.auth.domain.repository.UserRepository;
+import com.linkeleven.msa.auth.jwt.JwtProvider;
 import com.linkeleven.msa.auth.libs.exception.CustomException;
 import com.linkeleven.msa.auth.libs.exception.ErrorCode;
 import com.linkeleven.msa.auth.presentation.dto.ChatSendMessageRequestDto;
@@ -26,19 +30,21 @@ public class ChatService {
 	private final SimpMessageSendingOperations messagingTemplate;
 	private final ChatRepository chatRepository;
 	private final ChatRoomRepository chatRoomRepository;
+	private final JwtProvider jwtProvider;
 
 	public void sendMessage(
 		Long chatRoomId,
-		Long userId,
+		String token,
 		ChatSendMessageRequestDto chatSendMessageRequestDto
 	) {
-		User sender = validateUserById(userId);
+		String userId = jwtProvider.validateToken(token);
+
+		User sender = validateUserById(Long.valueOf(userId));
 		User receiver = validateUserById(chatSendMessageRequestDto.getReceiverId());
 
-
 		ChatRoom chatRoom = validateChatRoom(sender.getUserId(), receiver.getUserId(), chatRoomId);
-		log.info("message : "+chatSendMessageRequestDto.getMessage());
-		chatRepository.save(Chat.createChat(chatSendMessageRequestDto.getMessage(),sender,chatRoom));
+		log.info("message : " + chatSendMessageRequestDto.getMessage());
+		chatRepository.save(Chat.createChat(chatSendMessageRequestDto.getMessage(), sender, chatRoom));
 		messagingTemplate.convertAndSend("/sub/chat/" + chatRoomId,
 			ChatSendMessageResponseDto.of(
 				chatRoom.getChatRoomId(),
@@ -48,6 +54,12 @@ public class ChatService {
 				chatSendMessageRequestDto.getMessage()
 			));
 
+	}
+
+	public Slice<ChatQueryResponseDto> getChatByChatRoomId(Long chatRoomId, Long userId, Pageable pageable) {
+		User user = validateUserById(userId);
+		ChatRoom chatRoom = validateChatRoomByUserId(user.getUserId(), chatRoomId);
+		return chatRepository.findChatByChatRoom(chatRoom, pageable);
 	}
 
 	private ChatRoom validateChatRoom(Long senderId, Long receiverId, Long chatRoomId) {
@@ -67,4 +79,14 @@ public class ChatService {
 		}
 		return user;
 	}
+
+	private ChatRoom validateChatRoomByUserId(Long userId, Long chatRoomId) {
+		ChatRoom chatRoom = chatRoomRepository.findChatRoomByChatRoomIdAndUserId(chatRoomId, userId).orElseThrow(
+			() -> new CustomException(ErrorCode.NOT_YOUR_CHAT_ROOM));
+		if (chatRoom.getDeletedBy() != null) {
+			throw new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND);
+		}
+		return chatRoom;
+	}
+
 }

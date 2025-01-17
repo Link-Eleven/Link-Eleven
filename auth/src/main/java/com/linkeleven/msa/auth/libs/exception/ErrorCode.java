@@ -16,6 +16,10 @@ public enum ErrorCode {
 	/*  401 UNAUTHORIZED : 인증 안됨  */
 	UNAUTHORIZED(401, "인증되지 않았습니다."),
 	INVALID_PASSWORD(401, "비밀번호가 틀렸습니다."),
+	INVALID_JWT_SIGNATURE(401, "유효하지 않는 JWT 서명입니다."),
+	EXPIRED_JWT_TOKEN(401, "만료된 JWT 토큰입니다."),
+	UNSUPPORTED_JWT_TOKEN(401, "지원되지 않는 JWT 토큰입니다."),
+	INVALID_JWT_CLAIMS(401, "JWT claims가 유효하지 않습니다."),
 
 	/*  403 FORBIDDEN : 권한 없음  */
 	FORBIDDEN(403, "권한이 없습니다."),

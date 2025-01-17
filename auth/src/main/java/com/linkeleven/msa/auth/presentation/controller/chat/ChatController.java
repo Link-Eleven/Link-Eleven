@@ -21,9 +21,9 @@ public class ChatController {
 	@MessageMapping("/chat/{chatRoomId}")
 	public void sendMessage(
 		@DestinationVariable Long chatRoomId,
-		@Header("X-User-Id") Long userId,
+		@Header("token") String token,
 		@Payload ChatSendMessageRequestDto sendMessageRequestDto
 	) {
-		chatService.sendMessage(chatRoomId, userId, sendMessageRequestDto);
+		chatService.sendMessage(chatRoomId, token, sendMessageRequestDto);
 	}
 }

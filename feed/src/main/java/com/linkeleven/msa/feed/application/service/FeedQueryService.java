@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
-import com.linkeleven.msa.feed.domain.model.Category;
+import com.linkeleven.msa.feed.domain.enums.Category;
 import com.linkeleven.msa.feed.domain.repository.FeedRepository;
 import com.linkeleven.msa.feed.domain.service.RecommendationService;
 import com.linkeleven.msa.feed.presentation.request.FeedSearchRequestDto;

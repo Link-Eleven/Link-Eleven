@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.application.service.FeedQueryService;
-import com.linkeleven.msa.feed.domain.model.Category;
+import com.linkeleven.msa.feed.domain.enums.Category;
 import com.linkeleven.msa.feed.libs.dto.SuccessResponseDto;
 
 import lombok.RequiredArgsConstructor;

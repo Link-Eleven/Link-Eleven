@@ -1,7 +1,7 @@
 package com.linkeleven.msa.feed.presentation.request;
 
 import com.linkeleven.msa.feed.domain.enums.Region;
-import com.linkeleven.msa.feed.domain.model.Category;
+import com.linkeleven.msa.feed.domain.enums.Category;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -26,17 +26,18 @@ public class UserActivityProducer {
 		try {
 			kafkaTemplate.send(TOPIC, String.valueOf(userId), messageDto);
 		} catch (KafkaException e) {
-			resend(userId, messageDto,0);
+			resend(userId, messageDto, 0);
 			log.error("Kafka에 메시지 전송 실패: {}", e.getMessage());
 		}
 	}
+
 	private void resend(Long userId, UserActivityMessageDto messageDto, int retryCount) {
-		try{
+		try {
 			Thread.sleep(1000);
 			kafkaTemplate.send(TOPIC, String.valueOf(userId), messageDto);
-		} catch (KafkaException | InterruptedException e){
-			if (retryCount < 3){
-				resend(userId, messageDto, retryCount+1);
+		} catch (KafkaException | InterruptedException e) {
+			if (retryCount < 3) {
+				resend(userId, messageDto, retryCount + 1);
 			}
 		}
 	}

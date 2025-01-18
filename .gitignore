@@ -41,3 +41,8 @@ out/
 ### Docker compose yml ###
 docker-compose.yml
 /.env
+/.txt
+notification/src/main/resources/*.json
+notification/src/main/resources/static/*
+
+notification/src/main/java/com/linkeleven/msa/notification/infrastructure/messaging/fcm/*

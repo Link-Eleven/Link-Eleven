@@ -49,7 +49,7 @@ public class Notification {
 	private LocalDateTime createdAt;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	private Notification(NotificationType type, Long targetId, Long targetAuthorId, Long userId, String message, LocalDateTime createdAt) {
+	private Notification(NotificationType type, Long targetId, Long targetAuthorId, Long userId, String message) {
 		this.type = type;
 		this.targetId = targetId;
 		this.targetAuthorId = targetAuthorId;

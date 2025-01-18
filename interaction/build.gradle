@@ -76,9 +76,6 @@ dependencies {
 	// prometheus
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
-
-	// loki
-	implementation 'com.github.loki4j:loki-logback-appender:1.5.1'
 }
 
 dependencyManagement {

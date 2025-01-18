@@ -13,8 +13,9 @@ import lombok.RequiredArgsConstructor;
 public class NotificationService {
 
 	private final NotificationRepository notificationRepository;
+	private final AwsNotificationService awsNotificationService;
 
-	public void saveNotificationEvent(
+	public void saveNotificationAndSend(
 		NotificationType type,
 		Long targetId, Long targetAuthorId,
 		Long userId, String username, String contentType)
@@ -28,5 +29,7 @@ public class NotificationService {
 			contentType
 		);
 		notificationRepository.save(notification);
+
+		awsNotificationService.sendAwsNotification(notification.getTargetAuthorId(), notification.getMessage());
 	}
 }

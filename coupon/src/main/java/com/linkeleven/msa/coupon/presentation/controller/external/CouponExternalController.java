@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.linkeleven.msa.coupon.application.service.CouponService;
+import com.linkeleven.msa.coupon.application.service.CouponDeletionService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/external/coupons")
 public class CouponExternalController {
-	private final CouponService couponService;
+	private final CouponDeletionService couponDeletionService;
 
 	// 쿠폰 삭제
 	@DeleteMapping("/{feedId}")
@@ -23,6 +23,6 @@ public class CouponExternalController {
 		@RequestHeader(value = "X-User-Id") Long userId,
 		@RequestHeader(value = "X-Role") String role
 	) {
-		couponService.deleteCoupon(userId, role, feedId);
+		couponDeletionService.deleteCoupon(userId, role, feedId);
 	}
 }

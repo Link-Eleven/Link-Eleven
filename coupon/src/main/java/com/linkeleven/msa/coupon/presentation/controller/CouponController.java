@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.linkeleven.msa.coupon.application.dto.CouponResponseDto;
 import com.linkeleven.msa.coupon.application.dto.CouponSearchResponseDto;
-import com.linkeleven.msa.coupon.application.service.CouponService;
+import com.linkeleven.msa.coupon.application.service.CouponQueryService;
 import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
 import com.linkeleven.msa.coupon.libs.dto.SuccessResponseDto;
 
@@ -22,20 +22,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/coupons")
 public class CouponController {
-	private final CouponService couponService;
+	private final CouponQueryService couponQueryService;
 
-	// 단건 쿠폰 조회 API
 	@GetMapping("/{couponId}")
 	public ResponseEntity<SuccessResponseDto<CouponResponseDto>> getCouponById(
 		@PathVariable Long couponId,
 		@RequestHeader(value = "X-User-Id") Long userId,
 		@RequestHeader(value = "X-Role") String role
 	) {
-		CouponResponseDto coupon = couponService.getCouponById(userId, role, couponId);
+		CouponResponseDto coupon = couponQueryService.getCouponById(userId, role, couponId);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 조회 완료", coupon));
 	}
 
-	// Master & Company: 쿠폰 검색 API
 	@GetMapping("/search")
 	public ResponseEntity<SuccessResponseDto<Page<CouponSearchResponseDto>>> searchCoupons(
 		@RequestHeader(value = "X-User-Id", required = false) Long userId,
@@ -45,7 +43,8 @@ public class CouponController {
 		@RequestParam(required = false) String validFrom,
 		@RequestParam(required = false) String validTo,
 		Pageable pageable) {
-		Page<CouponSearchResponseDto> couponList = couponService.searchCoupons(userId, role, status, feedId, validFrom,
+		Page<CouponSearchResponseDto> couponList = couponQueryService.searchCoupons(userId, role, status, feedId,
+			validFrom,
 			validTo,
 			pageable);
 		return ResponseEntity.ok(SuccessResponseDto.success("쿠폰 조회 완료", couponList));

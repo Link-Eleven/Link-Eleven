@@ -3,6 +3,8 @@ package com.linkeleven.msa.coupon.domain.model;
 import java.time.LocalDateTime;
 
 import com.linkeleven.msa.coupon.domain.model.enums.IssuedCouponStatus;
+import com.linkeleven.msa.coupon.libs.exception.CustomException;
+import com.linkeleven.msa.coupon.libs.exception.ErrorCode;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.Column;
@@ -50,8 +52,15 @@ public class IssuedCoupon extends BaseTime {
 			.build();
 	}
 
-	public void updateStatus(IssuedCouponStatus newStatus) {
-		this.status = newStatus;
+	public void markAsUsed() {
+		validateCanBeUsed();
+		this.status = IssuedCouponStatus.USED;
+	}
+
+	private void validateCanBeUsed() {
+		if (status != IssuedCouponStatus.ISSUED) {
+			throw new CustomException(ErrorCode.EXPIRED_COUPON);
+		}
 	}
 
 	public void softDelete(Long userId) {

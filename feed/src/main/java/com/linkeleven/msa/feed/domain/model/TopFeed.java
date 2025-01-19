@@ -2,8 +2,6 @@ package com.linkeleven.msa.feed.domain.model;
 
 import java.time.LocalDateTime;
 
-import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
-
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -35,41 +34,38 @@ public class TopFeed {
 	@Column(name = "title", nullable = false)
 	private String title;
 
-	@Column(name = "popularity_score", nullable = false)
-	private double popularityScore;
-
+	@Setter
 	@Column(name = "comment_count", nullable = false)
 	private long commentCount;
 
+	@Setter
 	@Column(name = "like_count", nullable = false)
 	private long likeCount;
+
+	@Column(name = "views", nullable = false)
+	private int views;
+
+	@Column(name = "popularity_score", nullable = false)
+	private double popularityScore;
 
 	@Column(name = "backup_date", nullable = false)
 	private LocalDateTime backupDate;
 
-	public static TopFeed of(FeedTopResponseDto dto) {
-		if (dto == null) {
-			throw new IllegalArgumentException("FeedTopResponseDto cannot be null");
-		}
+	public static TopFeed of(Long feedId, Long userId, String title, long commentCount,
+		long likeCount, int views, double popularityScore) {
 		return TopFeed.builder()
-			.feedId(dto.getFeedId())
-			.userId(dto.getUserId())
-			.title(dto.getTitle())
-			.popularityScore(dto.getPopularityScore())
-			.commentCount(dto.getCommentCount())
-			.likeCount(dto.getLikeCount())
+			.feedId(feedId)
+			.userId(userId)
+			.title(title)
+			.commentCount(commentCount)
+			.likeCount(likeCount)
+			.views(views)
+			.popularityScore(popularityScore)
 			.backupDate(LocalDateTime.now())
 			.build();
 	}
 
-	public FeedTopResponseDto toDto() {
-		return FeedTopResponseDto.builder()
-			.feedId(this.feedId)
-			.userId(this.userId)
-			.title(this.title)
-			.commentCount(this.commentCount)
-			.likeCount(this.likeCount)
-			.popularityScore(this.popularityScore)
-			.build();
+	public void setViewCount(int viewCount) {
+		this.views = viewCount;
 	}
 }

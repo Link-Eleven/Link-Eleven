@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +45,7 @@ public class FeedService {
 	private final InteractionClient interactionClient;
 	private final AuthClient authClient;
 	private final CouponClient couponClient;
-	private final RedisTemplate<String, List<FeedTopResponseDto>> redisTemplate;
+	private final RedisTemplate<String, FeedTopResponseDto> redisTemplate;
 	private final RedisTemplate<String, Object> opsHashRedisTemplate;
 	private final UserActivityProducer userActivityProducer;
 
@@ -122,10 +124,64 @@ public class FeedService {
 	}
 
 	@Transactional
-	public void updateTopFeed() {
-		opsHashRedisTemplate.delete("commentCounts");
-		opsHashRedisTemplate.delete("likeCounts");
+	public void updateFeedMetrics() {
+		LocalDateTime lastUpdate = LocalDateTime.now()
+			.truncatedTo(ChronoUnit.DAYS)
+			.minusDays(1)
+			.withHour(23)
+			.withMinute(15);
 
+		List<TopFeed> newFeedList = topFeedRepository.findFeedsAfterDate(lastUpdate);
+		List<Long> feedIdList = newFeedList.stream()
+			.map(TopFeed::getFeedId)
+			.toList();
+
+		Map<Long, Integer> commentCounts = interactionClient.getCommentCount(feedIdList).getCount();
+		Map<Long, Integer> likeCounts = interactionClient.getLikeCount(feedIdList).getCount();
+
+		HashOperations<String, String, Integer> hashOperations = redisTemplate.opsForHash();
+		ListOperations<String, FeedTopResponseDto> listOperations = redisTemplate.opsForList();
+
+		feedIdList.forEach(feedId -> {
+			int commentCount = commentCounts.getOrDefault(feedId, 0);
+			int likeCount = likeCounts.getOrDefault(feedId, 0);
+			int viewCount = feedRepository.findById(feedId)
+				.map(Feed::getViews)
+				.orElse(0);
+
+			TopFeed topFeed = newFeedList.stream()
+				.filter(tf -> tf.getFeedId().equals(feedId))
+				.max(Comparator.comparing(TopFeed::getBackupDate))
+				.orElse(null);
+
+			if (topFeed != null) {
+				topFeed.setCommentCount(commentCount);
+				topFeed.setLikeCount(likeCount);
+				topFeed.setViewCount(viewCount);
+				topFeedRepository.save(topFeed);
+			}
+
+			hashOperations.put("commentCounts", feedId.toString(), commentCount);
+			hashOperations.put("likeCounts", feedId.toString(), likeCount);
+			hashOperations.put("viewCounts", feedId.toString(), viewCount);
+
+			FeedTopResponseDto updatedFeed = FeedTopResponseDto.builder()
+				.feedId(feedId)
+				.userId(topFeed != null ? topFeed.getUserId() : null)
+				.title(topFeed != null ? topFeed.getTitle() : "")
+				.commentCount(commentCount)
+				.likeCount(likeCount)
+				.views(viewCount)
+				.popularityScore(topFeed != null ? topFeed.getPopularityScore() : 0.0)
+				.build();
+
+			listOperations.set("popularFeeds", feedIdList.indexOf(feedId), updatedFeed);
+
+		});
+	}
+
+	@Transactional
+	public void updateTopFeed() {
 		LocalDateTime adjustedCurrentDate = LocalDateTime.now().withHour(23).withMinute(30).withSecond(0).withNano(0);
 		LocalDateTime cutoffDate = adjustedCurrentDate.minusDays(7);
 
@@ -139,7 +195,8 @@ public class FeedService {
 			int weight = (daysSincePosted <= 7) ? (8 - (int)daysSincePosted) : 1;
 			int commentCount = commentCounts.getOrDefault(feed.getFeedId(), 0);
 			int likeCount = likeCounts.getOrDefault(feed.getFeedId(), 0);
-			double popularityScore = calculatePopularityScore(feed.getViews(), commentCount, likeCount, weight);
+			int viewCount = feed.getViews();
+			double popularityScore = calculatePopularityScore(viewCount, commentCount, likeCount, weight);
 			feed.updatePopularityScore(popularityScore);
 		});
 
@@ -148,18 +205,29 @@ public class FeedService {
 			.limit(100)
 			.map(feed -> FeedTopResponseDto.of(feed,
 				commentCounts.getOrDefault(feed.getFeedId(), 0),
-				likeCounts.getOrDefault(feed.getFeedId(), 0)))
+				likeCounts.getOrDefault(feed.getFeedId(), 0),
+				feed.getViews()))
 			.toList();
 
 		backupTopFeed(topFeedList);
 
-		redisTemplate.opsForValue().set("popularFeeds", topFeedList);
+		ListOperations<String, FeedTopResponseDto> listOperations = redisTemplate.opsForList();
+		listOperations.rightPushAll("popularFeeds", topFeedList);
+
 	}
 
 	@Transactional
 	public void backupTopFeed(List<FeedTopResponseDto> topFeedList) {
 		List<TopFeed> backupList = topFeedList.stream()
-			.map(TopFeed::of)
+			.map(dto -> TopFeed.of(
+				dto.getFeedId(),
+				dto.getUserId(),
+				dto.getTitle(),
+				dto.getCommentCount(),
+				dto.getLikeCount(),
+				dto.getViews(),
+				dto.getPopularityScore()
+			))
 			.toList();
 
 		topFeedRepository.saveAll(backupList);
@@ -181,11 +249,18 @@ public class FeedService {
 	}
 
 	private List<FeedTopResponseDto> topFeedListFromCacheOrDb() {
-		List<FeedTopResponseDto> top100FeedList = redisTemplate.opsForValue().get("popularFeeds");
+		ListOperations<String, FeedTopResponseDto> listOperations = redisTemplate.opsForList();
+		List<FeedTopResponseDto> top100FeedList = listOperations.range("popularFeeds", 0, -1);
+
 		if (top100FeedList == null || top100FeedList.isEmpty()) {
-			top100FeedList = topFeedRepository.findAll().stream().map(TopFeed::toDto).toList();
-			redisTemplate.opsForValue().set("popularFeeds", top100FeedList);
+			top100FeedList = topFeedRepository.findAll().stream()
+				.map(FeedTopResponseDto::toDto)
+				.sorted(Comparator.comparingDouble(FeedTopResponseDto::getPopularityScore).reversed())
+				.toList();
+			listOperations.rightPushAll("popularFeeds", top100FeedList);
+
 		}
+
 		return top100FeedList;
 	}
 

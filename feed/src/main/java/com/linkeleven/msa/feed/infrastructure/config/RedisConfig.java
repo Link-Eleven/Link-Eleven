@@ -1,7 +1,5 @@
 package com.linkeleven.msa.feed.infrastructure.config;
 
-import java.util.List;
-
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,24 +18,21 @@ import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 public class RedisConfig {
 
 	@Bean
-	public RedisTemplate<String, List<FeedTopResponseDto>> redisTemplate(
+	public RedisTemplate<String, FeedTopResponseDto> redisTemplate(
 		RedisConnectionFactory redisConnectionFactory) {
-		RedisTemplate<String, List<FeedTopResponseDto>> template = new RedisTemplate<>();
+		RedisTemplate<String, FeedTopResponseDto> template = new RedisTemplate<>();
 		template.setConnectionFactory(redisConnectionFactory);
 		template.setKeySerializer(new StringRedisSerializer());
 
-		// ObjectMapper 설정
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.registerModule(new JavaTimeModule());
-		objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
-			ObjectMapper.DefaultTyping.NON_FINAL);
 
-		// Jackson2JsonRedisSerializer 설정
-		Jackson2JsonRedisSerializer<List<FeedTopResponseDto>> serializer = new Jackson2JsonRedisSerializer<>(
-			objectMapper.getTypeFactory().constructCollectionType(List.class, FeedTopResponseDto.class)
-		);
+		Jackson2JsonRedisSerializer<FeedTopResponseDto> serializer = new Jackson2JsonRedisSerializer<>(
+			FeedTopResponseDto.class);
 
 		template.setValueSerializer(serializer);
+		template.setHashValueSerializer(serializer);
+
 		return template;
 	}
 
@@ -48,6 +43,15 @@ public class RedisConfig {
 		template.setKeySerializer(new StringRedisSerializer());
 		template.setHashKeySerializer(new StringRedisSerializer());
 		template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+
+		Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+
+		template.setHashValueSerializer(serializer);
+		template.setValueSerializer(serializer);
+
 		return template;
 	}
 }

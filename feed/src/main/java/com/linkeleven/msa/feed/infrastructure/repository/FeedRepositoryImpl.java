@@ -10,8 +10,8 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
-import com.linkeleven.msa.feed.domain.enums.Region;
 import com.linkeleven.msa.feed.domain.enums.Category;
+import com.linkeleven.msa.feed.domain.enums.Region;
 import com.linkeleven.msa.feed.domain.repository.FeedRepositoryCustom;
 import com.linkeleven.msa.feed.presentation.request.FeedSearchRequestDto;
 import com.querydsl.core.BooleanBuilder;

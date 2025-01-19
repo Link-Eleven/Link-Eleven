@@ -6,8 +6,7 @@ import org.springframework.data.domain.Pageable;
 import com.linkeleven.msa.coupon.application.dto.CouponSearchResponseDto;
 import com.linkeleven.msa.coupon.domain.model.enums.CouponPolicyStatus;
 
-public interface CouponRepositoryCustom {
-	Page<CouponSearchResponseDto> findCouponsByFilter(Long userId, CouponPolicyStatus status, Long feedId,
-		String validFrom,
-		String validTo, Pageable pageable);
+public interface CouponQueryRepository {
+	Page<CouponSearchResponseDto> findCouponsByFilter(
+		Long userId, CouponPolicyStatus status, Long feedId, String validFrom, String validTo, Pageable pageable);
 }

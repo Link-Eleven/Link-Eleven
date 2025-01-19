@@ -30,6 +30,7 @@ public enum ErrorCode {
 	COUPON_SOLD_OUT(410, "쿠폰이 모두 소진되었습니다"),
 
 	/*  500 INTERNAL_SERVER_ERROR : 서버 에러  */
+	COUPON_ISSUE_FAILED(500, "쿠폰 발급 중 오류가 발생했습니다."),
 	INTERNAL_SERVER_ERROR(500, "내부 서버 에러입니다."),
 	REDIS_OPERATION_ERROR(500, "Redis 작업 중 오류가 발생했습니다"),
 

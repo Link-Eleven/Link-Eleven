@@ -83,7 +83,7 @@
       "bars": true,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_LOKI}",
+      "datasource": "loki",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -124,7 +124,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(count_over_time({job=\"$app\"} |= \"$search\" [$__interval]))",
+          "expr": "sum(count_over_time({job=\".+\"} |= \"$search\" [$__interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -173,7 +173,7 @@
       }
     },
     {
-      "datasource": "${DS_LOKI}",
+      "datasource": "loki",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -196,7 +196,7 @@
       },
       "targets": [
         {
-          "expr": "{job=\"$app\"} |= \"$search\" | logfmt",
+          "expr": "{job=\".+\"} |= \"$search\" | logfmt",
           "hide": false,
           "legendFormat": "",
           "refId": "A"
@@ -218,8 +218,9 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "${DS_LOKI}",
+        "datasource": "loki",
         "definition": "label_values(job)",
+        "regex": ".+",
         "hide": 0,
         "includeAll": false,
         "label": "App",
@@ -228,7 +229,6 @@
         "options": [],
         "query": "label_values(job)",
         "refresh": 1,
-        "regex": "",
         "skipUrlSync": false,
         "sort": 0,
         "tagValuesQuery": "",
@@ -239,7 +239,7 @@
       },
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "",
           "value": ""
         },
@@ -249,8 +249,8 @@
         "options": [
           {
             "selected": true,
-            "text": "",
-            "value": ""
+            "text": "default",
+            "value": "default"
           }
         ],
         "query": "",

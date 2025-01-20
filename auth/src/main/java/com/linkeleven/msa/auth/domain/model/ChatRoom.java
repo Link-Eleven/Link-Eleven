@@ -29,7 +29,7 @@ public class ChatRoom extends BaseTime {
 	private String chatRoomName;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "sernder_user",nullable = false)
+	@JoinColumn(name = "sender_user",nullable = false)
 	private User sender;
 
 	@ManyToOne(fetch = FetchType.LAZY)

@@ -1,0 +1,47 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'interaction-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:19094']
+#        host.docker.internal 이부분만 dns로 변경
+
+  - job_name: 'notification-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'host.docker.internal:19098' ]
+
+  - job_name: 'area-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'host.docker.internal:19095' ]
+
+  - job_name: 'auth-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'host.docker.internal:19092' ]
+
+  - job_name: 'coupon-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'host.docker.internal:19097' ]
+
+  - job_name: 'feed-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'host.docker.internal:19093' ]
+
+  - job_name: 'recommendation-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [ 'host.docker.internal:19096' ]
+
+  - job_name: 'loki'
+    static_configs:
+      - targets: [ 'loki:3100' ]
+
+  - job_name: 'promtail'
+    static_configs:
+      - targets: [ 'promtail:9080' ]

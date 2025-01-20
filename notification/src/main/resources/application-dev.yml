@@ -66,3 +66,16 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  endpoint:
+    health:
+      show-details: always

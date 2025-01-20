@@ -10,6 +10,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import com.linkeleven.msa.auth.application.dto.UserQueryResponseDto;
+import com.linkeleven.msa.auth.domain.common.UserRole;
 import com.linkeleven.msa.auth.domain.model.User;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -64,7 +65,9 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 			.from(user)
 			.where(
 				user.deletedBy.isNull(),
-				user.userId.in(userIdList)
+				user.userId.in(userIdList),
+				user.role.eq(UserRole.COMPANY),
+				user.isCouponIssued.eq(true)
 			)
 			.fetch();
 	}

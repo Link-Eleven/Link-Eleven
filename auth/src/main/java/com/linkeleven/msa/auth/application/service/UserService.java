@@ -49,9 +49,6 @@ public class UserService {
 		List<UserIdAndRoleResponseDto> responseDtoList =new ArrayList<>();
 
 		List<User> userList = userRepository.findAllUserInId(userIdList);
-		// userIdList ->인기 게시글 1, 2, 3 등 작성자
-		// -> where in을 사용 매치 안되면 안나올텐데
-		// 그러면 중간에 탈퇴한 사람 있으면 우짬? -> 빼고 보내주자
 		Map<Long, User> userMap = userList.stream()
 			.collect(Collectors.toMap(User::getUserId, Function.identity()));
 

@@ -17,10 +17,13 @@ public class CacheScheduler {
 
 	@Scheduled(cron = "0 30 23 * * ?")
 	public void updateCache() {
-
 		cacheManager.getCache("popularFeeds").clear();
-
 		feedService.updateTopFeed();
+	}
 
+	@Scheduled(cron = "0 0 1,4,7,10,13,16,19,22 * * *")
+	@Scheduled(cron = "0 30 2,5,8,11,14,17,20 * * *")
+	public void updatePartialCache() {
+		feedService.updateFeedMetrics();
 	}
 }

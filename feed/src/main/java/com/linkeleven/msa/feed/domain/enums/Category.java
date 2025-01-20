@@ -1,4 +1,4 @@
-package com.linkeleven.msa.feed.domain.model;
+package com.linkeleven.msa.feed.domain.enums;
 
 public enum Category {
 	HOTEL,

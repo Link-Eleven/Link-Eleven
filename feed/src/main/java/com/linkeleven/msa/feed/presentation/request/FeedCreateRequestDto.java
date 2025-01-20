@@ -1,7 +1,7 @@
 package com.linkeleven.msa.feed.presentation.request;
 
+import com.linkeleven.msa.feed.domain.enums.Category;
 import com.linkeleven.msa.feed.domain.enums.Region;
-import com.linkeleven.msa.feed.domain.model.Category;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +18,6 @@ public class FeedCreateRequestDto {
 	private String title;
 	private String content;
 	private Category category;
-	// private Region region;
 	private String region;
 
 	public Region getRegionEnum() {

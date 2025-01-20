@@ -1,7 +1,7 @@
 package com.linkeleven.msa.feed.application.dto;
 
+import com.linkeleven.msa.feed.domain.enums.Category;
 import com.linkeleven.msa.feed.domain.enums.Region;
-import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.model.Feed;
 
 import lombok.AllArgsConstructor;

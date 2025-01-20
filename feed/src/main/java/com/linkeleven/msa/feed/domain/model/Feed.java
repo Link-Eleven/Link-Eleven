@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.linkeleven.msa.feed.domain.enums.Category;
 import com.linkeleven.msa.feed.domain.enums.Region;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
@@ -96,8 +97,4 @@ public class Feed extends BaseTime {
 		this.files.forEach(file -> file.delete(userId));
 	}
 
-	public void setCreatedByAndUpdatedBy (Long userId) {
-		this.setCreatedBy(userId);
-		this.setUpdatedBy(userId);
-	}
 }

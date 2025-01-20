@@ -10,14 +10,13 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
+import com.linkeleven.msa.feed.domain.enums.Category;
 import com.linkeleven.msa.feed.domain.enums.Region;
-import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.domain.repository.FeedRepositoryCustom;
 import com.linkeleven.msa.feed.presentation.request.FeedSearchRequestDto;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -29,8 +28,36 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public Slice<FeedSearchResponseDto> searchFeeds(FeedSearchRequestDto searchRequestDto, Pageable pageable) {
+	public Slice<FeedSearchResponseDto> searchFeeds(List<String> keywordList, FeedSearchRequestDto searchRequestDto,
+		Pageable pageable) {
 
+		BooleanBuilder builder = SearchConditionBuilder(keywordList, searchRequestDto);
+
+		List<FeedSearchResponseDto> feedList = queryFactory.query()
+			.select(
+				Projections.constructor(FeedSearchResponseDto.class,
+					feed.feedId,
+					feed.title,
+					feed.content,
+					feed.category,
+					feed.region
+				)
+			)
+			.from(feed)
+			.where(builder)
+			.orderBy(feed.feedId.desc())
+			.limit(pageable.getPageSize() + 1)
+			.fetch();
+
+		boolean hasNext = feedList.size() > pageable.getPageSize();
+		if (hasNext) {
+			feedList.remove(feedList.size() - 1);
+		}
+
+		return new SliceImpl<>(feedList, pageable, hasNext);
+	}
+
+	private BooleanBuilder SearchConditionBuilder(List<String> keywordList, FeedSearchRequestDto searchRequestDto) {
 		BooleanBuilder builder = new BooleanBuilder();
 		builder.and(feed.deletedAt.isNull());
 
@@ -49,29 +76,18 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 		if (searchRequestDto.getCategory() != null) {
 			builder.and(categoryEq(searchRequestDto.getCategory()));
 		}
-		List<FeedSearchResponseDto> feedList = queryFactory.query()
-			.select(
-			Projections.constructor(FeedSearchResponseDto.class,
-				feed.feedId,
-				feed.title,
-				feed.content,
-				feed.category,
-				feed.region
-			)
-		)
-		.from(feed)
-		.where(builder)
-		.orderBy(feed.createdAt.desc())
-		.limit(pageable.getPageSize() + 1)
-			.fetch();
 
-
-		boolean hasNext = feedList.size() > pageable.getPageSize();
-		if (hasNext) {
-			feedList.remove(feedList.size() - 1);
+		if (searchRequestDto.getCursorFeedId() != null) {
+			builder.and(feedIdLessThan(searchRequestDto.getCursorFeedId()));
 		}
 
-		return new SliceImpl<>(feedList, pageable, hasNext);
+		if (keywordList != null && !keywordList.isEmpty()) {
+			for (String keyword : keywordList) {
+				builder.or(feed.title.like("%" + keyword + "%"));
+			}
+		}
+
+		return builder;
 	}
 
 	private BooleanExpression titleContains(String title) {
@@ -88,6 +104,10 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 
 	private BooleanExpression categoryEq(Category category) {
 		return category != null ? feed.category.eq(category) : null;
+	}
+
+	private BooleanExpression feedIdLessThan(Long cursorFeedId) {
+		return cursorFeedId != null ? feed.feedId.lt(cursorFeedId) : null;
 	}
 
 }

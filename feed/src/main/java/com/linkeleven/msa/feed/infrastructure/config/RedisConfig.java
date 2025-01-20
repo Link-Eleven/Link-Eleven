@@ -1,7 +1,5 @@
 package com.linkeleven.msa.feed.infrastructure.config;
 
-import java.util.List;
-
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,30 +17,22 @@ import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 @EnableCaching
 public class RedisConfig {
 
-	/**
-	 * RedisTemplate을 설정합니다.
-	 * RedisConnectionFactory를 통해 Redis 연결을 설정하고,
-	 * 키와 값의 직렬화 방법을 지정합니다.
-	 * 키는 문자열로, 값은 FeedTopResponseDto의 리스트로 직렬화됩니다. */
 	@Bean
-	public RedisTemplate<String, List<?>> redisTemplate(
+	public RedisTemplate<String, FeedTopResponseDto> redisTemplate(
 		RedisConnectionFactory redisConnectionFactory) {
-		RedisTemplate<String, List<?>> template = new RedisTemplate<>();
+		RedisTemplate<String, FeedTopResponseDto> template = new RedisTemplate<>();
 		template.setConnectionFactory(redisConnectionFactory);
 		template.setKeySerializer(new StringRedisSerializer());
 
-		// ObjectMapper 설정
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.registerModule(new JavaTimeModule());
-		objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
-			ObjectMapper.DefaultTyping.NON_FINAL);
 
-		// Jackson2JsonRedisSerializer 설정
-		Jackson2JsonRedisSerializer<List<FeedTopResponseDto>> serializer = new Jackson2JsonRedisSerializer<>(
-			objectMapper.getTypeFactory().constructCollectionType(List.class, FeedTopResponseDto.class)
-		);
+		Jackson2JsonRedisSerializer<FeedTopResponseDto> serializer = new Jackson2JsonRedisSerializer<>(
+			FeedTopResponseDto.class);
 
 		template.setValueSerializer(serializer);
+		template.setHashValueSerializer(serializer);
+
 		return template;
 	}
 
@@ -53,6 +43,15 @@ public class RedisConfig {
 		template.setKeySerializer(new StringRedisSerializer());
 		template.setHashKeySerializer(new StringRedisSerializer());
 		template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+
+		Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+
+		template.setHashValueSerializer(serializer);
+		template.setValueSerializer(serializer);
+
 		return template;
 	}
 }

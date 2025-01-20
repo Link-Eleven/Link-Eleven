@@ -3,9 +3,6 @@ package com.linkeleven.msa.feed.presentation.controller;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.linkeleven.msa.feed.application.dto.FeedCreateResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedReadResponseDto;
-import com.linkeleven.msa.feed.application.dto.FeedSearchResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedTopResponseDto;
 import com.linkeleven.msa.feed.application.dto.FeedUpdateResponseDto;
 import com.linkeleven.msa.feed.application.service.FeedService;
-import com.linkeleven.msa.feed.domain.model.Category;
 import com.linkeleven.msa.feed.libs.dto.SuccessResponseDto;
 import com.linkeleven.msa.feed.presentation.request.FeedCreateRequestDto;
 import com.linkeleven.msa.feed.presentation.request.FeedUpdateRequestDto;
@@ -43,7 +38,7 @@ public class FeedController {
 	public ResponseEntity<SuccessResponseDto<FeedCreateResponseDto>> createFeed(
 		@RequestHeader("X-User-Id") Long userId,
 		@RequestPart FeedCreateRequestDto feedCreateRequestDto,
-		@RequestParam(value = "file", required = false) List<MultipartFile> files) throws IOException {
+		@RequestParam(value = "file", required = false) List<MultipartFile> files) {
 
 		FeedCreateResponseDto response = feedService.createFeed(feedCreateRequestDto, files, userId);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 생성 성공", response));
@@ -55,7 +50,7 @@ public class FeedController {
 		@RequestHeader("X-User-Id") Long userId,
 		@RequestHeader("X-Role") String userRole,
 		@RequestPart FeedUpdateRequestDto feedUpdateRequestDto,
-		@RequestParam(value = "file", required = false) List<MultipartFile> files) throws IOException {
+		@RequestParam(value = "file", required = false) List<MultipartFile> files) {
 
 		FeedUpdateResponseDto response = feedService.updateFeed(feedId, feedUpdateRequestDto, files, userId, userRole);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
@@ -79,16 +74,6 @@ public class FeedController {
 	public ResponseEntity<SuccessResponseDto<List<FeedTopResponseDto>>> getTopFeed() {
 		List<FeedTopResponseDto> response = feedService.getAllTopFeed();
 		return ResponseEntity.ok(SuccessResponseDto.success("인기 게시글 조회 완료", response));
-	}
-
-	@GetMapping
-	public Slice<FeedSearchResponseDto> searchFeeds(
-		@RequestParam(required = false) String title,
-		@RequestParam(required = false) String content,
-		@RequestParam(required = false) String region,
-		@RequestParam(required = false) Category category,
-		@PageableDefault(size = 10) Pageable pageable) {
-		return feedService.searchFeeds(title, content, region, category, pageable);
 	}
 
 }

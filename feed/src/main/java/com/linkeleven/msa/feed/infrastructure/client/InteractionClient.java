@@ -18,5 +18,4 @@ public interface InteractionClient {
 	@GetMapping("/external/feeds/likes")
 	LikeCountResponseDto getLikeCount(@RequestParam("feedIdList") List<Long> feedIdList);
 
-
 }

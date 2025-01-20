@@ -43,7 +43,7 @@ public class ChatService {
 		User receiver = validateUserById(chatSendMessageRequestDto.getReceiverId());
 
 		ChatRoom chatRoom = validateChatRoom(sender.getUserId(), receiver.getUserId(), chatRoomId);
-		log.info("message : " + chatSendMessageRequestDto.getMessage());
+
 		chatRepository.save(Chat.createChat(chatSendMessageRequestDto.getMessage(), sender, chatRoom));
 		messagingTemplate.convertAndSend("/sub/chat/" + chatRoomId,
 			ChatSendMessageResponseDto.of(

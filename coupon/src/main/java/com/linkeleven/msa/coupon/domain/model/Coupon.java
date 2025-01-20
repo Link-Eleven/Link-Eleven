@@ -40,12 +40,14 @@ public class Coupon extends BaseTime {
 	@OneToMany(mappedBy = "couponId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<CouponPolicy> policies;  // 쿠폰 정책 목록
 
-	public static Coupon of(Long feedId,
-		LocalDateTime validFrom, LocalDateTime validTo) {
+	public static Coupon of(Long feedId) {
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime startDate = now.toLocalDate().atStartOfDay().plusDays(1);
+		LocalDateTime expiryDate = startDate.plusDays(30).minusSeconds(1);
 		return Coupon.builder()
 			.feedId(feedId)
-			.validFrom(validFrom)
-			.validTo(validTo)
+			.validFrom(startDate)
+			.validTo(expiryDate)
 			.build();
 	}
 

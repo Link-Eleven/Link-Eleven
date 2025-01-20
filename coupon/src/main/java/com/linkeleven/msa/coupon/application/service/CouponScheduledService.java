@@ -30,20 +30,17 @@ public class CouponScheduledService {
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final FeedServiceClient feedServiceClient;
 	private final AuthServiceClient authServiceClient;
-	private final CouponService couponService;
+	private final CouponCreateService couponCreateService;
 
 	@Scheduled(cron = "0 50 23 * * ?")
 	public void generateCouponsForPopularFeeds() {
 		try {
-			// 인기 게시글 목록 - Feign Client 호출
 			List<PopularFeedResponseDto> popularFeeds = feedServiceClient.getPopularFeeds();
 
-			// UserId 추출 -> 리스트
 			List<Long> userIds = popularFeeds.stream()
 				.map(PopularFeedResponseDto::getUserId)
 				.toList();
 
-			// 유저 권한 불러오기
 			List<UserRoleResponseDto> userRoles = authServiceClient.getUserRoles(userIds);
 
 			userRoles.forEach(userRole -> {
@@ -55,7 +52,7 @@ public class CouponScheduledService {
 							// 각 쿠폰 생성 전에 ThreadLocal에 사용자 ID 설정
 							jpaAuditorAware.setCurrentAuditor(feed.getUserId());
 							try {
-								couponService.createCoupon(feed);
+								couponCreateService.createCoupon(feed);
 							} finally {
 								// 처리 완료 후 ThreadLocal 정리
 								jpaAuditorAware.clearCurrentAuditor();
@@ -68,7 +65,7 @@ public class CouponScheduledService {
 		}
 	}
 
-	@Scheduled(cron = "0 0 0 * * *")  // 매일 자정에 실행
+	@Scheduled(cron = "0 0 0 * * *")
 	@Transactional
 	public void updateExpiredCouponsStatus() {
 		// 유효기한 지난 쿠폰 상태변경

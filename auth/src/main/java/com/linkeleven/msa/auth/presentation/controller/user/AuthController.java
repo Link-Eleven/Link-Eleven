@@ -1,4 +1,4 @@
-package com.linkeleven.msa.auth.presentation.controller;
+package com.linkeleven.msa.auth.presentation.controller.user;
 
 import lombok.RequiredArgsConstructor;
 

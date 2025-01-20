@@ -1,4 +1,4 @@
-package com.linkeleven.msa.auth.presentation.controller;
+package com.linkeleven.msa.auth.presentation.controller.follow;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

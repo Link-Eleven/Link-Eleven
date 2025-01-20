@@ -22,7 +22,7 @@ public class UserActivityProducer {
 			.userId(userId)
 			.title(title)
 			.build();
-		log.info("Sending message: {}", messageDto);
+
 		try {
 			kafkaTemplate.send(TOPIC, String.valueOf(userId), messageDto);
 		} catch (KafkaException e) {

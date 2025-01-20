@@ -8,8 +8,8 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class SuccessResponseDto<T> {
-	private final String message; // 응답 메시지
-	private final T data; // 선택적으로 포함할 데이터
+	private final String message;
+	private final T data;
 
 	/**
 	 * 성공 응답 생성 - 데이터 없이 메시지만 반환

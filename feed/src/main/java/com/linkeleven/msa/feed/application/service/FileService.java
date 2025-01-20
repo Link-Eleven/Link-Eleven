@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class FileService {
 
 	private final AmazonS3 amazonS3;
-	private final FileRepository fileRepository;
 
 	@Value("${aws.s3.bucket}")
 	private String bucketName;

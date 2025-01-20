@@ -38,7 +38,7 @@ public class FeedController {
 	public ResponseEntity<SuccessResponseDto<FeedCreateResponseDto>> createFeed(
 		@RequestHeader("X-User-Id") Long userId,
 		@RequestPart FeedCreateRequestDto feedCreateRequestDto,
-		@RequestParam(value = "file", required = false) List<MultipartFile> files) throws IOException {
+		@RequestParam(value = "file", required = false) List<MultipartFile> files) {
 
 		FeedCreateResponseDto response = feedService.createFeed(feedCreateRequestDto, files, userId);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 생성 성공", response));
@@ -50,7 +50,7 @@ public class FeedController {
 		@RequestHeader("X-User-Id") Long userId,
 		@RequestHeader("X-Role") String userRole,
 		@RequestPart FeedUpdateRequestDto feedUpdateRequestDto,
-		@RequestParam(value = "file", required = false) List<MultipartFile> files) throws IOException {
+		@RequestParam(value = "file", required = false) List<MultipartFile> files) {
 
 		FeedUpdateResponseDto response = feedService.updateFeed(feedId, feedUpdateRequestDto, files, userId, userRole);
 		return ResponseEntity.ok(SuccessResponseDto.success("게시글 수정 완료", response));
